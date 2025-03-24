@@ -1,0 +1,42 @@
+.centered-title {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Full screen height */
+    padding: 20px;
+    background-color: #f4f4f4;
+  }
+  
+  .container strong {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .container ion-item {
+    width: 100%;
+    max-width: 350px;
+    margin-bottom: 15px;
+    --border-radius: 8px;
+  }
+  
+  .container ion-input {
+    --padding-start: 10px;
+  }
+  
+  .container ion-button {
+    width: 100%;
+    max-width: 350px;
+    margin-top: 10px;
+    --border-radius: 8px;
+  }
+  

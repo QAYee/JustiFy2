@@ -1,0 +1,79 @@
+/* Fullscreen center */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+    padding: 20px;
+    background-color: #f4f4f4; /* Light gray background */
+  }
+  
+  /* Card-like form container */
+  .form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Ensures content is centered */
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Fix IonContent default padding */
+  ion-content {
+    --padding-top: 0;
+    --padding-bottom: 0;
+  }
+  
+  /* Form input styling */
+  .form-container ion-item {
+    width: 100%;
+    margin-bottom: 15px;
+    --border-radius: 8px;
+    --padding-start: 10px;
+  }
+  
+  /* Button styling */
+  .form-container ion-button {
+    width: 100%;
+    --border-radius: 8px;
+    --background: #3880ff; /* Ionic primary blue */
+    --color: white;
+    --padding: 12px;
+    margin-top: 10px;
+  }
+  
+  /* Styling for outlined button (Back to Login) */
+  .form-container ion-button[fill="outline"] {
+    --border-color: #3880ff;
+    --color: #3880ff;
+  }
+  
+  .form-container ion-button[fill="outline"]:hover {
+    background-color: rgba(56, 128, 255, 0.1);
+  }
+  
+  /* Center the title */
+  ion-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #3880ff;
+    color: white;
+  }
+  
+  ion-toolbar {
+    display: flex;
+    justify-content: center;
+  }
+  
+  ion-title {
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+    flex-grow: 1;
+  }
+  
