@@ -32,12 +32,17 @@ const DashboardContainer: React.FC = () => {
     try {
       let parsedUser = JSON.parse(loggedInUser);
 
+      if (!parsedUser.admin) {
+        history.replace("/user-dashboard");
+        return;
+      }
+
       // Remove 'id' and 'created_at' before setting user state
-      const { id, created_at, admin,...filteredUser } = parsedUser;
-      setUser(filteredUser);
+      const { id, created_at, admin, ...filteredUser } = parsedUser;
+      setUser({ ...filteredUser, admin });
 
       // Optional: Update localStorage without 'id' & 'created_at'
-      localStorage.setItem("user", JSON.stringify(filteredUser));
+      localStorage.setItem("user", JSON.stringify({ ...filteredUser, admin }));
 
     } catch (error) {
       console.error("Error parsing user data:", error);

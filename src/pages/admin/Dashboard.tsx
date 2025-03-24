@@ -27,7 +27,7 @@ const Dashboard: React.FC = () => {
         <DashboardContainer />
       </IonContent>
 
-      {/* ✅ Move NavbarContainer OUTSIDE IonContent */}
+      
     </IonPage>
   );
 };
