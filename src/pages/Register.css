@@ -1,24 +1,19 @@
 /* Fullscreen center */
 
-  
-  /* Card-like form container */
-  
-  
-  /* Fix IonContent default padding */
-  
-  
-  /* Form input styling */
-  /* .form-container ion-item {
+/* Card-like form container */
+
+/* Fix IonContent default padding */
+
+/* Form input styling */
+/* .form-container ion-item {
     width: 100%;
     margin-bottom: 15px;
     --border-radius: 8px;
     --padding-start: 10px;
   } */
-  
- 
-  
-  /* Styling for outlined button (Back to Login) */
-  /* .form-container ion-button[fill="outline"] {
+
+/* Styling for outlined button (Back to Login) */
+/* .form-container ion-button[fill="outline"] {
     --border-color: #3880ff;
     --color: #3880ff;
   }
@@ -27,33 +22,34 @@
     background-color: rgba(56, 128, 255, 0.1);
   }
    */
-  /* Center the title */
-  ion-header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #3880ff;
-    color: white;
-  }
-  
-  ion-toolbar {
-    display: flex;
-    justify-content: center;
-  }
-  
-  ion-title {
-    font-size: 22px;
-    font-weight: bold;
-    text-align: center;
-    flex-grow: 1;
-  }
-  
-  ion-card {
-    width: 80%; /* Adjust width as needed */
-    max-width: 300px; /* Ensures the card doesn't get too wide */
-    padding: 15px; /* Adjust padding to make it more compact */
-    margin: 20px auto; /* Centers the card */
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
+/* Center the title */
+ion-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #3880ff;
+  color: white;
+}
+
+ion-toolbar {
+  display: flex;
+  justify-content: center;
+}
+
+ion-title {
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+  flex-grow: 1;
+}
+
+ion-card {
+  width: 80%; /* Adjust width as needed */
+  max-width: 300px; /* Ensures the card doesn't get too wide */
+  padding: 15px; /* Adjust padding to make it more compact */
+  margin: 20px auto; /* Centers the card */
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+

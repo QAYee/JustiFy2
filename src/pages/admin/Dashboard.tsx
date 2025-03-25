@@ -1,13 +1,8 @@
-import {
-  IonContent,
-  IonHeader,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-} from "@ionic/react";
-import DashboardContainer from "../../components/admin/DashboardContainer";
+import type React from "react"
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from "@ionic/react"
+import DashboardContainer from "../../components/admin/DashboardContainer"
 
-import "./Dashboard.css";
+import "./Dashboard.css"
 
 const Dashboard: React.FC = () => {
   return (
@@ -26,10 +21,9 @@ const Dashboard: React.FC = () => {
         </IonHeader>
         <DashboardContainer />
       </IonContent>
-
-      
     </IonPage>
-  );
-};
+  )
+}
 
-export default Dashboard;
+export default Dashboard
+

@@ -1,15 +1,7 @@
-import {
-  IonContent,
-  IonHeader,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-} from "@ionic/react";
-import ExploreContainer from "../components/ExploreContainer";
-import "./Login.css";
-import LoginContainer from "../components/LoginContainer";
-
-
+import type React from "react"
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from "@ionic/react"
+import "./Login.css"
+import LoginContainer from "../components/LoginContainer"
 
 const Login: React.FC = () => {
   return (
@@ -21,14 +13,13 @@ const Login: React.FC = () => {
       </IonHeader>
       <IonContent fullscreen>
         <IonHeader collapse="condense">
-          <IonToolbar>
-           
-          </IonToolbar>
+          <IonToolbar></IonToolbar>
         </IonHeader>
         <LoginContainer />
       </IonContent>
     </IonPage>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login
+

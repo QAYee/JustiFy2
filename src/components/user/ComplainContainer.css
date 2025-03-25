@@ -1,44 +1,113 @@
-/* ComplainContainer.css */
+.complaint-form-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 16px;
+}
 
-.ion-toolbar {
-    font-size: 1.5rem; /* Make the title bigger */
-    text-align: center;
+.form-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: var(--ion-color-primary);
+  text-align: center;
+}
+
+.form-subtitle {
+  font-size: 14px;
+  color: var(--ion-color-medium);
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.form-card {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background-color: #ffffff;
+}
+
+.form-section {
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.form-section:last-child {
+  border-bottom: none;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  color: var(--ion-color-dark);
+}
+
+.form-item {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--ion-color-dark);
+}
+
+.form-input {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px;
+  width: 100%;
+  font-size: 14px;
+}
+
+.form-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+
+.form-button {
+  flex: 1;
+  margin: 0 8px;
+}
+
+.form-button:first-child {
+  margin-left: 0;
+}
+
+.form-button:last-child {
+  margin-right: 0;
+}
+
+.required-field::after {
+  content: "*";
+  color: var(--ion-color-danger);
+  margin-left: 4px;
+}
+
+.complaint-details {
+  min-height: 120px !important;
+  font-size: 1.2rem;
+  height: auto !important;
+  overflow-y: hidden;
+  white-space: pre-wrap;
+  display: block;
+  resize: none;
+}
+
+@media (max-width: 576px) {
+  .form-actions {
+    flex-direction: column;
   }
-  
-  .ion-title {
-    font-size: 1.8rem !important; /* Increase title font size */
+
+  .form-button {
+    margin: 8px 0;
   }
-  
-  .form-container {
-    max-width: 500px;
-    margin: auto;
-    padding: 20px;
-  }
-  
-  .custom-input {
-    font-size: 1.2rem;
-    height: 50px;
-  }
-  
-  .ion-item {
-    font-size: 1.2rem;
-    --min-height: 60px; /* Increase item height */
-  }
-  
-  .ion-button {
-    font-size: 1.3rem;
-    padding: 15px;
-    border-radius: 8px;
-  }
-  
-  /* Make Complaint Details input expand downward with text */
-  .custom-input.complaint-details {
-    min-height: 120px !important; /* Set minimum height */
-    font-size: 1.2rem;
-    height: auto !important; /* Allow expansion */
-    overflow-y: hidden; /* Hide scroll initially */
-    white-space: pre-wrap; /* Preserve text formatting */
-    display: block;
-    resize: none; /* Prevent manual resizing */
-  }
-  
+}
+

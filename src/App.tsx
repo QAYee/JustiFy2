@@ -1,3 +1,7 @@
+"use client";
+
+import type React from "react";
+
 import { Redirect, Route, useLocation } from "react-router-dom";
 import {
   IonApp,
@@ -12,10 +16,7 @@ import {
   IonToolbar,
   IonTitle,
   IonButtons,
-  IonPage,
   IonButton,
-  IonContent,
-  IonRouterLink,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import {
@@ -44,6 +45,7 @@ import AInbox from "./pages/admin/Inbox";
 import ARecord from "./pages/admin/Record";
 import ATicket from "./pages/admin/Ticket";
 import ADashboard from "./pages/admin/Dashboard";
+import TicketContainer from "./components/admin/TicketContainer";
 
 /* Core CSS */
 import "@ionic/react/css/core.css";
@@ -74,19 +76,19 @@ const App: React.FC = () => {
 const isUserAdmin = (): boolean => {
   try {
     // First check the new format in userInfo
-    const userInfo = localStorage.getItem('userInfo');
+    const userInfo = localStorage.getItem("userInfo");
     if (userInfo) {
       const parsedInfo = JSON.parse(userInfo);
       if (parsedInfo.isAdmin === 1) return true;
     }
-    
+
     // Check the original user object format as fallback
-    const user = localStorage.getItem('user');
+    const user = localStorage.getItem("user");
     if (user) {
       const parsedUser = JSON.parse(user);
       if (parsedUser.admin === 1) return true;
     }
-    
+
     return false;
   } catch (e) {
     console.error("Error checking admin status:", e);
@@ -96,14 +98,17 @@ const isUserAdmin = (): boolean => {
 
 // Check if user is logged in
 const isLoggedIn = (): boolean => {
-  return localStorage.getItem('user') !== null || localStorage.getItem('userInfo') !== null;
+  return (
+    localStorage.getItem("user") !== null ||
+    localStorage.getItem("userInfo") !== null
+  );
 };
 
 // Logout function
 const handleLogout = () => {
-  localStorage.removeItem('user');
-  localStorage.removeItem('userInfo');
-  window.location.href = '/login';
+  localStorage.removeItem("user");
+  localStorage.removeItem("userInfo");
+  window.location.href = "/login";
 };
 
 // Main router component to decide between admin or user app
@@ -111,7 +116,7 @@ const AppRouter: React.FC = () => {
   const [isAdmin, setIsAdmin] = useState<boolean>(isUserAdmin());
   const [loggedIn, setLoggedIn] = useState<boolean>(isLoggedIn());
   const location = useLocation();
-  
+
   // Update states when location changes (like after login)
   useEffect(() => {
     setIsAdmin(isUserAdmin());
@@ -119,10 +124,12 @@ const AppRouter: React.FC = () => {
   }, [location.pathname]);
 
   // Auth routes (login, register)
-  if (!loggedIn && 
-      (location.pathname === '/login' || 
-       location.pathname === '/register' || 
-       location.pathname === '/')) {
+  if (
+    !loggedIn &&
+    (location.pathname === "/login" ||
+      location.pathname === "/register" ||
+      location.pathname === "/")
+  ) {
     return (
       <IonRouterOutlet>
         <Route exact path="/">
@@ -144,7 +151,7 @@ const AppRouter: React.FC = () => {
 // Admin interface component
 const AdminApp: React.FC = () => {
   const location = useLocation();
-  
+
   return (
     <IonTabs>
       <IonHeader>
@@ -160,17 +167,25 @@ const AdminApp: React.FC = () => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      
+
       <IonRouterOutlet>
         <Route exact path="/">
           <Redirect to="login" />
         </Route>
-        <Route exact path="/admin/dashboard" component={ADashboard || DashboardContainer} />
+        <Route
+          exact
+          path="/admin/dashboard"
+          component={ADashboard || DashboardContainer}
+        />
         <Route exact path="/admin/home" component={AHome} />
         <Route exact path="/admin/complain" component={AComplain} />
         <Route exact path="/admin/inbox" component={AInbox} />
         <Route exact path="/admin/record" component={ARecord} />
         <Route exact path="/admin/ticket" component={ATicket} />
+        <Route
+          path="/admin/ticket"
+          render={(props) => <TicketContainer name="Admin" {...props} />}
+        />
         <Route>
           <Redirect to="/admin/home" />
         </Route>
@@ -205,7 +220,7 @@ const AdminApp: React.FC = () => {
 // User interface component
 const UserApp: React.FC = () => {
   const location = useLocation();
-  
+
   return (
     <IonTabs>
       <IonHeader>
@@ -221,7 +236,7 @@ const UserApp: React.FC = () => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      
+
       <IonRouterOutlet>
         <Route exact path="/">
           <Redirect to="/home" />

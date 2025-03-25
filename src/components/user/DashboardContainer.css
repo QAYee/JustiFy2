@@ -1,34 +1,110 @@
-/* Center Content Properly */
 .dashboard-content {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* Full height of viewport */
-  background-color: #121212; /* Dark background */
-}
-
-/* Card Styling */
-.dashboard-card {
-  background-color: #1e1e1e;
-  color: white;
-  width: 350px;
+  min-height: 100%;
   padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+  background-color: #f5f7fa;
 }
 
-/* Ensure Header Stays Fixed */
-.header {
-  background-color: black;
-  color: white;
-  text-align: center;
-  position: fixed;
-  top: 0;
+.dashboard-card {
+  background-color: #ffffff;
+  color: #333333;
   width: 100%;
-  z-index: 1000;
+  max-width: 450px;
+  padding: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
 
-.header-title {
-  font-weight: bold;
+.dashboard-header {
+  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-tint));
+  color: white;
+  padding: 24px 16px;
+  text-align: center;
 }
+
+.dashboard-avatar {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 16px;
+  background-color: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+}
+
+.dashboard-avatar ion-icon {
+  font-size: 48px;
+  color: white;
+}
+
+.dashboard-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.dashboard-subtitle {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 16px;
+}
+
+.user-info {
+  padding: 20px;
+}
+
+.info-item {
+  display: flex;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-weight: 500;
+  width: 120px;
+  color: #666;
+}
+
+.info-value {
+  flex: 1;
+  color: #333;
+}
+
+.dashboard-actions {
+  display: flex;
+  gap: 10px;
+  padding: 0 20px 20px;
+}
+
+@media (max-width: 576px) {
+  .dashboard-card {
+    max-width: 100%;
+  }
+
+  .dashboard-avatar {
+    width: 70px;
+    height: 70px;
+  }
+
+  .dashboard-title {
+    font-size: 20px;
+  }
+
+  .info-item {
+    flex-direction: column;
+  }
+
+  .info-label {
+    width: 100%;
+    margin-bottom: 4px;
+  }
+}
+

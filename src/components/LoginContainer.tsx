@@ -1,10 +1,14 @@
+"use client";
+
+import type React from "react";
+
 import { useState } from "react";
-import { 
-  IonButton, 
-  IonInput, 
-  IonItem, 
-  IonLabel, 
-  IonCard, 
+import {
+  IonButton,
+  IonInput,
+  IonItem,
+  IonLabel,
+  IonCard,
   IonCardContent,
   IonCardHeader,
   IonCardTitle,
@@ -14,7 +18,7 @@ import {
   IonText,
   IonRow,
   IonCol,
-  IonRouterLink
+  IonRouterLink,
 } from "@ionic/react";
 import { useHistory } from "react-router-dom";
 
@@ -39,37 +43,52 @@ const LoginContainer: React.FC = () => {
 
   const handleLogin = async () => {
     setError(null);
-    
+
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
-    
+
     try {
-      const response = await fetch("http://127.0.0.1/justify/index.php/LoginController/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-  
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Server error occurred");
-      }
-  
-      const result = await response.json();
-      console.log("Login Response:", result); // Debugging
-  
-      if (result.status === "success") {
-        // Ensure admin value is treated as an integer
-        const isAdmin = parseInt(result.user.admin) === 1;
-        
+      // Static login credentials
+      const staticUsers = {
+        user: {
+          email: "user",
+          password: "123",
+          admin: 0,
+          name: "Regular User",
+        },
+        admin: {
+          email: "admin",
+          password: "123",
+          admin: 1,
+          name: "Administrator",
+        },
+      };
+
+      // Simulate network delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Check credentials
+      const matchedUser = Object.values(staticUsers).find(
+        (user) => user.email === email && user.password === password
+      );
+
+      if (matchedUser) {
+        const isAdmin = matchedUser.admin === 1;
+
         // Store user data
-        localStorage.setItem("user", JSON.stringify(result.user));
-        localStorage.setItem("userInfo", JSON.stringify({ ...result.user, isAdmin }));
-  
-        // Debugging log
-        console.log("Redirecting as admin:", isAdmin);
-  
+        const userData = {
+          email: matchedUser.email,
+          name: matchedUser.name,
+          admin: matchedUser.admin,
+        };
+
+        localStorage.setItem("user", JSON.stringify(userData));
+        localStorage.setItem(
+          "userInfo",
+          JSON.stringify({ ...userData, isAdmin })
+        );
+
         // Redirect based on role
         if (isAdmin) {
           history.push("/admin/home");
@@ -77,7 +96,7 @@ const LoginContainer: React.FC = () => {
           history.push("/home");
         }
       } else {
-        setError(result.message || "Login failed. Please check your credentials.");
+        setError("Invalid credentials. Please try again.");
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -86,78 +105,80 @@ const LoginContainer: React.FC = () => {
       setIsLoading(false);
     }
   };
-  
 
   return (
-    <IonPage>
-    <IonContent className="ion-justify-content-center ion-align-items-center" fullscreen={true}>
-      <IonRow className="ion-justify-content-center ion-align-items-center" style={{ height: "100%" }}>
-        <IonCol size="12" sizeMd="8" sizeLg="6" sizeXl="4">
-          <IonCard>
-            <IonCardHeader>
-              <IonCardTitle className="ion-text-center">
-                <h1>JustiFy</h1>
-              </IonCardTitle>
-            </IonCardHeader>
-  
-            <IonCardContent>
-              <h2 className="ion-text-center">Login</h2>
-  
-              {error && (
-                <IonText color="danger">
-                  <p className="ion-text-center">{error}</p>
-                </IonText>
-              )}
-  
-              <IonItem className="ion-margin-bottom">
-                <IonLabel position="floating">Email</IonLabel>
-                <IonInput 
-                  type="email" 
-                  value={email} 
-                  onIonChange={(e) => setEmail(e.detail.value!)} 
-                  onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-                  required 
-                />
-              </IonItem>
-  
-              <IonItem className="ion-margin-bottom">
-                <IonLabel position="floating">Password</IonLabel>
-                <IonInput 
-                  type="password" 
-                  value={password} 
-                  onIonChange={(e) => setPassword(e.detail.value!)} 
-                  onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-                  required 
-                />
-              </IonItem>
-  
-              <IonButton 
-                expand="block" 
-                className="ion-margin-top" 
-                onClick={handleLogin}
-              >
-                Login
-              </IonButton>
-              
-              <div className="ion-text-center ion-margin-top">
-                <IonText>
-                  Don't have an account?{' '}
-                  <IonRouterLink onClick={() => history.push("/register")}>
-                    Register
-                  </IonRouterLink>
-                </IonText>
-              </div>
-            </IonCardContent>
-          </IonCard>
-        </IonCol>
-      </IonRow>
-    </IonContent>
-  
-    <IonLoading 
-      isOpen={isLoading} 
-      message="Logging in..." 
-    />
-  </IonPage>
+    <div className="login-container">
+      <IonContent
+        className="ion-justify-content-center ion-align-items-center"
+        fullscreen={true}
+      >
+        <IonRow
+          className="ion-justify-content-center ion-align-items-center"
+          style={{ height: "100%" }}
+        >
+          <IonCol size="12" sizeMd="8" sizeLg="6" sizeXl="4">
+            <IonCard>
+              <IonCardHeader>
+                <IonCardTitle className="ion-text-center">
+                  <h1>JustiFy</h1>
+                </IonCardTitle>
+              </IonCardHeader>
+
+              <IonCardContent>
+                <h2 className="ion-text-center">Login</h2>
+
+                {error && (
+                  <IonText color="danger">
+                    <p className="ion-text-center">{error}</p>
+                  </IonText>
+                )}
+
+                <IonItem className="ion-margin-bottom">
+                  <IonLabel position="floating">Email</IonLabel>
+                  <IonInput
+                    type="email"
+                    value={email}
+                    onIonChange={(e) => setEmail(e.detail.value!)}
+                    onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+                    required
+                  />
+                </IonItem>
+
+                <IonItem className="ion-margin-bottom">
+                  <IonLabel position="floating">Password</IonLabel>
+                  <IonInput
+                    type="password"
+                    value={password}
+                    onIonChange={(e) => setPassword(e.detail.value!)}
+                    onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+                    required
+                  />
+                </IonItem>
+
+                <IonButton
+                  expand="block"
+                  className="ion-margin-top"
+                  onClick={handleLogin}
+                >
+                  Login
+                </IonButton>
+
+                <div className="ion-text-center ion-margin-top">
+                  <IonText>
+                    Don't have an account?{" "}
+                    <IonRouterLink onClick={() => history.push("/register")}>
+                      Register
+                    </IonRouterLink>
+                  </IonText>
+                </div>
+              </IonCardContent>
+            </IonCard>
+          </IonCol>
+        </IonRow>
+      </IonContent>
+
+      <IonLoading isOpen={isLoading} message="Logging in..." />
+    </div>
   );
 };
 

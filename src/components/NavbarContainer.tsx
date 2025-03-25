@@ -1,6 +1,7 @@
-import { IonTabs, IonTabBar, IonTabButton, IonLabel, IonIcon } from "@ionic/react";
-import { chatboxOutline, ticketOutline, personOutline, mailOutline, documentTextOutline } from "ionicons/icons";
-import "./NavbarContainer.css";
+import type React from "react"
+import { IonTabs, IonTabBar, IonTabButton, IonLabel, IonIcon } from "@ionic/react"
+import { chatboxOutline, ticketOutline, personOutline, mailOutline, documentTextOutline } from "ionicons/icons"
+import "./NavbarContainer.css"
 
 const NavbarContainer: React.FC = () => {
   return (
@@ -32,7 +33,8 @@ const NavbarContainer: React.FC = () => {
         </IonTabButton>
       </IonTabBar>
     </IonTabs>
-  );
-};
+  )
+}
 
-export default NavbarContainer;
+export default NavbarContainer
+
