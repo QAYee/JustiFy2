@@ -71,10 +71,7 @@ const DashboardContainer: React.FC = () => {
           ) : (
             <p>No user data available</p>
           )}
-          <IonButton expand="full" color="danger" onClick={handleLogout}>
-            <IonIcon slot="start" icon={logOutOutline} />
-            Logout
-          </IonButton>
+          
         </IonCardContent>
       </IonCard>
     </div>

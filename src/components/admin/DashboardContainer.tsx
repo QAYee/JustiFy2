@@ -65,21 +65,20 @@ const DashboardContainer: React.FC = () => {
           <IonCardTitle>Welcome, {user?.name || "User"}!</IonCardTitle>
         </IonCardHeader>
         <IonCardContent>
-          {user ? (
+            {user ? (
             <div>
-              {Object.entries(user).map(([key, value]) => (
+              {Object.entries(user)
+              .filter(([key]) => !['admin', 'ID'].includes(key))
+              .map(([key, value]) => (
                 <p key={key}>
-                  <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong> {String(value)}
+                <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong> {String(value)}
                 </p>
               ))}
             </div>
-          ) : (
+            ) : (
             <p>No user data available</p>
-          )}
-          <IonButton expand="full" color="danger" onClick={handleLogout}>
-            <IonIcon slot="start" icon={logOutOutline} />
-            Logout
-          </IonButton>
+            )}
+          
         </IonCardContent>
       </IonCard>
     </div>

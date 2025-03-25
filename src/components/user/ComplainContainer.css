@@ -1,0 +1,44 @@
+/* ComplainContainer.css */
+
+.ion-toolbar {
+    font-size: 1.5rem; /* Make the title bigger */
+    text-align: center;
+  }
+  
+  .ion-title {
+    font-size: 1.8rem !important; /* Increase title font size */
+  }
+  
+  .form-container {
+    max-width: 500px;
+    margin: auto;
+    padding: 20px;
+  }
+  
+  .custom-input {
+    font-size: 1.2rem;
+    height: 50px;
+  }
+  
+  .ion-item {
+    font-size: 1.2rem;
+    --min-height: 60px; /* Increase item height */
+  }
+  
+  .ion-button {
+    font-size: 1.3rem;
+    padding: 15px;
+    border-radius: 8px;
+  }
+  
+  /* Make Complaint Details input expand downward with text */
+  .custom-input.complaint-details {
+    min-height: 120px !important; /* Set minimum height */
+    font-size: 1.2rem;
+    height: auto !important; /* Allow expansion */
+    overflow-y: hidden; /* Hide scroll initially */
+    white-space: pre-wrap; /* Preserve text formatting */
+    display: block;
+    resize: none; /* Prevent manual resizing */
+  }
+  
