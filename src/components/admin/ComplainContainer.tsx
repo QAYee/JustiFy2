@@ -250,17 +250,13 @@ const ComplainContainer: React.FC = () => {
 
   return (
     <>
-      <IonHeader>
-        <IonToolbar color="primary">
-          <IonTitle className="ion-text-center">Complaint Management</IonTitle>
-        </IonToolbar>
-      </IonHeader>
+      
       <IonContent className="ion-padding" color="light">
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
 
-        <IonCard>
+        
           <IonCardHeader>
             <IonCardTitle>Complaints Dashboard</IonCardTitle>
           </IonCardHeader>
@@ -295,7 +291,7 @@ const ComplainContainer: React.FC = () => {
               animated
             />
 
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: "16px", marginBottom: "16px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: "16px", marginBottom: "16px", flexWrap: "wrap", gap: "8px" }}>
               <IonSegment value={filter} onIonChange={(e) => setFilter(e.detail.value as string)}>
                 <IonSegmentButton value="all">
                   <IonLabel>All</IonLabel>
@@ -325,7 +321,7 @@ const ComplainContainer: React.FC = () => {
               </IonSelect>
             </div>
           </IonCardContent>
-        </IonCard>
+        
 
         {loading && (
           <div className="ion-text-center ion-padding">

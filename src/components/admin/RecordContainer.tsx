@@ -243,7 +243,7 @@ const RecordContainer: React.FC<{ name: string }> = ({ name }) => {
 
   return (
     <IonContent color="light">
-      <IonCard>
+      
         <IonCardHeader>
           <IonCardTitle>Records Management</IonCardTitle>
         </IonCardHeader>
@@ -332,7 +332,7 @@ const RecordContainer: React.FC<{ name: string }> = ({ name }) => {
             </IonSegmentButton>
           </IonSegment>
         </IonCardContent>
-      </IonCard>
+      
 
       <IonModal isOpen={showDatePicker} onDidDismiss={() => setShowDatePicker(false)}>
         <IonContent>

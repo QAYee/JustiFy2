@@ -224,7 +224,7 @@ const InboxContainer: React.FC<ContainerProps> = ({ name }) => {
         <IonRefresherContent></IonRefresherContent>
       </IonRefresher>
 
-      <IonCard>
+     
         <IonCardHeader>
           <IonCardTitle>
             Admin Inbox
@@ -274,7 +274,7 @@ const InboxContainer: React.FC<ContainerProps> = ({ name }) => {
             </IonButton>
           </div>
         </IonCardContent>
-      </IonCard>
+ 
 
       <IonList>
         {loading ? (

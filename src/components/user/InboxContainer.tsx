@@ -185,7 +185,7 @@ const InboxContainer: React.FC<ContainerProps> = ({ name }) => {
         <IonRefresherContent></IonRefresherContent>
       </IonRefresher>
 
-      <IonCard>
+     
         <IonCardHeader>
           <IonCardTitle>
             Inbox
@@ -220,7 +220,7 @@ const InboxContainer: React.FC<ContainerProps> = ({ name }) => {
             </IonChip>
           </div>
         </IonCardContent>
-      </IonCard>
+    
 
       <IonList>
         {loading ? (

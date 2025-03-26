@@ -315,7 +315,7 @@ const TicketContainer: React.FC<{ name: string }> = ({ name }) => {
   return (
     <>
       <IonContent className="ion-padding" color="light">
-        <IonCard>
+       
           <IonCardHeader>
             <IonCardTitle>My Tickets</IonCardTitle>
             <IonCardSubtitle>Track and manage your support requests</IonCardSubtitle>
@@ -343,7 +343,7 @@ const TicketContainer: React.FC<{ name: string }> = ({ name }) => {
               </IonSegmentButton>
             </IonSegment>
           </IonCardContent>
-        </IonCard>
+       
 
         <IonList>
           {loading ? (

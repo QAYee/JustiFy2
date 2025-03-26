@@ -1,7 +1,3 @@
-"use client";
-
-import type React from "react";
-
 import { useState } from "react";
 import {
   IonButton,
@@ -12,30 +8,32 @@ import {
   IonCardContent,
   IonCardHeader,
   IonCardTitle,
-  IonContent,
-  IonPage,
-  IonLoading,
   IonText,
   IonRow,
   IonCol,
   IonRouterLink,
+  IonPage,
+  IonContent,
+  IonLoading,
 } from "@ionic/react";
 import { useHistory } from "react-router-dom";
 
 const LoginContainer: React.FC = () => {
-  const history = useHistory();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const history = useHistory();
 
-  const validateForm = () => {
-    if (!email.trim()) {
-      setError("Email is required");
-      return false;
-    }
-    if (!password.trim()) {
-      setError("Password is required");
+  // Static user credentials (for testing purposes)
+  const staticUsers = [
+    { username: "admin", password: "123", admin: 1, name: "Administrator" },
+    { username: "user", password: "123", admin: 0, name: "Regular User" },
+  ];
+
+  const validateForm = (): boolean => {
+    if (!email || !password) {
+      setError("Both username and password are required.");
       return false;
     }
     return true;
@@ -43,71 +41,75 @@ const LoginContainer: React.FC = () => {
 
   const handleLogin = async () => {
     setError(null);
-
     if (!validateForm()) return;
-
     setIsLoading(true);
 
     try {
-      // Static login credentials
-      const staticUsers = {
-        user: {
-          email: "user",
-          password: "123",
-          admin: 0,
-          name: "Regular User",
-        },
-        admin: {
-          email: "admin",
-          password: "123",
-          admin: 1,
-          name: "Administrator",
-        },
-      };
-
-      // Simulate network delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Check credentials
-      const matchedUser = Object.values(staticUsers).find(
-        (user) => user.email === email && user.password === password
+      // Check static users first
+      const staticUser = staticUsers.find(
+        (user) => user.username === email && user.password === password
       );
 
-      if (matchedUser) {
-        const isAdmin = matchedUser.admin === 1;
-
-        // Store user data
+      if (staticUser) {
+        // Create user data object
         const userData = {
-          email: matchedUser.email,
-          name: matchedUser.name,
-          admin: matchedUser.admin,
+          name: staticUser.name,
+          username: staticUser.username,
+          admin: staticUser.admin,
+          isAdmin: staticUser.admin === 1,
         };
 
+        // Store user data in localStorage
         localStorage.setItem("user", JSON.stringify(userData));
-        localStorage.setItem(
-          "userInfo",
-          JSON.stringify({ ...userData, isAdmin })
-        );
+        localStorage.setItem("userInfo", JSON.stringify(userData));
 
         // Redirect based on role
-        if (isAdmin) {
-          history.push("/admin/home");
-        } else {
-          history.push("/home");
+        history.push(staticUser.admin === 1 ? "/admin/home" : "/home");
+        return;
+      }
+
+      // If not a static user, proceed with API login
+      const response = await fetch(
+        "http://127.0.0.1/justify/index.php/LoginController/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
         }
+      );
+
+      if (!response.ok) {
+        throw new Error("Invalid credentials");
+      }
+
+      const result = await response.json();
+
+      if (result.status === "success") {
+        localStorage.setItem("user", JSON.stringify(result.user));
+        localStorage.setItem(
+          "userInfo",
+          JSON.stringify({
+            ...result.user,
+            isAdmin: parseInt(result.user.admin) === 1,
+          })
+        );
+
+        history.push(
+          parseInt(result.user.admin) === 1 ? "/admin/home" : "/home"
+        );
       } else {
-        setError("Invalid credentials. Please try again.");
+        setError(result.message || "Invalid credentials");
       }
     } catch (error) {
       console.error("Login error:", error);
-      setError("An error occurred while logging in. Please try again.");
+      setError("Invalid username or password");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="login-container">
+    <IonPage>
       <IonContent
         className="ion-justify-content-center ion-align-items-center"
         fullscreen={true}
@@ -175,10 +177,11 @@ const LoginContainer: React.FC = () => {
             </IonCard>
           </IonCol>
         </IonRow>
-      </IonContent>
 
-      <IonLoading isOpen={isLoading} message="Logging in..." />
-    </div>
+        {/* Loading Indicator */}
+        <IonLoading isOpen={isLoading} message="Logging in..." />
+      </IonContent>
+    </IonPage>
   );
 };
 
