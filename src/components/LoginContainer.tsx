@@ -109,7 +109,7 @@ const LoginContainer: React.FC = () => {
   };
 
   return (
-    <IonPage>
+    <>
       <IonContent
         className="ion-justify-content-center ion-align-items-center"
         fullscreen={true}
@@ -181,7 +181,7 @@ const LoginContainer: React.FC = () => {
         {/* Loading Indicator */}
         <IonLoading isOpen={isLoading} message="Logging in..." />
       </IonContent>
-    </IonPage>
+    </>
   );
 };
 

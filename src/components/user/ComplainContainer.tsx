@@ -26,6 +26,7 @@ import {
   IonDatetime,
   IonModal,
   IonList,
+  IonFooter,
 } from "@ionic/react";
 import {
   documentTextOutline,
@@ -54,6 +55,9 @@ const ComplainContainer: React.FC = () => {
   } | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [recentComplaints, setRecentComplaints] = useState([]);
+  const [selectedComplaint, setSelectedComplaint] = useState<any>(null);
+  const [messages, setMessages] = useState<Array<any>>([]);
+  const [newMessage, setNewMessage] = useState("");
 
   // Updated complaint types
   const complaintTypes: ComplaintType[] = [
@@ -89,13 +93,19 @@ const ComplainContainer: React.FC = () => {
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
+        const userId = parseInt(parsedUser.id);
+
+        if (!userId) {
+          throw new Error("Invalid user ID");
+        }
+
         setUser({
-          id: parsedUser.id || 0,
+          id: userId,
           name: parsedUser.name || "",
         });
 
-        // Fetch user's complaints
-        fetchUserComplaints(parsedUser.id);
+        // Fetch only this user's complaints
+        fetchUserComplaints(userId);
       } catch (error) {
         console.error("Failed to parse user from localStorage:", error);
         setShowToast({
@@ -109,14 +119,22 @@ const ComplainContainer: React.FC = () => {
   const fetchUserComplaints = async (userId: number) => {
     try {
       const response = await fetch(
-        `http://127.0.0.1/justify/index.php/ComplaintController/getAllComplaints`
+        `http://127.0.0.1/justify/index.php/ComplaintController/getAllComplaints?user_id=${userId}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
       );
+
       const data = await response.json();
 
       if (data.status && Array.isArray(data.complaints)) {
-        // Filter complaints to only show the current user's complaints
+        // Ensure we only get complaints for this user
         const userComplaints = data.complaints.filter(
-          (complaint: any) => complaint.user_id === userId.toString()
+          (complaint: any) => String(complaint.user_id) === String(userId)
         );
         setRecentComplaints(userComplaints);
       } else {
@@ -128,6 +146,7 @@ const ComplainContainer: React.FC = () => {
         message: "Failed to load your complaints",
         success: false,
       });
+      setRecentComplaints([]);
     }
   };
 
@@ -221,6 +240,102 @@ const ComplainContainer: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchMessages = async (complaintId: number) => {
+    try {
+      if (!complaintId) {
+        throw new Error("Invalid complaint ID");
+      }
+
+      const response = await fetch(
+        `http://127.0.0.1/justify/index.php/ChatController/getMessages/${complaintId}`
+       
+      );
+
+      const data = await response.json();
+
+      if (!data.status) {
+        // If no messages, set empty array but don't show error
+        setMessages([]);
+        return;
+      }
+
+      // Format messages if they exist
+      if (Array.isArray(data.messages)) {
+        const formattedMessages = data.messages.map((msg: any) => ({
+          text: msg.message,
+          sender: msg.sender,
+          timestamp: new Date(msg.timestamp).toLocaleString(),
+          user_id: msg.user_id,
+        }));
+        setMessages(formattedMessages);
+      } else {
+        setMessages([]);
+      }
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      setMessages([]);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !selectedComplaint || !user) return;
+
+    try {
+      const response = await fetch(
+        "http://127.0.0.1/justify/index.php/ChatController/sendMessage",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            complaint_id: selectedComplaint.id,
+            user_id: user.id,
+            message: newMessage,
+            sender: "user", // Keep this as "user" for consistent typing
+            timestamp: new Date().toISOString(),
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Server response:", errorText);
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result.status) {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            text: newMessage,
+            sender: "user",
+            timestamp: new Date().toLocaleString(),
+            user_id: user.id,
+          },
+        ]);
+        setNewMessage("");
+      } else {
+        throw new Error(result.message || "Failed to send message");
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setShowToast({
+        message:
+          error instanceof Error ? error.message : "Failed to send message",
+        success: false,
+      });
+    }
+  };
+
+  const handleComplaintClick = (complaint: any) => {
+    setSelectedComplaint(complaint);
+    fetchMessages(complaint.id);
   };
 
   return (
@@ -363,6 +478,7 @@ const ComplainContainer: React.FC = () => {
           </IonCardContent>
 
           {/* Recent complaints preview */}
+          {/* Recent complaints with chat functionality */}
           <IonCard className="form-card" style={{ marginTop: "20px" }}>
             <IonCardHeader>
               <IonCardTitle>Your Recent Complaints</IonCardTitle>
@@ -371,16 +487,18 @@ const ComplainContainer: React.FC = () => {
               <IonList>
                 {recentComplaints.length > 0 ? (
                   recentComplaints.map((complaint: any) => (
-                    <IonItem key={complaint.id}>
+                    <IonItem
+                      key={complaint.id}
+                      button
+                      onClick={() => handleComplaintClick(complaint)}
+                    >
                       <IonLabel>
                         <h2>
                           {complaintTypes.find(
                             (t) => t.id === parseInt(complaint.complaint_type)
                           )?.name || "Unknown Complaint Type"}
                         </h2>
-                        <p>Against: {complaint.respondent}</p>
                         <p>
-                          Status:{" "}
                           <IonChip
                             color={
                               complaint.status === "pending"
@@ -407,8 +525,57 @@ const ComplainContainer: React.FC = () => {
               </IonList>
             </IonCardContent>
           </IonCard>
-        </div>
 
+          {/* Chat Modal */}
+          <IonModal
+            isOpen={!!selectedComplaint}
+            onDidDismiss={() => setSelectedComplaint(null)}
+          >
+            <IonHeader>
+              <IonToolbar>
+                <IonTitle>
+                  {selectedComplaint
+                    ? `Complaint #${selectedComplaint.id}`
+                    : "Chat"}
+                </IonTitle>
+                <IonButton
+                  slot="end"
+                  onClick={() => setSelectedComplaint(null)}
+                >
+                  Close
+                </IonButton>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent>
+              <div className="chat-container">
+                {messages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`message ${
+                      msg.sender === "user" ? "user-message" : "admin-message"
+                    }`}
+                  >
+                    <p>{msg.text}</p>
+                    <small>{msg.timestamp}</small>
+                  </div>
+                ))}
+              </div>
+            </IonContent>
+            <IonFooter>
+              <IonItem>
+                <IonInput
+                  placeholder="Type your message..."
+                  value={newMessage}
+                  onIonChange={(e) => setNewMessage(e.detail.value!)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                />
+                <IonButton onClick={handleSendMessage}>
+                  <IonIcon icon={sendOutline} />
+                </IonButton>
+              </IonItem>
+            </IonFooter>
+          </IonModal>
+        </div>
         {showToast && (
           <IonToast
             isOpen={!!showToast}

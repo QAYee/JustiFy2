@@ -201,7 +201,7 @@ const RecordContainer: React.FC<{ name: string }> = ({ name }) => {
 
           <div
             style={{
-              display: "flex",
+              display: "flex", 
               justifyContent: "space-between",
               marginTop: "16px",
               marginBottom: "16px",
@@ -216,7 +216,7 @@ const RecordContainer: React.FC<{ name: string }> = ({ name }) => {
 
             {selectedDate && (
               <IonButton size="small" fill="clear" onClick={clearDateFilter}>
-                Clear Date
+          Clear Date
               </IonButton>
             )}
 
@@ -228,11 +228,11 @@ const RecordContainer: React.FC<{ name: string }> = ({ name }) => {
             </IonSelect>
           </div>
 
-          <IonSegment value={filter} onIonChange={(e) => setFilter(e.detail.value!)}>
+          <IonSegment value={filter} onIonChange={(e) => setFilter(e.detail.value!)} scrollable>
             <IonSegmentButton value="all">
               <IonLabel>All</IonLabel>
             </IonSegmentButton>
-            <IonSegmentButton value="pending"> 
+            <IonSegmentButton value="pending">
               <IonLabel>Pending</IonLabel>
             </IonSegmentButton>
             <IonSegmentButton value="approved">

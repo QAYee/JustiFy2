@@ -320,29 +320,35 @@ const TicketContainer: React.FC<{ name: string }> = ({ name }) => {
             <IonCardTitle>My Tickets</IonCardTitle>
             <IonCardSubtitle>Track and manage your support requests</IonCardSubtitle>
           </IonCardHeader>
-          <IonCardContent>
+            <IonCardContent>
             <IonSearchbar
               value={searchText}
               onIonChange={(e) => setSearchText(e.detail.value!)}
               placeholder="Search tickets"
               animated
+              style={{ padding: '0', marginBottom: '10px' }}
             />
 
-            <IonSegment value={filter} onIonChange={(e) => setFilter(e.detail.value!)}>
-              <IonSegmentButton value="all">
-                <IonLabel>All</IonLabel>
+            <IonSegment 
+              value={filter} 
+              onIonChange={(e) => setFilter(e.detail.value!)}
+              scrollable={true}
+              style={{ width: '100%', minWidth: '100%' }}
+            >
+              <IonSegmentButton value="all" style={{ minWidth: 'auto' }}>
+              <IonLabel>All</IonLabel>
               </IonSegmentButton>
-              <IonSegmentButton value="open">
-                <IonLabel>Open</IonLabel>
+              <IonSegmentButton value="open" style={{ minWidth: 'auto' }}>
+              <IonLabel>Open</IonLabel>
               </IonSegmentButton>
-              <IonSegmentButton value="in-progress">
-                <IonLabel>In Progress</IonLabel>
+              <IonSegmentButton value="in-progress" style={{ minWidth: 'auto' }}>
+              <IonLabel>In Progress</IonLabel>
               </IonSegmentButton>
-              <IonSegmentButton value="resolved">
-                <IonLabel>Resolved</IonLabel>
+              <IonSegmentButton value="resolved" style={{ minWidth: 'auto' }}>
+              <IonLabel>Resolved</IonLabel>
               </IonSegmentButton>
             </IonSegment>
-          </IonCardContent>
+            </IonCardContent>
        
 
         <IonList>

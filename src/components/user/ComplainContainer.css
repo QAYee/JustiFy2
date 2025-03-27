@@ -111,3 +111,38 @@
   }
 }
 
+.chat-container {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.message {
+  max-width: 80%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin: 0.5rem 0;
+}
+
+.user-message {
+  background-color: var(--ion-color-primary);
+  color: white;
+  align-self: flex-end;
+}
+
+.admin-message {
+  background-color: var(--ion-color-light);
+  color: var(--ion-color-dark);
+  align-self: flex-start;
+}
+
+.message p {
+  margin: 0 0 0.5rem 0;
+}
+
+.message small {
+  opacity: 0.7;
+  font-size: 0.8rem;
+}
+
