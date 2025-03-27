@@ -46,6 +46,150 @@ import {
   sendOutline,
 } from "ionicons/icons";
 
+// Add this function before the main ComplainContainer component
+// Add these interfaces before the component
+interface Complaint {
+  id: number;
+  complainant: string;
+  respondent: string;
+  details: string;
+  incident_date: string;
+  status: "pending" | "processing" | "resolved" | "rejected";
+  type: string;
+  user_id: number;
+  created_at: string;
+}
+
+interface SelectedComplaint extends Complaint {
+  messages?: Message[];
+}
+
+// Add this interface after your existing interfaces
+interface StatusOption {
+  value: Complaint["status"];
+  label: string;
+  color: string;
+  icon: string;
+}
+
+// Add this constant before your ComplainContainer component
+const STATUS_OPTIONS: StatusOption[] = [
+  { value: "pending", label: "Pending", color: "warning", icon: timeOutline },
+  {
+    value: "processing",
+    label: "Processing",
+    color: "primary",
+    icon: timeOutline,
+  },
+  {
+    value: "resolved",
+    label: "Resolved",
+    color: "success",
+    icon: checkmarkCircleOutline,
+  },
+  {
+    value: "rejected",
+    label: "Rejected",
+    color: "danger",
+    icon: closeCircleOutline,
+  },
+];
+
+const ComplaintDetails: React.FC<{
+  selectedComplaint: SelectedComplaint | null;
+  handleStatusUpdate: (id: number, status: Complaint["status"]) => void;
+  getStatusChip: (status: Complaint["status"]) => JSX.Element | undefined;
+  formatDate: (date: string) => string;
+}> = ({ selectedComplaint, handleStatusUpdate, getStatusChip, formatDate }) => {
+  if (!selectedComplaint) return null;
+
+  return (
+    <>
+      <IonCardHeader>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <IonCardTitle>Complaint #{selectedComplaint.id}</IonCardTitle>
+          {getStatusChip(selectedComplaint.status)}
+        </div>
+      </IonCardHeader>
+      <IonCardContent>
+        <div style={{ marginBottom: "16px" }}>
+          <p>
+            <strong>Type:</strong> {selectedComplaint.type}
+          </p>
+          <p>
+            <strong>Complainant:</strong> {selectedComplaint.complainant}
+          </p>
+          <p>
+            <strong>Respondent:</strong> {selectedComplaint.respondent}
+          </p>
+          <p>
+            <strong>Details:</strong> {selectedComplaint.details}
+          </p>
+          <p>
+            <strong>Incident Date:</strong>{" "}
+            {formatDate(selectedComplaint.incident_date)}
+          </p>
+        </div>
+
+        {selectedComplaint.status !== "resolved" && (
+          <div
+            style={{
+              marginBottom: "16px",
+              padding: "12px",
+              backgroundColor: "#f8f9fa",
+              borderRadius: "8px",
+            }}
+          >
+            <h3 style={{ marginTop: "0", marginBottom: "12px" }}>
+              Update Status
+            </h3>
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+              {selectedComplaint.status !== "processing" && (
+                <IonButton
+                  size="small"
+                  color="primary"
+                  onClick={() =>
+                    handleStatusUpdate(selectedComplaint.id, "processing")
+                  }
+                >
+                  <IonIcon slot="start" icon={timeOutline} />
+                  Mark as Processing
+                </IonButton>
+              )}
+              <IonButton
+                size="small"
+                color="success"
+                onClick={() =>
+                  handleStatusUpdate(selectedComplaint.id, "resolved")
+                }
+              >
+                <IonIcon slot="start" icon={checkmarkCircleOutline} />
+                Mark as Resolved
+              </IonButton>
+              <IonButton
+                size="small"
+                color="danger"
+                onClick={() =>
+                  handleStatusUpdate(selectedComplaint.id, "rejected")
+                }
+              >
+                <IonIcon slot="start" icon={closeCircleOutline} />
+                Mark as Rejected
+              </IonButton>
+            </div>
+          </div>
+        )}
+      </IonCardContent>
+    </>
+  );
+};
+
 const ComplainContainer: React.FC = () => {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,6 +202,9 @@ const ComplainContainer: React.FC = () => {
     useState<SelectedComplaint | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [selectedStatusComplaint, setSelectedStatusComplaint] =
+    useState<Complaint | null>(null);
 
   const fetchComplaints = async () => {
     setLoading(true);
@@ -476,6 +623,9 @@ const ComplainContainer: React.FC = () => {
             <IonSegmentButton value="resolved">
               <IonLabel>Resolved</IonLabel>
             </IonSegmentButton>
+            <IonSegmentButton value="rejected">
+              <IonLabel>rejected</IonLabel>
+            </IonSegmentButton>
           </IonSegment>
         </div>
 
@@ -618,21 +768,32 @@ const ComplainContainer: React.FC = () => {
             </IonButton>
           </IonToolbar>
         </IonHeader>
-        <IonContent>
+
+        <IonContent className="ion-padding">
+          <IonCard>
+            <ComplaintDetails
+              selectedComplaint={selectedComplaint}
+              handleStatusUpdate={handleStatusUpdate}
+              getStatusChip={getStatusChip}
+              formatDate={formatDate}
+            />
+          </IonCard>
+
           <div className="chat-container">
             {messages.map((msg, index) => (
               <div
                 key={msg.id || index}
                 className={`message ${
-                  msg.sender === "user" ? "user-message" : "admin-message"
+                  msg.sender === "admin" ? "user-message" : "admin-message"
                 }`}
               >
-                <p>{msg.message || msg.text}</p>
-                <small>{new Date(msg.timestamp).toLocaleTimeString()}</small>
+                <p>{msg.message || msg.text || ""}</p>
+                <small>{new Date(msg.timestamp).toLocaleString()}</small>
               </div>
             ))}
           </div>
         </IonContent>
+
         <IonFooter>
           <IonItem>
             <IonInput

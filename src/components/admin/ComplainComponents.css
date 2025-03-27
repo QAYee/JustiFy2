@@ -2,16 +2,16 @@
   padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  max-height: 70vh;
+  gap: 1rem;
+  max-height: 50vh;
   overflow-y: auto;
 }
 
 .message {
   max-width: 80%;
   padding: 0.75rem;
-  border-radius: 1rem;
-  margin: 0.25rem;
+  border-radius: 12px;
+  margin: 0.5rem;
 }
 
 .user-message {
@@ -32,7 +32,7 @@
 
 .message small {
   display: block;
-  font-size: 0.8em;
+  font-size: 0.8rem;
   opacity: 0.7;
   margin-top: 0.25rem;
 }

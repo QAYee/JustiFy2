@@ -479,7 +479,7 @@ const ComplainContainer: React.FC = () => {
 
           {/* Recent complaints preview */}
           {/* Recent complaints with chat functionality */}
-          <IonCard className="form-card" style={{ marginTop: "20px" }}>
+          
             <IonCardHeader>
               <IonCardTitle>Your Recent Complaints</IonCardTitle>
             </IonCardHeader>
@@ -524,7 +524,7 @@ const ComplainContainer: React.FC = () => {
                 )}
               </IonList>
             </IonCardContent>
-          </IonCard>
+        
 
           {/* Chat Modal */}
           <IonModal
