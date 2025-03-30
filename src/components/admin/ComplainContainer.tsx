@@ -514,7 +514,7 @@ const ComplainContainer: React.FC = () => {
           },
           body: JSON.stringify({
             complaint_id: selectedComplaint.id,
-            user_id: 1, // Replace with actual admin ID
+            user_id: 2, // Replace with actual admin ID
             message: newMessage,
             sender: "admin",
           }),

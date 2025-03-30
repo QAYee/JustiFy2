@@ -14,7 +14,7 @@ const Ticket: React.FC = () => {
         <IonHeader collapse="condense">
           <IonToolbar></IonToolbar>
         </IonHeader>
-        <TicketContainer name="name" />
+        <TicketContainer  />
       </IonContent>
     </IonPage>
   )
