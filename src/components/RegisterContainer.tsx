@@ -9,6 +9,7 @@ import {
   IonLabel,
   IonDatetime,
   IonModal,
+  IonContent,
 } from "@ionic/react";
 import { useHistory } from "react-router-dom";
 
@@ -59,17 +60,26 @@ const RegisterContainer: React.FC = () => {
       password,
       confirmPassword,
     });
-  
-    if (!name || !birthdate || !age || !address || !phone || !email || !password || !confirmPassword) {
+
+    if (
+      !name ||
+      !birthdate ||
+      !age ||
+      !address ||
+      !phone ||
+      !email ||
+      !password ||
+      !confirmPassword
+    ) {
       alert("All fields are required");
       return;
     }
-  
+
     if (password !== confirmPassword) {
       alert("Passwords do not match");
       return;
     }
-  
+
     const userData = {
       name,
       birthdate,
@@ -80,7 +90,7 @@ const RegisterContainer: React.FC = () => {
       password,
       confirm_password: confirmPassword,
     };
-  
+
     try {
       const response = await fetch(
         "http://localhost/justify/index.php/RegisterController/register",
@@ -90,11 +100,11 @@ const RegisterContainer: React.FC = () => {
           body: JSON.stringify(userData),
         }
       );
-  
+
       const result = await response.json();
       console.log("Server Response:", result); // Log server response
       alert(result.message);
-  
+
       if (result.status === "success") {
         history.push("/login");
       }
@@ -103,30 +113,51 @@ const RegisterContainer: React.FC = () => {
       alert("An error occurred while registering.");
     }
   };
-  
+
   return (
     <div className="container">
       <IonItem>
         <IonLabel position="floating">Full Name</IonLabel>
-        <IonInput value={name} onIonChange={(e) => setName(e.detail.value || "")} required />
+        <IonInput
+          value={name}
+          onIonChange={(e) => setName(e.detail.value || "")}
+          required
+        />
       </IonItem>
 
       <IonItem>
         <IonLabel position="floating">Birthdate</IonLabel>
-        <IonInput type="text" value={birthdate} readonly onClick={() => setShowPicker(true)} />
+        <IonInput
+          type="text"
+          value={birthdate}
+          readonly
+          onClick={() => setShowPicker(true)}
+        />
       </IonItem>
 
-      <IonModal isOpen={showPicker} onDidDismiss={() => setShowPicker(false)}>
-        <IonDatetime
-          value={birthdate}
-          min="1900-01-01"
-          max="2025-12-31"
-          onIonChange={handleBirthdateChange}
-          presentation="date"
-        />
-        <IonButton expand="full" onClick={() => setShowPicker(false)}>
-          Close
-        </IonButton>
+      <IonModal
+        isOpen={showPicker}
+        onDidDismiss={() => setShowPicker(false)}
+        className="datetime-modal"
+        breakpoints={[0, 0.5, 0.8]}
+        initialBreakpoint={0.5}
+      >
+        <IonContent>
+          <div className="ion-padding">
+            <h2>Select Birthdate</h2>
+            <IonDatetime
+              value={birthdate}
+              min="1900-01-01"
+              max="2025-12-31"
+              onIonChange={handleBirthdateChange}
+              presentation="date"
+              showDefaultButtons={true}
+              doneText="Confirm"
+              cancelText="Cancel"
+              className="custom-datetime"
+            />
+          </div>
+        </IonContent>
       </IonModal>
 
       <IonItem>
@@ -136,22 +167,41 @@ const RegisterContainer: React.FC = () => {
 
       <IonItem>
         <IonLabel position="floating">Address</IonLabel>
-        <IonInput value={address} onIonChange={(e) => setAddress(e.detail.value || "")} required />
+        <IonInput
+          value={address}
+          onIonChange={(e) => setAddress(e.detail.value || "")}
+          required
+        />
       </IonItem>
 
       <IonItem>
         <IonLabel position="floating">Phone</IonLabel>
-        <IonInput type="tel" value={phone} onIonChange={(e) => setPhone(e.detail.value || "")} required />
+        <IonInput
+          type="tel"
+          value={phone}
+          onIonChange={(e) => setPhone(e.detail.value || "")}
+          required
+        />
       </IonItem>
 
       <IonItem>
         <IonLabel position="floating">Email</IonLabel>
-        <IonInput type="email" value={email} onIonChange={(e) => setEmail(e.detail.value || "")} required />
+        <IonInput
+          type="email"
+          value={email}
+          onIonChange={(e) => setEmail(e.detail.value || "")}
+          required
+        />
       </IonItem>
 
       <IonItem>
         <IonLabel position="floating">Password</IonLabel>
-        <IonInput type="password" value={password} onIonChange={(e) => setPassword(e.detail.value || "")} required />
+        <IonInput
+          type="password"
+          value={password}
+          onIonChange={(e) => setPassword(e.detail.value || "")}
+          required
+        />
       </IonItem>
 
       <IonItem>
@@ -168,7 +218,11 @@ const RegisterContainer: React.FC = () => {
         Register
       </IonButton>
 
-      <IonButton expand="full" fill="outline" onClick={() => history.push("/login")}>
+      <IonButton
+        expand="full"
+        fill="outline"
+        onClick={() => history.push("/login")}
+      >
         Back to Login
       </IonButton>
     </div>

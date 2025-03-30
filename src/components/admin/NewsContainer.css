@@ -1,0 +1,66 @@
+.form-card {
+  margin-bottom: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.custom-input,
+.custom-textarea {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+  margin-top: 8px;
+}
+
+.submit-button {
+  margin: 24px 0 8px;
+  --border-radius: 8px;
+  font-weight: 600;
+}
+
+.news-list {
+  margin-top: 2rem;
+}
+
+.news-card {
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.news-card:hover {
+  transform: translateY(-2px);
+}
+
+.news-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--ion-color-light);
+}
+
+.news-description {
+  margin: 1rem 0;
+  color: var(--ion-color-light);
+  line-height: 1.5;
+}
+
+.news-timestamp {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ion-color-light);
+  font-size: 0.85rem;
+}
+
+.news-timestamp ion-icon {
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .form-card,
+  .news-card {
+    margin-inline: 0;
+  }
+}

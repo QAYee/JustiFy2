@@ -92,7 +92,7 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
   return (
     <div className="ion-padding">
       {/* Welcome Card */}
-      <IonCard>
+      
         <img
           alt="Barangay Hall"
           src="https://ionicframework.com/docs/img/demos/card-media.png"
@@ -121,7 +121,7 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
             </IonButton>
           </div>
         </IonCardContent>
-      </IonCard>
+      
 
       {/* Announcements Section */}
       <h2 style={{ margin: "24px 0 16px", fontSize: "20px", fontWeight: "600" }}>

@@ -32,8 +32,6 @@ const Home: React.FC = () => {
           <IonToolbar></IonToolbar>
         </IonHeader>
         <HomeContainer name="Home" />
-        <HomeContainer name="Home" />
-        <HomeContainer name="Home" />
       </IonContent>
     </IonPage>
   )

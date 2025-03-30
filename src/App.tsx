@@ -46,6 +46,7 @@ import ARecord from "./pages/admin/Record";
 import ATicket from "./pages/admin/Ticket";
 import ADashboard from "./pages/admin/Dashboard";
 import TicketContainer from "./components/admin/TicketContainer";
+import News from "./pages/admin/News";
 
 /* Core CSS */
 import "@ionic/react/css/core.css";
@@ -181,11 +182,12 @@ const AdminApp: React.FC = () => {
         <Route exact path="/admin/complain" component={AComplain} />
         <Route exact path="/admin/inbox" component={AInbox} />
         <Route exact path="/admin/record" component={ARecord} />
-        <Route exact path="/admin/ticket" component={ATicket} />
-        <Route
+        <Route exact path="/admin/news" component={News} />
+        {/* <Route exact path="/admin/ticket" component={ATicket} /> */}
+        {/* <Route
           path="/admin/ticket"
           render={(props) => <TicketContainer name="Admin" {...props} />}
-        />
+        /> */}
         <Route>
           <Redirect to="/admin/home" />
         </Route>
@@ -196,10 +198,14 @@ const AdminApp: React.FC = () => {
           <IonIcon icon={newspaper} />
           <IonLabel>Complaints</IonLabel>
         </IonTabButton>
-        <IonTabButton tab="admin-ticket" href="/admin/ticket">
+        <IonTabButton tab="admin-news" href="/admin/news">
+          <IonIcon icon={newspaper} />
+          <IonLabel>News</IonLabel>
+        </IonTabButton>
+        {/* <IonTabButton tab="admin-ticket" href="/admin/ticket">
           <IonIcon icon={ticket} />
           <IonLabel>Tickets</IonLabel>
-        </IonTabButton>
+        </IonTabButton> */}
         <IonTabButton tab="admin-home" href="/admin/home">
           <IonIcon icon={home} />
           <IonLabel>Home</IonLabel>

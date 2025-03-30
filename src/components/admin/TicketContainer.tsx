@@ -447,11 +447,6 @@ const TicketContainer: React.FC<{ name: string }> = ({ name }) => {
 
   return (
     <>
-      <IonHeader>
-        <IonToolbar color="primary">
-          <IonTitle>Ticket Management</IonTitle>
-        </IonToolbar>
-      </IonHeader>
       <IonContent className="ion-padding" color="light">
        
           <IonCardHeader>
