@@ -44,6 +44,7 @@ import {
   timeOutline,
   mailOutline,
   sendOutline,
+  imageOutline,
 } from "ionicons/icons";
 
 // Add this function before the main ComplainContainer component
@@ -58,6 +59,7 @@ interface Complaint {
   type: string;
   user_id: number;
   created_at: string;
+  image?: string; // Add this line
 }
 
 interface SelectedComplaint extends Complaint {
@@ -135,6 +137,33 @@ const ComplaintDetails: React.FC<{
             <strong>Incident Date:</strong>{" "}
             {formatDate(selectedComplaint.incident_date)}
           </p>
+
+          {/* Add the image display section */}
+          {selectedComplaint.image && (
+            <div style={{ marginTop: "16px" }}>
+              <p>
+                <strong>Attachment:</strong>
+              </p>
+              <div
+                style={{
+                  maxWidth: "100%",
+                  overflow: "hidden",
+                  borderRadius: "8px",
+                  border: "1px solid #ddd",
+                }}
+              >
+                <img
+                  src={`http://127.0.0.1/justify/uploads/complaints/${selectedComplaint.image}`}
+                  alt="Complaint attachment"
+                  style={{
+                    width: "100%",
+                    maxHeight: "300px",
+                    objectFit: "contain",
+                  }}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {selectedComplaint.status !== "resolved" && (
@@ -519,6 +548,7 @@ const ComplainContainer: React.FC = () => {
     type: string;
     user_id: number;
     created_at: string;
+    image?: string; // Add this line
   }
 
   interface ToastMessage {
@@ -680,6 +710,16 @@ const ComplainContainer: React.FC = () => {
                     <h2>
                       {complaint.type}{" "}
                       <IonBadge color="medium">#{complaint.id}</IonBadge>
+                      {complaint.image && (
+                        <IonIcon
+                          icon={imageOutline}
+                          style={{
+                            marginLeft: "8px",
+                            fontSize: "1.1em",
+                            verticalAlign: "middle",
+                          }}
+                        />
+                      )}
                     </h2>
                     <h3>Complainant: {complaint.complainant}</h3>
                     <p>

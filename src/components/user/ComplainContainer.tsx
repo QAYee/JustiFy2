@@ -33,6 +33,8 @@ import {
   calendarOutline,
   personOutline,
   sendOutline,
+  imageOutline,
+  closeCircleOutline,
 } from "ionicons/icons";
 import "./ComplainContainer.css";
 
@@ -58,6 +60,8 @@ const ComplainContainer: React.FC = () => {
   const [selectedComplaint, setSelectedComplaint] = useState<any>(null);
   const [messages, setMessages] = useState<Array<any>>([]);
   const [newMessage, setNewMessage] = useState("");
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Updated complaint types
   const complaintTypes: ComplaintType[] = [
@@ -156,6 +160,23 @@ const ComplainContainer: React.FC = () => {
     setShowDatePicker(false);
   };
 
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+  };
+
   const handleSubmit = async () => {
     if (!user) {
       setShowToast({
@@ -173,14 +194,16 @@ const ComplainContainer: React.FC = () => {
       return;
     }
 
-    const complaintData = {
-      user_id: user.id,
-      complainant: user.name,
-      respondent,
-      details,
-      incident_date: incidentDate,
-      complaint_type: complaintType,
-    };
+    const formData = new FormData();
+    formData.append("user_id", user.id.toString());
+    formData.append("complainant", user.name);
+    formData.append("respondent", respondent);
+    formData.append("details", details);
+    formData.append("incident_date", incidentDate);
+    formData.append("complaint_type", complaintType.toString());
+    if (selectedImage) {
+      formData.append("image", selectedImage);
+    }
 
     setLoading(true);
 
@@ -189,11 +212,7 @@ const ComplainContainer: React.FC = () => {
         "http://127.0.0.1/justify/index.php/ComplaintController/create",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json", // Add this line
-          },
-          body: JSON.stringify(complaintData),
+          body: formData, // Changed to formData instead of JSON.stringify
         }
       );
 
@@ -250,7 +269,6 @@ const ComplainContainer: React.FC = () => {
 
       const response = await fetch(
         `http://127.0.0.1/justify/index.php/ChatController/getMessages/${complaintId}`
-       
       );
 
       const data = await response.json();
@@ -452,6 +470,40 @@ const ComplainContainer: React.FC = () => {
                   <IonIcon slot="start" icon={documentTextOutline} />
                 </IonTextarea>
               </IonItem>
+
+              <IonItem lines="full" className="form-item">
+                <IonLabel position="stacked">Attachment (Optional)</IonLabel>
+                <div className="image-upload-container">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    style={{ display: "none" }}
+                    id="image-upload"
+                  />
+                  <IonButton
+                    fill="outline"
+                    onClick={() =>
+                      document.getElementById("image-upload")?.click()
+                    }
+                  >
+                    <IonIcon slot="start" icon={imageOutline} />
+                    Choose Image
+                  </IonButton>
+                  {imagePreview && (
+                    <div className="image-preview">
+                      <img src={imagePreview} alt="Preview" />
+                      <IonButton
+                        fill="clear"
+                        color="danger"
+                        onClick={removeImage}
+                      >
+                        <IonIcon slot="icon-only" icon={closeCircleOutline} />
+                      </IonButton>
+                    </div>
+                  )}
+                </div>
+              </IonItem>
             </div>
 
             <div className="form-actions">
@@ -479,52 +531,51 @@ const ComplainContainer: React.FC = () => {
 
           {/* Recent complaints preview */}
           {/* Recent complaints with chat functionality */}
-          
-            <IonCardHeader>
-              <IonCardTitle>Your Recent Complaints</IonCardTitle>
-            </IonCardHeader>
-            <IonCardContent>
-              <IonList>
-                {recentComplaints.length > 0 ? (
-                  recentComplaints.map((complaint: any) => (
-                    <IonItem
-                      key={complaint.id}
-                      button
-                      onClick={() => handleComplaintClick(complaint)}
-                    >
-                      <IonLabel>
-                        <h2>
-                          {complaintTypes.find(
-                            (t) => t.id === parseInt(complaint.complaint_type)
-                          )?.name || "Unknown Complaint Type"}
-                        </h2>
-                        <p>
-                          <IonChip
-                            color={
-                              complaint.status === "pending"
-                                ? "warning"
-                                : complaint.status === "resolved"
-                                ? "success"
-                                : "primary"
-                            }
-                            outline={true}
-                          >
-                            {complaint.status.charAt(0).toUpperCase() +
-                              complaint.status.slice(1)}
-                          </IonChip>
-                        </p>
-                        <p>Date: {complaint.incident_date}</p>
-                      </IonLabel>
-                    </IonItem>
-                  ))
-                ) : (
-                  <IonItem>
-                    <IonLabel>No complaints found</IonLabel>
+
+          <IonCardHeader>
+            <IonCardTitle>Your Recent Complaints</IonCardTitle>
+          </IonCardHeader>
+          <IonCardContent>
+            <IonList>
+              {recentComplaints.length > 0 ? (
+                recentComplaints.map((complaint: any) => (
+                  <IonItem
+                    key={complaint.id}
+                    button
+                    onClick={() => handleComplaintClick(complaint)}
+                  >
+                    <IonLabel>
+                      <h2>
+                        {complaintTypes.find(
+                          (t) => t.id === parseInt(complaint.complaint_type)
+                        )?.name || "Unknown Complaint Type"}
+                      </h2>
+                      <p>
+                        <IonChip
+                          color={
+                            complaint.status === "pending"
+                              ? "warning"
+                              : complaint.status === "resolved"
+                              ? "success"
+                              : "primary"
+                          }
+                          outline={true}
+                        >
+                          {complaint.status.charAt(0).toUpperCase() +
+                            complaint.status.slice(1)}
+                        </IonChip>
+                      </p>
+                      <p>Date: {complaint.incident_date}</p>
+                    </IonLabel>
                   </IonItem>
-                )}
-              </IonList>
-            </IonCardContent>
-        
+                ))
+              ) : (
+                <IonItem>
+                  <IonLabel>No complaints found</IonLabel>
+                </IonItem>
+              )}
+            </IonList>
+          </IonCardContent>
 
           {/* Chat Modal */}
           <IonModal
