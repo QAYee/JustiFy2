@@ -25,6 +25,8 @@ const RegisterContainer: React.FC = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPicker, setShowPicker] = useState(false);
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
 
   const calculateAge = (dob: string): string => {
     const birthDate = new Date(dob);
@@ -46,6 +48,18 @@ const RegisterContainer: React.FC = () => {
       setBirthdate(selectedDate);
       setAge(calculateAge(selectedDate));
       setShowPicker(false);
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -80,37 +94,34 @@ const RegisterContainer: React.FC = () => {
       return;
     }
 
-    const userData = {
-      name,
-      birthdate,
-      age,
-      address,
-      phone,
-      email,
-      password,
-      confirm_password: confirmPassword,
-    };
+    const userData = new FormData();
+    userData.append("name", name);
+    userData.append("birthdate", birthdate);
+    userData.append("age", age);
+    userData.append("address", address);
+    userData.append("phone", phone);
+    userData.append("email", email);
+    userData.append("password", password);
+    userData.append("confirm_password", confirmPassword);
+    if (image) {
+      userData.append("image", image);
+    }
 
-    try {
-      const response = await fetch(
-        "http://localhost/justify/index.php/RegisterController/register",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(userData),
-        }
-      );
-
-      const result = await response.json();
-      console.log("Server Response:", result); // Log server response
-      alert(result.message);
-
-      if (result.status === "success") {
-        history.push("/login");
+    // Update the fetch call
+    const response = await fetch(
+      "http://localhost/justify/index.php/RegisterController/register",
+      {
+        method: "POST",
+        body: userData, // FormData object
       }
-    } catch (error) {
-      console.error("Registration error:", error);
-      alert("An error occurred while registering.");
+    );
+
+    const result = await response.json();
+    console.log("Server Response:", result); // Log server response
+    alert(result.message);
+
+    if (result.status === "success") {
+      history.push("/login");
     }
   };
 
@@ -212,6 +223,30 @@ const RegisterContainer: React.FC = () => {
           onIonChange={(e) => setConfirmPassword(e.detail.value || "")}
           required
         />
+      </IonItem>
+
+      <IonItem>
+        <IonLabel position="floating">Profile Image</IonLabel>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          style={{ marginTop: "16px" }}
+        />
+        {imagePreview && (
+          <div style={{ marginTop: "10px" }}>
+            <img
+              src={imagePreview}
+              alt="Preview"
+              style={{
+                width: "100px",
+                height: "100px",
+                objectFit: "cover",
+                borderRadius: "50%",
+              }}
+            />
+          </div>
+        )}
       </IonItem>
 
       <IonButton expand="full" onClick={handleRegister}>

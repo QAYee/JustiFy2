@@ -26,19 +26,29 @@
 }
 
 .dashboard-avatar {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 16px;
-  background-color: rgba(255, 255, 255, 0.2);
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
   display: flex;
-  align-items: center;
   justify-content: center;
-  border: 3px solid rgba(255, 255, 255, 0.8);
+  align-items: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background-color: var(--ion-color-light);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+}
+
+.dashboard-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .dashboard-avatar ion-icon {
-  font-size: 48px;
-  color: white;
+  font-size: 100px;
+  color: var(--ion-color-medium);
 }
 
 .dashboard-title {
@@ -118,4 +128,3 @@
     margin-bottom: 4px;
   }
 }
-

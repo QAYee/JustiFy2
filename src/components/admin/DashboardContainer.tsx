@@ -1,73 +1,96 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useEffect, useState } from "react"
-import { IonButton, IonCard, IonIcon, IonChip, IonLabel } from "@ionic/react"
-import { logOutOutline, personCircleOutline, documentTextOutline, homeOutline, peopleOutline } from "ionicons/icons"
-import { useHistory } from "react-router-dom"
-import "./DashboardContainer.css"
+import type React from "react";
+import { useEffect, useState } from "react";
+import { IonButton, IonCard, IonIcon, IonChip, IonLabel } from "@ionic/react";
+import {
+  logOutOutline,
+  personCircleOutline,
+  documentTextOutline,
+  notificationsOutline,
+  homeOutline,
+  peopleOutline,
+} from "ionicons/icons";
+import { useHistory } from "react-router-dom";
+import "./DashboardContainer.css";
 
 interface AdminData {
-  name: string
-  email: string
-  role?: string
-  department?: string
-  position?: string
-  employeeId?: string
-  [key: string]: any
+  name: string;
+  email: string;
+  address: string;
+  phone?: string;
+  birthdate?: string;
+  age?: string;
+  image?: string;
+  [key: string]: any;
 }
 
 const DashboardContainer: React.FC = () => {
-  const history = useHistory()
-  const [user, setUser] = useState<AdminData | null>(null)
+  const history = useHistory();
+  const [user, setUser] = useState<AdminData | null>(null);
   const [stats, setStats] = useState({
     totalComplaints: 24,
     pendingTickets: 8,
-    resolvedCases: 16,
+    notifications: 15,
     activeUsers: 42,
-  })
+  });
 
   useEffect(() => {
-    const loggedInUser = localStorage.getItem("user")
+    const loggedInUser = localStorage.getItem("user");
 
     if (!loggedInUser) {
-      history.replace("/login")
-      return
+      history.replace("/login");
+      return;
     }
 
     try {
-      const parsedUser = JSON.parse(loggedInUser)
+      const parsedUser = JSON.parse(loggedInUser);
 
-      // Enhanced admin data with dummy values if missing
       const enhancedUser: AdminData = {
-        name: parsedUser.name || "Admin User",
-        email: parsedUser.email || "admin@justify.gov.ph",
-        role: "System Administrator",
-        department: "IT Department",
-        position: "Senior Administrator",
-        employeeId: "ADM-2023-001",
-        admin: 1,
+        name: parsedUser.name || "John Doe",
+        email: parsedUser.email || "john.doe@example.com",
+        address: parsedUser.address || "123 Main St, Anytown, PH",
+        phone: parsedUser.phone || "+63 912 345 6789",
+        birthdate: parsedUser.birthdate || "1990-01-01",
+        age: parsedUser.age || "33",
+        image: parsedUser.image || "",
         ...parsedUser,
-      }
+      };
 
-      // Remove sensitive or unnecessary fields
-      const { id, created_at, password, ...filteredUser } = enhancedUser
-      setUser(filteredUser)
+      const { id, created_at, password, ...filteredUser } = enhancedUser;
+      setUser(filteredUser);
     } catch (error) {
-      console.error("Error parsing user data:", error)
-      history.replace("/login")
+      console.error("Error parsing user data:", error);
+      history.replace("/login");
     }
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    if (user?.image) {
+      console.log(
+        "Image URL:",
+        `http://localhost/justify/uploads/${user.image}`
+      );
+      fetch(`http://localhost/justify/uploads/${user.image}`)
+        .then((response) => {
+          if (!response.ok) {
+            console.error("Image not found or server error:", response.status);
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to fetch image:", error);
+        });
+    }
+  }, [user]);
 
   const handleLogout = () => {
-    localStorage.removeItem("user")
-    localStorage.removeItem("userInfo")
-    history.replace("/login")
-  }
+    localStorage.removeItem("user");
+    localStorage.removeItem("userInfo");
+    history.replace("/login");
+  };
 
   if (!user) {
-    return <div className="dashboard-content">Loading admin profile...</div>
+    return <div className="dashboard-content">Loading admin profile...</div>;
   }
 
   return (
@@ -75,18 +98,61 @@ const DashboardContainer: React.FC = () => {
       <IonCard className="dashboard-card">
         <div className="dashboard-header">
           <div className="dashboard-avatar">
-            <IonIcon icon={personCircleOutline} />
+            {user.image ? (
+              <img
+                src={`http://localhost/justify/uploads/images/${user.image}`}
+                alt={user.name}
+                onError={(e) => {
+                  console.log("Image failed to load:", e.currentTarget.src);
+                  e.currentTarget.style.display = "none";
+                  const parent = e.currentTarget.parentElement;
+                  if (parent && !parent.querySelector("ion-icon")) {
+                    const iconElement = document.createElement("ion-icon");
+                    iconElement.setAttribute("icon", "person-circle-outline");
+                    iconElement.style.fontSize = "100px";
+                    iconElement.style.color = "var(--ion-color-medium)";
+                    parent.appendChild(iconElement);
+                  }
+                }}
+                style={{
+                  width: "100px",
+                  height: "100px",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                }}
+              />
+            ) : (
+              <IonIcon
+                icon={personCircleOutline}
+                style={{
+                  fontSize: "100px",
+                  color: "var(--ion-color-medium)",
+                }}
+              />
+            )}
           </div>
           <h2 className="dashboard-title">
             {user.name}
             <span className="admin-badge">Admin</span>
           </h2>
-          <p className="dashboard-subtitle">{user.role || "Administrator"}</p>
+          <p className="dashboard-subtitle">{user.role}</p>
 
-          <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginTop: "16px", flexWrap: "wrap" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "10px",
+              marginTop: "16px",
+              flexWrap: "wrap",
+            }}
+          >
             <IonChip color="light" outline={true}>
               <IonIcon icon={documentTextOutline} />
               <IonLabel>{stats.totalComplaints} Complaints</IonLabel>
+            </IonChip>
+            <IonChip color="light" outline={true}>
+              <IonIcon icon={notificationsOutline} />
+              <IonLabel>{stats.notifications} Notifications</IonLabel>
             </IonChip>
             <IonChip color="light" outline={true}>
               <IonIcon icon={peopleOutline} />
@@ -105,21 +171,29 @@ const DashboardContainer: React.FC = () => {
             <div className="info-value">{user.email}</div>
           </div>
           <div className="info-item">
-            <div className="info-label">Department</div>
-            <div className="info-value">{user.department}</div>
+            <div className="info-label">Address</div>
+            <div className="info-value">{user.address}</div>
           </div>
           <div className="info-item">
-            <div className="info-label">Position</div>
-            <div className="info-value">{user.position}</div>
+            <div className="info-label">Phone</div>
+            <div className="info-value">{user.phone}</div>
           </div>
           <div className="info-item">
-            <div className="info-label">Employee ID</div>
-            <div className="info-value">{user.employeeId}</div>
+            <div className="info-label">Birthdate</div>
+            <div className="info-value">{user.birthdate}</div>
+          </div>
+          <div className="info-item">
+            <div className="info-label">Age</div>
+            <div className="info-value">{user.age}</div>
           </div>
         </div>
 
         <div className="dashboard-actions">
-          <IonButton expand="block" fill="outline" onClick={() => history.push("/admin/home")}>
+          <IonButton
+            expand="block"
+            fill="outline"
+            onClick={() => history.push("/admin/home")}
+          >
             <IonIcon slot="start" icon={homeOutline} />
             Dashboard
           </IonButton>
@@ -130,8 +204,7 @@ const DashboardContainer: React.FC = () => {
         </div>
       </IonCard>
     </div>
-  )
-}
+  );
+};
 
-export default DashboardContainer
-
+export default DashboardContainer;
