@@ -55,7 +55,13 @@ interface Complaint {
   respondent: string;
   details: string;
   incident_date: string;
-  status: "New" | "Under review" | "In progress" | "Resolved" | "Closed" | "Rejected";
+  status:
+    | "New"
+    | "Under review"
+    | "In progress"
+    | "Resolved"
+    | "Closed"
+    | "Rejected";
   type: string;
   user_id: number;
   created_at: string;
@@ -91,11 +97,36 @@ interface Message {
 // Status Options Configuration
 const STATUS_OPTIONS: StatusOption[] = [
   { value: "New", label: "New", color: "warning", icon: timeOutline },
-  { value: "Under review", label: "Under Review", color: "primary", icon: timeOutline },
-  { value: "In progress", label: "In Progress", color: "tertiary", icon: timeOutline },
-  { value: "Resolved", label: "Resolved", color: "success", icon: checkmarkCircleOutline },
-  { value: "Closed", label: "Closed", color: "medium", icon: checkmarkCircleOutline },
-  { value: "Rejected", label: "Rejected", color: "danger", icon: closeCircleOutline },
+  {
+    value: "In progress",
+    label: "In Progress",
+    color: "tertiary",
+    icon: timeOutline,
+  },
+  {
+    value: "Under review",
+    label: "Under Review",
+    color: "primary",
+    icon: timeOutline,
+  },
+  {
+    value: "Resolved",
+    label: "Resolved",
+    color: "success",
+    icon: checkmarkCircleOutline,
+  },
+  {
+    value: "Closed",
+    label: "Closed",
+    color: "medium",
+    icon: checkmarkCircleOutline,
+  },
+  {
+    value: "Rejected",
+    label: "Rejected",
+    color: "danger",
+    icon: closeCircleOutline,
+  },
 ];
 
 // Complaint Details Component
@@ -115,7 +146,7 @@ const ComplaintDetails: React.FC<{
 
     // Find available next statuses based on current status
     const currentStatusIndex = STATUS_OPTIONS.findIndex(
-      option => option.value === selectedComplaint.status
+      (option) => option.value === selectedComplaint.status
     );
 
     return (
@@ -139,7 +170,9 @@ const ComplaintDetails: React.FC<{
                 size="small"
                 color={status.color}
                 className="status-button"
-                onClick={() => handleStatusUpdate(selectedComplaint.id, status.value)}
+                onClick={() =>
+                  handleStatusUpdate(selectedComplaint.id, status.value)
+                }
               >
                 <IonIcon slot="start" icon={status.icon} />
                 {status.label}
@@ -154,22 +187,41 @@ const ComplaintDetails: React.FC<{
   return (
     <>
       <IonCardHeader>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <IonCardTitle>Complaint #{selectedComplaint.id}</IonCardTitle>
           {getStatusChip(selectedComplaint.status)}
         </div>
       </IonCardHeader>
       <IonCardContent>
         <div className="complaint-details">
-          <p><strong>Type:</strong> {selectedComplaint.type}</p>
-          <p><strong>Complainant:</strong> {selectedComplaint.complainant}</p>
-          <p><strong>Respondent:</strong> {selectedComplaint.respondent}</p>
-          <p><strong>Details:</strong> {selectedComplaint.details}</p>
-          <p><strong>Incident Date:</strong> {formatDate(selectedComplaint.incident_date)}</p>
+          <p>
+            <strong>Type:</strong> {selectedComplaint.type}
+          </p>
+          <p>
+            <strong>Complainant:</strong> {selectedComplaint.complainant}
+          </p>
+          <p>
+            <strong>Respondent:</strong> {selectedComplaint.respondent}
+          </p>
+          <p>
+            <strong>Details:</strong> {selectedComplaint.details}
+          </p>
+          <p>
+            <strong>Incident Date:</strong>{" "}
+            {formatDate(selectedComplaint.incident_date)}
+          </p>
 
           {selectedComplaint.image && (
             <div className="attachment-container">
-              <p><strong>Attachment:</strong></p>
+              <p>
+                <strong>Attachment:</strong>
+              </p>
               <div className="image-container">
                 <img
                   src={`http://127.0.0.1/justify/uploads/complaints/${selectedComplaint.image}`}
@@ -300,7 +352,7 @@ const ComplainContainer: React.FC = () => {
         if (selectedComplaint && selectedComplaint.id === complaintId) {
           setSelectedComplaint({
             ...selectedComplaint,
-            status: newStatus
+            status: newStatus,
           });
         }
 
@@ -330,19 +382,23 @@ const ComplainContainer: React.FC = () => {
         filtered = filtered.filter((complaint) => {
           // Handle potential undefined or null status
           if (!complaint.status) return false;
-          
+
           // Convert filter and status to lowercase for case-insensitive comparison
           const filterLower = filter.toLowerCase();
           const statusLower = complaint.status.toLowerCase();
-          
+
           // Handle mapping for specific statuses
           if (filterLower === "new" && statusLower === "new") return true;
-          if (filterLower === "under review" && statusLower === "under review") return true;
-          if (filterLower === "in progress" && statusLower === "in progress") return true;
-          if (filterLower === "resolved" && statusLower === "resolved") return true;
+          if (filterLower === "under review" && statusLower === "under review")
+            return true;
+          if (filterLower === "in progress" && statusLower === "in progress")
+            return true;
+          if (filterLower === "resolved" && statusLower === "resolved")
+            return true;
           if (filterLower === "closed" && statusLower === "closed") return true;
-          if (filterLower === "rejected" && statusLower === "rejected") return true;
-          
+          if (filterLower === "rejected" && statusLower === "rejected")
+            return true;
+
           return false;
         });
       }
@@ -402,18 +458,16 @@ const ComplainContainer: React.FC = () => {
 
   // Improved getStatusChip function using STATUS_OPTIONS
   const getStatusChip = (status: Complaint["status"]) => {
-    const statusOption = STATUS_OPTIONS.find(option => 
-      option.value.toLowerCase() === status?.toLowerCase()
+    const statusOption = STATUS_OPTIONS.find(
+      (option) => option.value.toLowerCase() === status?.toLowerCase()
     );
-    
+
     if (statusOption) {
       return (
-        <IonBadge color={statusOption.color}>
-          {statusOption.label}
-        </IonBadge>
+        <IonBadge color={statusOption.color}>{statusOption.label}</IonBadge>
       );
     }
-    
+
     // Default fallback
     return <IonBadge color="medium">{status || "Unknown"}</IonBadge>;
   };
@@ -437,13 +491,13 @@ const ComplainContainer: React.FC = () => {
   // Get complaint counts by status
   const getComplaintCounts = () => {
     const counts: Record<string, number> = {
-      "New": 0,
+      New: 0,
       "Under review": 0,
       "In progress": 0,
-      "Resolved": 0,
-      "Closed": 0,
-      "Rejected": 0,
-      "total": complaints.length
+      Resolved: 0,
+      Closed: 0,
+      Rejected: 0,
+      total: complaints.length,
     };
 
     complaints.forEach((complaint) => {
@@ -528,6 +582,13 @@ const ComplainContainer: React.FC = () => {
     }
   }, [selectedComplaint]);
 
+  // Add this effect to auto-update status when a "New" complaint is selected
+  useEffect(() => {
+    if (selectedComplaint && selectedComplaint.status === "New") {
+      handleStatusUpdate(selectedComplaint.id, "In progress");
+    }
+  }, [selectedComplaint?.id]);
+
   return (
     <IonContent className="ion-padding" color="light">
       <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
@@ -561,9 +622,9 @@ const ComplainContainer: React.FC = () => {
             .filter(([status]) => status !== "total")
             .map(([status, count]) => {
               const statusOption = STATUS_OPTIONS.find(
-                option => option.value === status
+                (option) => option.value === status
               );
-              
+
               return statusOption ? (
                 <IonChip key={status} color={statusOption.color}>
                   <IonIcon icon={statusOption.icon} />
@@ -645,126 +706,155 @@ const ComplainContainer: React.FC = () => {
       />
 
       {!loading && !error && (
-      
-<IonList>
-  {getFilteredComplaints().length > 0 ? (
-    getFilteredComplaints().map((complaint) => (
-      <IonItemSliding key={complaint.id} className="complaint-item">
-        <IonItem
-          detail
-          button
-          onClick={() => {
-            setSelectedComplaint(complaint);
-            fetchMessages(complaint.id);
-          }}
-          className="complaint-content"
-        >
-          <IonLabel className="ion-text-wrap">
-            <h2 style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "4px" }}>
-              <span style={{ wordBreak: "break-word" }}>{complaint.type}</span> 
-              <IonBadge color="medium">#{complaint.id}</IonBadge>
-              {complaint.image && (
-                <IonIcon
-                  icon={imageOutline}
-                  style={{ marginLeft: "8px", fontSize: "1.1em", verticalAlign: "middle" }}
-                />
-              )}
-            </h2>
-            <h3 style={{ whiteSpace: "normal", overflow: "visible" }}>
-              Complainant: {complaint.complainant}
-            </h3>
-            <p style={{ whiteSpace: "normal", overflow: "visible" }}>
-              <strong>Respondent:</strong> {complaint.respondent}
-            </p>
-            <p style={{ whiteSpace: "normal", overflow: "visible" }}>
-              <strong>Date:</strong> 
-              <IonChip color="medium" outline={true} style={{ margin: "2px 0" }}>
-                <IonIcon icon={timeOutline} />
-                <span style={{ padding: "0 4px" }}>{formatDate(complaint.incident_date)}</span>
-              </IonChip>
-            </p>
-            <p style={{ whiteSpace: "normal", overflow: "visible" }}>
-              <strong>Status:</strong> {getStatusChip(complaint.status)}
-            </p>
-          </IonLabel>
-        </IonItem>
-        <IonItemOptions side="end">
-          {!["Resolved", "Closed", "Rejected"].includes(complaint.status) && (
-            <IonItemOption
-              color="primary"
-              onClick={() => handleStatusUpdate(complaint.id, "Under review")}
-              title="Under Review"
-            >
-              <div className="ion-item-option-content">
-                <IonIcon icon={timeOutline} />
-                <span className="ion-hide-sm-down">Review</span>
-              </div>
-            </IonItemOption>
+        <IonList>
+          {getFilteredComplaints().length > 0 ? (
+            getFilteredComplaints().map((complaint) => (
+              <IonItemSliding key={complaint.id} className="complaint-item">
+                <IonItem
+                  detail
+                  button
+                  onClick={() => {
+                    setSelectedComplaint(complaint);
+                    fetchMessages(complaint.id);
+                  }}
+                  className="complaint-content"
+                >
+                  <IonLabel className="ion-text-wrap">
+                    <h2
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        flexWrap: "wrap",
+                        gap: "4px",
+                      }}
+                    >
+                      <span style={{ wordBreak: "break-word" }}>
+                        {complaint.type}
+                      </span>
+                      <IonBadge color="medium">#{complaint.id}</IonBadge>
+                      {complaint.image && (
+                        <IonIcon
+                          icon={imageOutline}
+                          style={{
+                            marginLeft: "8px",
+                            fontSize: "1.1em",
+                            verticalAlign: "middle",
+                          }}
+                        />
+                      )}
+                    </h2>
+                    <h3 style={{ whiteSpace: "normal", overflow: "visible" }}>
+                      Complainant: {complaint.complainant}
+                    </h3>
+                    <p style={{ whiteSpace: "normal", overflow: "visible" }}>
+                      <strong>Respondent:</strong> {complaint.respondent}
+                    </p>
+                    <p style={{ whiteSpace: "normal", overflow: "visible" }}>
+                      <strong>Date:</strong>
+                      <IonChip
+                        color="medium"
+                        outline={true}
+                        style={{ margin: "2px 0" }}
+                      >
+                        <IonIcon icon={timeOutline} />
+                        <span style={{ padding: "0 4px" }}>
+                          {formatDate(complaint.incident_date)}
+                        </span>
+                      </IonChip>
+                    </p>
+                    <p style={{ whiteSpace: "normal", overflow: "visible" }}>
+                      <strong>Status:</strong> {getStatusChip(complaint.status)}
+                    </p>
+                  </IonLabel>
+                </IonItem>
+                <IonItemOptions side="end">
+                  {!["Resolved", "Closed", "Rejected"].includes(
+                    complaint.status
+                  ) && (
+                    <IonItemOption
+                      color="primary"
+                      onClick={() =>
+                        handleStatusUpdate(complaint.id, "Under review")
+                      }
+                      title="Under Review"
+                    >
+                      <div className="ion-item-option-content">
+                        <IonIcon icon={timeOutline} />
+                        <span className="ion-hide-sm-down">Review</span>
+                      </div>
+                    </IonItemOption>
+                  )}
+                  {!["Closed", "Rejected"].includes(complaint.status) && (
+                    <IonItemOption
+                      color="tertiary"
+                      onClick={() =>
+                        handleStatusUpdate(complaint.id, "In progress")
+                      }
+                      title="In Progress"
+                    >
+                      <div className="ion-item-option-content">
+                        <IonIcon icon={timeOutline} />
+                        <span className="ion-hide-sm-down">Progress</span>
+                      </div>
+                    </IonItemOption>
+                  )}
+                  {!["Closed", "Rejected"].includes(complaint.status) && (
+                    <>
+                      <IonItemOption
+                        color="success"
+                        onClick={() =>
+                          handleStatusUpdate(complaint.id, "Resolved")
+                        }
+                        title="Resolve"
+                      >
+                        <div className="ion-item-option-content">
+                          <IonIcon icon={checkmarkCircleOutline} />
+                          <span className="ion-hide-sm-down">Resolve</span>
+                        </div>
+                      </IonItemOption>
+                      <IonItemOption
+                        color="danger"
+                        onClick={() =>
+                          handleStatusUpdate(complaint.id, "Rejected")
+                        }
+                        title="Reject"
+                      >
+                        <div className="ion-item-option-content">
+                          <IonIcon icon={closeCircleOutline} />
+                          <span className="ion-hide-sm-down">Reject</span>
+                        </div>
+                      </IonItemOption>
+                    </>
+                  )}
+                  {complaint.status === "Resolved" && (
+                    <IonItemOption
+                      color="medium"
+                      onClick={() => handleStatusUpdate(complaint.id, "Closed")}
+                      title="Close"
+                    >
+                      <div className="ion-item-option-content">
+                        <IonIcon icon={checkmarkCircleOutline} />
+                        <span className="ion-hide-sm-down">Close</span>
+                      </div>
+                    </IonItemOption>
+                  )}
+                  <IonItemOption color="primary" title="Email">
+                    <div className="ion-item-option-content">
+                      <IonIcon icon={mailOutline} />
+                      <span className="ion-hide-sm-down">Email</span>
+                    </div>
+                  </IonItemOption>
+                </IonItemOptions>
+              </IonItemSliding>
+            ))
+          ) : (
+            <IonItem>
+              <IonLabel className="ion-text-center">
+                No complaints found matching your criteria.
+              </IonLabel>
+            </IonItem>
           )}
-          {!["Closed", "Rejected"].includes(complaint.status) && (
-            <IonItemOption
-              color="tertiary"
-              onClick={() => handleStatusUpdate(complaint.id, "In progress")}
-              title="In Progress"
-            >
-              <div className="ion-item-option-content">
-                <IonIcon icon={timeOutline} />
-                <span className="ion-hide-sm-down">Progress</span>
-              </div>
-            </IonItemOption>
-          )}
-          {!["Closed", "Rejected"].includes(complaint.status) && (
-            <>
-              <IonItemOption
-                color="success"
-                onClick={() => handleStatusUpdate(complaint.id, "Resolved")}
-                title="Resolve"
-              >
-                <div className="ion-item-option-content">
-                  <IonIcon icon={checkmarkCircleOutline} />
-                  <span className="ion-hide-sm-down">Resolve</span>
-                </div>
-              </IonItemOption>
-              <IonItemOption
-                color="danger"
-                onClick={() => handleStatusUpdate(complaint.id, "Rejected")}
-                title="Reject"
-              >
-                <div className="ion-item-option-content">
-                  <IonIcon icon={closeCircleOutline} />
-                  <span className="ion-hide-sm-down">Reject</span>
-                </div>
-              </IonItemOption>
-            </>
-          )}
-          {complaint.status === "Resolved" && (
-            <IonItemOption
-              color="medium"
-              onClick={() => handleStatusUpdate(complaint.id, "Closed")}
-              title="Close"
-            >
-              <div className="ion-item-option-content">
-                <IonIcon icon={checkmarkCircleOutline} />
-                <span className="ion-hide-sm-down">Close</span>
-              </div>
-            </IonItemOption>
-          )}
-          <IonItemOption color="primary" title="Email">
-            <div className="ion-item-option-content">
-              <IonIcon icon={mailOutline} />
-              <span className="ion-hide-sm-down">Email</span>
-            </div>
-          </IonItemOption>
-        </IonItemOptions>
-      </IonItemSliding>
-    ))
-  ) : (
-    <IonItem>
-      <IonLabel className="ion-text-center">No complaints found matching your criteria.</IonLabel>
-    </IonItem>
-  )}
-</IonList>
-      
+        </IonList>
       )}
 
       <IonInfiniteScroll onIonInfinite={handleInfiniteScroll}>
@@ -806,20 +896,24 @@ const ComplainContainer: React.FC = () => {
                   style={{
                     display: "flex",
                     flexDirection: "column",
-                    alignItems: msg.sender === "admin" ? "flex-end" : "flex-start",
+                    alignItems:
+                      msg.sender === "admin" ? "flex-end" : "flex-start",
                     marginBottom: "16px",
                   }}
                 >
                   <div
                     style={{
-                      backgroundColor: msg.sender === "admin" ? "#DCF8C6" : "#E8E8E8",
+                      backgroundColor:
+                        msg.sender === "admin" ? "#DCF8C6" : "#E8E8E8",
                       borderRadius: "12px",
                       padding: "8px 12px",
                       maxWidth: "70%",
                       wordBreak: "break-word",
                     }}
                   >
-                    <p style={{ margin: "0 0 4px 0" }}>{msg.message || msg.text || ""}</p>
+                    <p style={{ margin: "0 0 4px 0" }}>
+                      {msg.message || msg.text || ""}
+                    </p>
                     <small
                       style={{
                         fontSize: "0.75rem",
@@ -834,7 +928,9 @@ const ComplainContainer: React.FC = () => {
                 </div>
               ))
             ) : (
-              <div style={{ textAlign: "center", padding: "20px", color: "#666" }}>
+              <div
+                style={{ textAlign: "center", padding: "20px", color: "#666" }}
+              >
                 No messages yet. Start the conversation!
               </div>
             )}
