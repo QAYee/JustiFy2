@@ -47,26 +47,25 @@ import {
   imageOutline,
 } from "ionicons/icons";
 
-// Add this function before the main ComplainContainer component
 // Add these interfaces before the component
+// Types and Interfaces
 interface Complaint {
   id: number;
   complainant: string;
   respondent: string;
   details: string;
   incident_date: string;
-  status: "pending" | "processing" | "resolved" | "rejected";
+  status: "New" | "Under review" | "In progress" | "Resolved" | "Closed" | "Rejected";
   type: string;
   user_id: number;
   created_at: string;
-  image?: string; // Add this line
+  image?: string;
 }
 
 interface SelectedComplaint extends Complaint {
   messages?: Message[];
 }
 
-// Add this interface after your existing interfaces
 interface StatusOption {
   value: Complaint["status"];
   label: string;
@@ -74,146 +73,115 @@ interface StatusOption {
   icon: string;
 }
 
-// Add this constant before your ComplainContainer component
+interface ToastMessage {
+  message: string;
+  color?: string;
+}
+
+interface Message {
+  message: string;
+  id?: number;
+  text: string;
+  sender: "user" | "admin";
+  timestamp: string;
+  complaint_id?: number;
+  user_id?: number;
+}
+
+// Status Options Configuration
 const STATUS_OPTIONS: StatusOption[] = [
-  { value: "pending", label: "Pending", color: "warning", icon: timeOutline },
-  {
-    value: "processing",
-    label: "Processing",
-    color: "primary",
-    icon: timeOutline,
-  },
-  {
-    value: "resolved",
-    label: "Resolved",
-    color: "success",
-    icon: checkmarkCircleOutline,
-  },
-  {
-    value: "rejected",
-    label: "Rejected",
-    color: "danger",
-    icon: closeCircleOutline,
-  },
+  { value: "New", label: "New", color: "warning", icon: timeOutline },
+  { value: "Under review", label: "Under Review", color: "primary", icon: timeOutline },
+  { value: "In progress", label: "In Progress", color: "tertiary", icon: timeOutline },
+  { value: "Resolved", label: "Resolved", color: "success", icon: checkmarkCircleOutline },
+  { value: "Closed", label: "Closed", color: "medium", icon: checkmarkCircleOutline },
+  { value: "Rejected", label: "Rejected", color: "danger", icon: closeCircleOutline },
 ];
 
+// Complaint Details Component
 const ComplaintDetails: React.FC<{
   selectedComplaint: SelectedComplaint | null;
   handleStatusUpdate: (id: number, status: Complaint["status"]) => void;
-  getStatusChip: (status: Complaint["status"]) => JSX.Element | undefined;
+  getStatusChip: (status: Complaint["status"]) => JSX.Element;
   formatDate: (date: string) => string;
 }> = ({ selectedComplaint, handleStatusUpdate, getStatusChip, formatDate }) => {
   if (!selectedComplaint) return null;
 
+  const renderStatusActions = () => {
+    // Only show status updates for complaints that aren't Resolved, Closed, or Rejected
+    if (["Resolved", "Closed", "Rejected"].includes(selectedComplaint.status)) {
+      return null;
+    }
+
+    // Find available next statuses based on current status
+    const currentStatusIndex = STATUS_OPTIONS.findIndex(
+      option => option.value === selectedComplaint.status
+    );
+
+    return (
+      <div className="status-update-container">
+        <h3 className="status-update-title">Update Status</h3>
+        <div className="status-buttons-container">
+          {STATUS_OPTIONS.map((status) => {
+            // Don't show the current status
+            if (status.value === selectedComplaint.status) {
+              return null;
+            }
+
+            // Skip "New" as an option since it's the initial state
+            if (status.value === "New") {
+              return null;
+            }
+
+            return (
+              <IonButton
+                key={status.value}
+                size="small"
+                color={status.color}
+                className="status-button"
+                onClick={() => handleStatusUpdate(selectedComplaint.id, status.value)}
+              >
+                <IonIcon slot="start" icon={status.icon} />
+                {status.label}
+              </IonButton>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <IonCardHeader>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <IonCardTitle>Complaint #{selectedComplaint.id}</IonCardTitle>
           {getStatusChip(selectedComplaint.status)}
         </div>
       </IonCardHeader>
       <IonCardContent>
-        <div style={{ marginBottom: "16px" }}>
-          <p>
-            <strong>Type:</strong> {selectedComplaint.type}
-          </p>
-          <p>
-            <strong>Complainant:</strong> {selectedComplaint.complainant}
-          </p>
-          <p>
-            <strong>Respondent:</strong> {selectedComplaint.respondent}
-          </p>
-          <p>
-            <strong>Details:</strong> {selectedComplaint.details}
-          </p>
-          <p>
-            <strong>Incident Date:</strong>{" "}
-            {formatDate(selectedComplaint.incident_date)}
-          </p>
+        <div className="complaint-details">
+          <p><strong>Type:</strong> {selectedComplaint.type}</p>
+          <p><strong>Complainant:</strong> {selectedComplaint.complainant}</p>
+          <p><strong>Respondent:</strong> {selectedComplaint.respondent}</p>
+          <p><strong>Details:</strong> {selectedComplaint.details}</p>
+          <p><strong>Incident Date:</strong> {formatDate(selectedComplaint.incident_date)}</p>
 
-          {/* Add the image display section */}
           {selectedComplaint.image && (
-            <div style={{ marginTop: "16px" }}>
-              <p>
-                <strong>Attachment:</strong>
-              </p>
-              <div
-                style={{
-                  maxWidth: "100%",
-                  overflow: "hidden",
-                  borderRadius: "8px",
-                  border: "1px solid #ddd",
-                }}
-              >
+            <div className="attachment-container">
+              <p><strong>Attachment:</strong></p>
+              <div className="image-container">
                 <img
                   src={`http://127.0.0.1/justify/uploads/complaints/${selectedComplaint.image}`}
                   alt="Complaint attachment"
-                  style={{
-                    width: "100%",
-                    maxHeight: "300px",
-                    objectFit: "contain",
-                  }}
+                  className="complaint-image"
                 />
               </div>
             </div>
           )}
         </div>
 
-        {selectedComplaint.status !== "resolved" && (
-          <div
-            style={{
-              marginBottom: "16px",
-              padding: "12px",
-              backgroundColor: "#f8f9fa",
-              borderRadius: "8px",
-            }}
-          >
-            <h3 style={{ marginTop: "0", marginBottom: "12px" }}>
-              Update Status
-            </h3>
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-              {selectedComplaint.status !== "processing" && (
-                <IonButton
-                  size="small"
-                  color="primary"
-                  onClick={() =>
-                    handleStatusUpdate(selectedComplaint.id, "processing")
-                  }
-                >
-                  <IonIcon slot="start" icon={timeOutline} />
-                  Mark as Processing
-                </IonButton>
-              )}
-              <IonButton
-                size="small"
-                color="success"
-                onClick={() =>
-                  handleStatusUpdate(selectedComplaint.id, "resolved")
-                }
-              >
-                <IonIcon slot="start" icon={checkmarkCircleOutline} />
-                Mark as Resolved
-              </IonButton>
-              <IonButton
-                size="small"
-                color="danger"
-                onClick={() =>
-                  handleStatusUpdate(selectedComplaint.id, "rejected")
-                }
-              >
-                <IonIcon slot="start" icon={closeCircleOutline} />
-                Mark as Rejected
-              </IonButton>
-            </div>
-          </div>
-        )}
+        {renderStatusActions()}
       </IonCardContent>
     </>
   );
@@ -328,6 +296,14 @@ const ComplainContainer: React.FC = () => {
           )
         );
 
+        // Also update the selected complaint if it's the one being updated
+        if (selectedComplaint && selectedComplaint.id === complaintId) {
+          setSelectedComplaint({
+            ...selectedComplaint,
+            status: newStatus
+          });
+        }
+
         setToast({
           message: `Status updated to ${newStatus}`,
           color: "success",
@@ -354,7 +330,20 @@ const ComplainContainer: React.FC = () => {
         filtered = filtered.filter((complaint) => {
           // Handle potential undefined or null status
           if (!complaint.status) return false;
-          return complaint.status.toLowerCase() === filter.toLowerCase();
+          
+          // Convert filter and status to lowercase for case-insensitive comparison
+          const filterLower = filter.toLowerCase();
+          const statusLower = complaint.status.toLowerCase();
+          
+          // Handle mapping for specific statuses
+          if (filterLower === "new" && statusLower === "new") return true;
+          if (filterLower === "under review" && statusLower === "under review") return true;
+          if (filterLower === "in progress" && statusLower === "in progress") return true;
+          if (filterLower === "resolved" && statusLower === "resolved") return true;
+          if (filterLower === "closed" && statusLower === "closed") return true;
+          if (filterLower === "rejected" && statusLower === "rejected") return true;
+          
+          return false;
         });
       }
 
@@ -411,22 +400,25 @@ const ComplainContainer: React.FC = () => {
     }
   };
 
+  // Improved getStatusChip function using STATUS_OPTIONS
   const getStatusChip = (status: Complaint["status"]) => {
-    switch (status) {
-      case "pending":
-        return <IonBadge color="warning">Pending</IonBadge>;
-      case "processing":
-        return <IonBadge color="primary">Processing</IonBadge>;
-      case "resolved":
-        return <IonBadge color="success">Resolved</IonBadge>;
-      case "rejected":
-        return <IonBadge color="danger">Rejected</IonBadge>;
-      default:
-        return <IonBadge color="medium">{status}</IonBadge>;
+    const statusOption = STATUS_OPTIONS.find(option => 
+      option.value.toLowerCase() === status?.toLowerCase()
+    );
+    
+    if (statusOption) {
+      return (
+        <IonBadge color={statusOption.color}>
+          {statusOption.label}
+        </IonBadge>
+      );
     }
+    
+    // Default fallback
+    return <IonBadge color="medium">{status || "Unknown"}</IonBadge>;
   };
 
-  // Add this helper function after your imports
+  // Helper function for formatting dates
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
@@ -442,30 +434,21 @@ const ComplainContainer: React.FC = () => {
     }
   };
 
-  // Add this function after the formatDate function
+  // Get complaint counts by status
   const getComplaintCounts = () => {
-    const counts = {
-      pending: 0,
-      processing: 0,
-      resolved: 0,
-      rejected: 0,
-      total: complaints.length,
+    const counts: Record<string, number> = {
+      "New": 0,
+      "Under review": 0,
+      "In progress": 0,
+      "Resolved": 0,
+      "Closed": 0,
+      "Rejected": 0,
+      "total": complaints.length
     };
 
     complaints.forEach((complaint) => {
-      switch (complaint.status) {
-        case "pending":
-          counts.pending++;
-          break;
-        case "processing":
-          counts.processing++;
-          break;
-        case "resolved":
-          counts.resolved++;
-          break;
-        case "rejected":
-          counts.rejected++;
-          break;
+      if (complaint.status && counts.hasOwnProperty(complaint.status)) {
+        counts[complaint.status]++;
       }
     });
 
@@ -537,39 +520,6 @@ const ComplainContainer: React.FC = () => {
     }
   };
 
-  // Update the interface to match backend data
-  interface Complaint {
-    id: number;
-    complainant: string;
-    respondent: string;
-    details: string;
-    incident_date: string;
-    status: "pending" | "processing" | "resolved" | "rejected";
-    type: string;
-    user_id: number;
-    created_at: string;
-    image?: string; // Add this line
-  }
-
-  interface ToastMessage {
-    message: string;
-    color?: string;
-  }
-
-  interface Message {
-    message: string;
-    id?: number;
-    text: string;
-    sender: "user" | "admin";
-    timestamp: string;
-    complaint_id?: number;
-    user_id?: number;
-  }
-
-  interface SelectedComplaint extends Complaint {
-    messages?: Message[];
-  }
-
   useEffect(() => {
     if (selectedComplaint) {
       fetchMessages(selectedComplaint.id);
@@ -584,6 +534,16 @@ const ComplainContainer: React.FC = () => {
         <IonRefresherContent></IonRefresherContent>
       </IonRefresher>
 
+      {toast && (
+        <IonToast
+          isOpen={!!toast}
+          message={toast.message}
+          duration={3000}
+          color={toast.color || "primary"}
+          onDidDismiss={() => setToast(null)}
+        />
+      )}
+
       <IonCardHeader>
         <IonCardTitle>Complaints Dashboard</IonCardTitle>
       </IonCardHeader>
@@ -597,27 +557,22 @@ const ComplainContainer: React.FC = () => {
             gap: "8px",
           }}
         >
-          {Object.entries(getComplaintCounts()).map(
-            ([status, count]) =>
-              status !== "total" && (
-                <IonChip
-                  key={status}
-                  color={
-                    status === "pending"
-                      ? "warning"
-                      : status === "processing"
-                      ? "primary"
-                      : status === "resolved"
-                      ? "success"
-                      : "danger"
-                  }
-                >
+          {Object.entries(getComplaintCounts())
+            .filter(([status]) => status !== "total")
+            .map(([status, count]) => {
+              const statusOption = STATUS_OPTIONS.find(
+                option => option.value === status
+              );
+              
+              return statusOption ? (
+                <IonChip key={status} color={statusOption.color}>
+                  <IonIcon icon={statusOption.icon} />
                   <IonLabel>
-                    {status.charAt(0).toUpperCase() + status.slice(1)}: {count}
+                    {statusOption.label}: {count}
                   </IonLabel>
                 </IonChip>
-              )
-          )}
+              ) : null;
+            })}
         </div>
 
         <IonSearchbar
@@ -638,24 +593,20 @@ const ComplainContainer: React.FC = () => {
           }}
         >
           <IonSegment
+            style={{ width: "100%" }}
+            className="status-segment"
+            scrollable={true}
             value={filter}
             onIonChange={(e) => setFilter(e.detail.value as string)}
           >
             <IonSegmentButton value="all">
               <IonLabel>All</IonLabel>
             </IonSegmentButton>
-            <IonSegmentButton value="pending">
-              <IonLabel>Pending</IonLabel>
-            </IonSegmentButton>
-            <IonSegmentButton value="processing">
-              <IonLabel>Processing</IonLabel>
-            </IonSegmentButton>
-            <IonSegmentButton value="resolved">
-              <IonLabel>Resolved</IonLabel>
-            </IonSegmentButton>
-            <IonSegmentButton value="rejected">
-              <IonLabel>rejected</IonLabel>
-            </IonSegmentButton>
+            {STATUS_OPTIONS.map((option) => (
+              <IonSegmentButton key={option.value} value={option.value}>
+                <IonLabel>{option.label}</IonLabel>
+              </IonSegmentButton>
+            ))}
           </IonSegment>
         </div>
 
@@ -694,98 +645,126 @@ const ComplainContainer: React.FC = () => {
       />
 
       {!loading && !error && (
-        <IonList>
-          {getFilteredComplaints().length > 0 ? (
-            getFilteredComplaints().map((complaint) => (
-              <IonItemSliding key={complaint.id}>
-                <IonItem
-                  detail
-                  button
-                  onClick={() => {
-                    setSelectedComplaint(complaint);
-                    fetchMessages(complaint.id);
-                  }}
-                >
-                  <IonLabel>
-                    <h2>
-                      {complaint.type}{" "}
-                      <IonBadge color="medium">#{complaint.id}</IonBadge>
-                      {complaint.image && (
-                        <IonIcon
-                          icon={imageOutline}
-                          style={{
-                            marginLeft: "8px",
-                            fontSize: "1.1em",
-                            verticalAlign: "middle",
-                          }}
-                        />
-                      )}
-                    </h2>
-                    <h3>Complainant: {complaint.complainant}</h3>
-                    <p>
-                      <strong>Respondent:</strong> {complaint.respondent}
-                    </p>
-                    <p>
-                      <strong>Date:</strong>{" "}
-                      <IonChip color="medium" outline={true}>
-                        <IonIcon icon={timeOutline} />
-                        {formatDate(complaint.incident_date)}
-                      </IonChip>
-                    </p>
-                    <p>
-                      <strong>Status:</strong> {getStatusChip(complaint.status)}
-                    </p>
-                  </IonLabel>
-                </IonItem>
-                <IonItemOptions side="end">
-                  {complaint.status === "pending" && (
-                    <IonItemOption
-                      color="primary"
-                      onClick={() =>
-                        handleStatusUpdate(complaint.id, "processing")
-                      }
-                    >
-                      <IonIcon slot="icon-only" icon={timeOutline} />
-                    </IonItemOption>
-                  )}
-                  {(complaint.status === "pending" ||
-                    complaint.status === "processing") && (
-                    <>
-                      <IonItemOption
-                        color="success"
-                        onClick={() =>
-                          handleStatusUpdate(complaint.id, "resolved")
-                        }
-                      >
-                        <IonIcon
-                          slot="icon-only"
-                          icon={checkmarkCircleOutline}
-                        />
-                      </IonItemOption>
-                      <IonItemOption
-                        color="danger"
-                        onClick={() =>
-                          handleStatusUpdate(complaint.id, "rejected")
-                        }
-                      >
-                        <IonIcon slot="icon-only" icon={closeCircleOutline} />
-                      </IonItemOption>
-                    </>
-                  )}
-                  <IonItemOption color="primary">
-                    <IonIcon slot="icon-only" icon={mailOutline} />
-                  </IonItemOption>
-                </IonItemOptions>
-              </IonItemSliding>
-            ))
-          ) : (
-            <IonItem>
-              <IonLabel className="ion-text-center">
-                No complaints found matching your criteria.
-              </IonLabel>
-            </IonItem>
+      
+<IonList>
+  {getFilteredComplaints().length > 0 ? (
+    getFilteredComplaints().map((complaint) => (
+      <IonItemSliding key={complaint.id} className="complaint-item">
+        <IonItem
+          detail
+          button
+          onClick={() => {
+            setSelectedComplaint(complaint);
+            fetchMessages(complaint.id);
+          }}
+          className="complaint-content"
+        >
+          <IonLabel className="ion-text-wrap">
+            <h2 style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "4px" }}>
+              <span style={{ wordBreak: "break-word" }}>{complaint.type}</span> 
+              <IonBadge color="medium">#{complaint.id}</IonBadge>
+              {complaint.image && (
+                <IonIcon
+                  icon={imageOutline}
+                  style={{ marginLeft: "8px", fontSize: "1.1em", verticalAlign: "middle" }}
+                />
+              )}
+            </h2>
+            <h3 style={{ whiteSpace: "normal", overflow: "visible" }}>
+              Complainant: {complaint.complainant}
+            </h3>
+            <p style={{ whiteSpace: "normal", overflow: "visible" }}>
+              <strong>Respondent:</strong> {complaint.respondent}
+            </p>
+            <p style={{ whiteSpace: "normal", overflow: "visible" }}>
+              <strong>Date:</strong> 
+              <IonChip color="medium" outline={true} style={{ margin: "2px 0" }}>
+                <IonIcon icon={timeOutline} />
+                <span style={{ padding: "0 4px" }}>{formatDate(complaint.incident_date)}</span>
+              </IonChip>
+            </p>
+            <p style={{ whiteSpace: "normal", overflow: "visible" }}>
+              <strong>Status:</strong> {getStatusChip(complaint.status)}
+            </p>
+          </IonLabel>
+        </IonItem>
+        <IonItemOptions side="end">
+          {!["Resolved", "Closed", "Rejected"].includes(complaint.status) && (
+            <IonItemOption
+              color="primary"
+              onClick={() => handleStatusUpdate(complaint.id, "Under review")}
+              title="Under Review"
+            >
+              <div className="ion-item-option-content">
+                <IonIcon icon={timeOutline} />
+                <span className="ion-hide-sm-down">Review</span>
+              </div>
+            </IonItemOption>
           )}
-        </IonList>
+          {!["Closed", "Rejected"].includes(complaint.status) && (
+            <IonItemOption
+              color="tertiary"
+              onClick={() => handleStatusUpdate(complaint.id, "In progress")}
+              title="In Progress"
+            >
+              <div className="ion-item-option-content">
+                <IonIcon icon={timeOutline} />
+                <span className="ion-hide-sm-down">Progress</span>
+              </div>
+            </IonItemOption>
+          )}
+          {!["Closed", "Rejected"].includes(complaint.status) && (
+            <>
+              <IonItemOption
+                color="success"
+                onClick={() => handleStatusUpdate(complaint.id, "Resolved")}
+                title="Resolve"
+              >
+                <div className="ion-item-option-content">
+                  <IonIcon icon={checkmarkCircleOutline} />
+                  <span className="ion-hide-sm-down">Resolve</span>
+                </div>
+              </IonItemOption>
+              <IonItemOption
+                color="danger"
+                onClick={() => handleStatusUpdate(complaint.id, "Rejected")}
+                title="Reject"
+              >
+                <div className="ion-item-option-content">
+                  <IonIcon icon={closeCircleOutline} />
+                  <span className="ion-hide-sm-down">Reject</span>
+                </div>
+              </IonItemOption>
+            </>
+          )}
+          {complaint.status === "Resolved" && (
+            <IonItemOption
+              color="medium"
+              onClick={() => handleStatusUpdate(complaint.id, "Closed")}
+              title="Close"
+            >
+              <div className="ion-item-option-content">
+                <IonIcon icon={checkmarkCircleOutline} />
+                <span className="ion-hide-sm-down">Close</span>
+              </div>
+            </IonItemOption>
+          )}
+          <IonItemOption color="primary" title="Email">
+            <div className="ion-item-option-content">
+              <IonIcon icon={mailOutline} />
+              <span className="ion-hide-sm-down">Email</span>
+            </div>
+          </IonItemOption>
+        </IonItemOptions>
+      </IonItemSliding>
+    ))
+  ) : (
+    <IonItem>
+      <IonLabel className="ion-text-center">No complaints found matching your criteria.</IonLabel>
+    </IonItem>
+  )}
+</IonList>
+      
       )}
 
       <IonInfiniteScroll onIonInfinite={handleInfiniteScroll}>
@@ -819,18 +798,46 @@ const ComplainContainer: React.FC = () => {
             />
           </IonCard>
 
-          <div className="chat-container">
-            {messages.map((msg, index) => (
-              <div
-                key={msg.id || index}
-                className={`message ${
-                  msg.sender === "admin" ? "user-message" : "admin-message"
-                }`}
-              >
-                <p>{msg.message || msg.text || ""}</p>
-                <small>{new Date(msg.timestamp).toLocaleString()}</small>
+          <div className="chat-container" style={{ padding: "16px" }}>
+            {messages.length > 0 ? (
+              messages.map((msg, index) => (
+                <div
+                  key={msg.id || index}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: msg.sender === "admin" ? "flex-end" : "flex-start",
+                    marginBottom: "16px",
+                  }}
+                >
+                  <div
+                    style={{
+                      backgroundColor: msg.sender === "admin" ? "#DCF8C6" : "#E8E8E8",
+                      borderRadius: "12px",
+                      padding: "8px 12px",
+                      maxWidth: "70%",
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    <p style={{ margin: "0 0 4px 0" }}>{msg.message || msg.text || ""}</p>
+                    <small
+                      style={{
+                        fontSize: "0.75rem",
+                        color: "#666",
+                        display: "block",
+                        textAlign: "right",
+                      }}
+                    >
+                      {new Date(msg.timestamp).toLocaleString()}
+                    </small>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div style={{ textAlign: "center", padding: "20px", color: "#666" }}>
+                No messages yet. Start the conversation!
               </div>
-            ))}
+            )}
           </div>
         </IonContent>
 

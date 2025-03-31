@@ -179,19 +179,19 @@ const ComplainContainer: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!user) {
-      setShowToast({
-        message: "You must be logged in to submit a complaint.",
-        success: false,
-      });
-      return;
+        setShowToast({
+            message: "You must be logged in to submit a complaint.",
+            success: false,
+        });
+        return;
     }
 
     if (!respondent.trim() || !details.trim() || !incidentDate) {
-      setShowToast({
-        message: "Please fill in all required fields.",
-        success: false,
-      });
-      return;
+        setShowToast({
+            message: "Please fill in all required fields.",
+            success: false,
+        });
+        return;
     }
 
     const formData = new FormData();
@@ -201,65 +201,65 @@ const ComplainContainer: React.FC = () => {
     formData.append("details", details);
     formData.append("incident_date", incidentDate);
     formData.append("complaint_type", complaintType.toString());
+
     if (selectedImage) {
-      formData.append("image", selectedImage);
+        formData.append("image", selectedImage);
     }
 
     setLoading(true);
 
     try {
-      const response = await fetch(
-        "http://127.0.0.1/justify/index.php/ComplaintController/create",
-        {
-          method: "POST",
-          body: formData, // Changed to formData instead of JSON.stringify
+        const response = await fetch(
+            "http://127.0.0.1/justify/index.php/ComplaintController/create",
+            {
+                method: "POST",
+                body: formData,
+            }
+        );
+
+        if (!response.ok) {
+            const text = await response.text();
+            console.error("Server response:", text);
+            throw new Error(`Server error: ${response.status}`);
         }
-      );
 
-      // Check if response is ok before trying to parse JSON
-      if (!response.ok) {
-        const text = await response.text();
-        console.error("Server response:", text);
-        throw new Error(`Server error: ${response.status}`);
-      }
+        let result;
+        try {
+            result = await response.json();
+        } catch (e) {
+            console.error("JSON parse error:", e);
+            throw new Error("Invalid response from server");
+        }
 
-      // Try to parse JSON response
-      let result;
-      try {
-        result = await response.json();
-      } catch (e) {
-        console.error("JSON parse error:", e);
-        throw new Error("Invalid response from server");
-      }
+        if (result.status) {
+            setShowToast({
+                message: `Complaint submitted successfully!`,
+                success: true,
+            });
 
-      if (result.status) {
-        setShowToast({
-          message: `Complaint submitted successfully!`,
-          success: true,
-        });
-
-        // Reset form and refresh list
-        setRespondent("");
-        setDetails("");
-        setIncidentDate("");
-        setComplaintType(1);
-        fetchUserComplaints(user.id);
-      } else {
-        throw new Error(result.message || "Failed to submit complaint");
-      }
+            // Reset form and refresh list
+            setRespondent("");
+            setDetails("");
+            setIncidentDate("");
+            setComplaintType(1);
+            fetchUserComplaints(user.id);
+        } else {
+            throw new Error(result.message || "Failed to submit complaint");
+        }
     } catch (error) {
-      console.error("Error submitting complaint:", error);
-      setShowToast({
-        message:
-          error instanceof Error
-            ? error.message
-            : "Failed to connect to server. Please check your connection.",
-        success: false,
-      });
+        console.error("Error submitting complaint:", error);
+        setShowToast({
+            message:
+                error instanceof Error
+                    ? error.message
+                    : "Failed to connect to server. Please check your connection.",
+            success: false,
+        });
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
+
 
   const fetchMessages = async (complaintId: number) => {
     try {
