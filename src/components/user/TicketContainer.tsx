@@ -65,7 +65,7 @@ interface Complaint {
   respondent: string;
 }
 
-// Add this after your interfaces
+// Default complaint types
 const DEFAULT_COMPLAINT_TYPES: ComplaintType[] = [
   {
     id: 1,
@@ -90,7 +90,7 @@ const DEFAULT_COMPLAINT_TYPES: ComplaintType[] = [
   },
 ];
 
-// Add these helper functions after your interfaces
+// Helper functions
 const isActiveTicket = (status: string) => {
   return ["New", "Under review", "In progress"].includes(status);
 };
@@ -107,15 +107,11 @@ const TicketContainer: React.FC = () => {
   const [showToast, setShowToast] = useState<ShowToast | null>(null);
   const [recentComplaints, setRecentComplaints] = useState<Complaint[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<
-    | "all"
-    | "New"
-    | "Under review"
-    | "In progress"
-    | "Resolved"
-    | "Closed"
-    | "Rejected"
-  >("all");
+  
+  // Separate filters for tickets and records
+  const [ticketFilter, setTicketFilter] = useState<"all" | "New" | "Under review" | "In progress">("all");
+  const [recordFilter, setRecordFilter] = useState<"all" | "Resolved" | "Closed" | "Rejected">("all");
+  
   const [complaintTypes, setComplaintTypes] = useState<ComplaintType[]>([]);
 
   useEffect(() => {
@@ -137,7 +133,7 @@ const TicketContainer: React.FC = () => {
         });
 
         fetchUserComplaints(userId);
-        fetchComplaintTypes(); // Add this line
+        fetchComplaintTypes();
       } catch (error) {
         console.error("Failed to parse user from localStorage:", error);
         setShowToast({
@@ -148,12 +144,10 @@ const TicketContainer: React.FC = () => {
     }
   }, []);
 
-  // Add this useEffect after your existing useEffects
   useEffect(() => {
     fetchComplaintTypes();
   }, []);
 
-  // Keep only the essential functions
   const fetchUserComplaints = async (userId: number) => {
     try {
       const response = await fetch(
@@ -294,48 +288,55 @@ const TicketContainer: React.FC = () => {
     fetchMessages(complaint.id);
   };
 
-  // Replace the existing filteredComplaints function with this:
-  const filteredComplaints = recentComplaints.filter((complaint: any) => {
-    // Convert search query to lowercase for case-insensitive comparison
+  // Updated filtering logic with separate filters for tickets and records
+  const filterComplaint = (complaint: Complaint) => {
+    // Search query filtering - applies to both sections
     const query = searchQuery.toLowerCase().trim();
+    if (query) {
+      // Check if the complaint type exists and matches search
+      const complaintType = complaintTypes.find(
+        (t) => t.id === parseInt(complaint.complaint_type)
+      );
+      const typeMatches = complaintType?.name.toLowerCase().includes(query);
+      
+      // Check if the date matches search
+      const dateMatches = complaint.incident_date?.toLowerCase().includes(query);
+      
+      // If search query doesn't match anything, filter out this complaint
+      if (!typeMatches && !dateMatches) {
+        return false;
+      }
+    }
 
-    // Check if the complaint type exists and matches search
-    const complaintType = complaintTypes.find(
-      (t) => t.id === parseInt(complaint.complaint_type)
-    );
-    const typeMatches = complaintType?.name.toLowerCase().includes(query);
+    // Status filtering - depends on which section we're in
+    if (isActiveTicket(complaint.status)) {
+      return ticketFilter === "all" || complaint.status === ticketFilter;
+    } else if (isRecord(complaint.status)) {
+      return recordFilter === "all" || complaint.status === recordFilter;
+    }
 
-    // Check if the date matches search
-    const dateMatches = complaint.incident_date?.toLowerCase().includes(query);
+    return false;
+  };
 
-    // Check if the status matches filter
-    const statusMatches =
-      statusFilter === "all" ||
-      complaint.status?.toLowerCase() === statusFilter.toLowerCase();
+  // Filter complaints for active tickets section
+  const filteredActiveTickets = recentComplaints
+    .filter(complaint => isActiveTicket(complaint.status))
+    .filter(filterComplaint);
 
-    // Debug logging (remove in production)
-    console.log({
-      complaint,
-      typeMatches,
-      dateMatches,
-      statusMatches,
-      query,
-      status: complaint.status,
-      filterStatus: statusFilter,
-    });
+  // Filter complaints for records section
+  const filteredRecords = recentComplaints
+    .filter(complaint => isRecord(complaint.status))
+    .filter(filterComplaint);
 
-    // Return true if either type or date matches search AND status matches filter
-    return (typeMatches || dateMatches) && statusMatches;
-  });
-
-  // Add this useEffect to monitor filter changes
+  // Debug monitoring for filters
   useEffect(() => {
     console.log("Search Query:", searchQuery);
-    console.log("Status Filter:", statusFilter);
-    console.log("Filtered Complaints:", filteredComplaints);
-  }, [searchQuery, statusFilter, recentComplaints]);
+    console.log("Ticket Filter:", ticketFilter);
+    console.log("Record Filter:", recordFilter);
+    console.log("Active Tickets:", filteredActiveTickets.length);
+    console.log("Records:", filteredRecords.length);
+  }, [searchQuery, ticketFilter, recordFilter, recentComplaints]);
 
-  // Update fetchComplaintTypes to log the response
   const fetchComplaintTypes = async () => {
     try {
       const response = await fetch(
@@ -364,12 +365,10 @@ const TicketContainer: React.FC = () => {
     }
   };
 
-  if (!user) {
-    return <div className="dashboard-content">Loading user profile...</div>;
-  }
+  
 
   return (
-    <>
+    <div>
       <IonCardHeader>
         <IonCardTitle
           style={{
@@ -395,151 +394,168 @@ const TicketContainer: React.FC = () => {
               debounce={300}
             />
           </IonItem>
-          <IonItem lines="none" className="status-filter">
-            <IonSegment
-              scrollable={true}
-              value={statusFilter}
-              className="status-segment"
-              onIonChange={(e: CustomEvent) => {
-                const value = e.detail.value as "all" | "New" | "Under review" | "In progress";
-                setStatusFilter(value);
-              }}
-            >
-              <IonSegmentButton value="all" className="segment-btn">
-                <IonLabel className="segment-label">All</IonLabel>
-              </IonSegmentButton>
-              <IonSegmentButton value="New" className="segment-btn">
-                <IonLabel className="segment-label">New</IonLabel>
-              </IonSegmentButton>
-              <IonSegmentButton value="Under review" className="segment-btn">
-                <IonLabel className="segment-label">Under Review</IonLabel>
-              </IonSegmentButton>
-              <IonSegmentButton value="In progress" className="segment-btn">
-                <IonLabel className="segment-label">In Progress</IonLabel>
-              </IonSegmentButton>
-            </IonSegment>
-          </IonItem>
         </div>
       </IonCardHeader>
-      <>
-        <IonCardContent>
-          <div className="section-header">
-            <h2>Active Tickets</h2>
-            <small>New, Under Review, and In Progress complaints</small>
-          </div>
-          <IonList>
-            {filteredComplaints
-              .filter((complaint) => isActiveTicket(complaint.status))
-              .map((complaint: Complaint) => (
-                <IonItem
-                  key={complaint.id}
-                  button
-                  onClick={() => handleComplaintClick(complaint)}
-                >
-                  <IonLabel>
-                    <h2>
-                      {complaintTypes.find(
-                        (t) => t.id === parseInt(complaint.complaint_type)
-                      )?.name || "Unknown Type"}
-                    </h2>
-                    <p className="respondent-text">
-                      Respondent: {complaint.respondent || "Not specified"}
-                    </p>
-                    <p>
-                      <IonChip
-                        color={
-                          complaint.status === "New"
-                            ? "primary"
-                            : complaint.status === "Under review"
-                            ? "warning"
-                            : "tertiary"
-                        }
-                        outline={true}
-                      >
-                        {complaint.status}
-                      </IonChip>
-                    </p>
-                    <p>
-                      Date:{" "}
-                      {new Date(complaint.incident_date).toLocaleDateString()}
-                    </p>
-                  </IonLabel>
-                </IonItem>
-              ))}
-          </IonList>
-        </IonCardContent>
-
-        <IonCardContent>
+      
+      {/* Active Tickets Section */}
+      <IonCardContent>
+        <div className="section-header">
+          <h2>Active Tickets</h2>
+          <small>New, Under Review, and In Progress complaints</small>
+        </div>
+        
         <IonItem lines="none" className="status-filter">
-            <IonSegment
-              scrollable={true}
-              value={statusFilter}
-              className="status-segment"
-              onIonChange={(e: CustomEvent) => {
-                const value = e.detail.value as "all" | "Resolved" | "Closed" | "Rejected";
-                setStatusFilter(value);
-              }}
-            >
-              <IonSegmentButton value="all" className="segment-btn">
-                <IonLabel className="segment-label">All</IonLabel>
-              </IonSegmentButton>
-              <IonSegmentButton value="Resolved" className="segment-btn">
-                <IonLabel className="segment-label">Resolved</IonLabel>
-              </IonSegmentButton>
-              <IonSegmentButton value="Closed" className="segment-btn">
-                <IonLabel className="segment-label">Closed</IonLabel>
-              </IonSegmentButton>
-              <IonSegmentButton value="Rejected" className="segment-btn">
-                <IonLabel className="segment-label">Rejected</IonLabel>
-              </IonSegmentButton>
-            </IonSegment>
-          </IonItem>
-          <div className="section-header">
-            <h2>Records</h2>
-            <small>Closed, Resolved, and Rejected complaints</small>
-          </div>
-          <IonList>
-            {filteredComplaints
-              .filter((complaint) => isRecord(complaint.status))
-              .map((complaint: Complaint) => (
-                <IonItem
-                  key={complaint.id}
-                  button
-                  onClick={() => handleComplaintClick(complaint)}
-                >
-                  <IonLabel>
-                    <h2>
-                      {complaintTypes.find(
-                        (t) => t.id === parseInt(complaint.complaint_type)
-                      )?.name || "Unknown Type"}
-                    </h2>
-                    <p className="respondent-text">
-                      Respondent: {complaint.respondent || "Not specified"}
-                    </p>
-                    <p>
-                      <IonChip
-                        color={
-                          complaint.status === "Resolved"
-                            ? "success"
-                            : complaint.status === "Closed"
-                            ? "medium"
-                            : "danger"
-                        }
-                        outline={true}
-                      >
-                        {complaint.status}
-                      </IonChip>
-                    </p>
-                    <p>
-                      Date:{" "}
-                      {new Date(complaint.incident_date).toLocaleDateString()}
-                    </p>
-                  </IonLabel>
-                </IonItem>
-              ))}
-          </IonList>
-        </IonCardContent>
-      </>
+          <IonSegment
+            scrollable={true}
+            value={ticketFilter}
+            className="status-segment"
+            onIonChange={(e: CustomEvent) => {
+              const value = e.detail.value as "all" | "New" | "Under review" | "In progress";
+              setTicketFilter(value);
+            }}
+          >
+            <IonSegmentButton value="all" className="segment-btn">
+              <IonLabel className="segment-label">All</IonLabel>
+            </IonSegmentButton>
+            <IonSegmentButton value="New" className="segment-btn">
+              <IonLabel className="segment-label">New</IonLabel>
+            </IonSegmentButton>
+            <IonSegmentButton value="Under review" className="segment-btn">
+              <IonLabel className="segment-label">Under Review</IonLabel>
+            </IonSegmentButton>
+            <IonSegmentButton value="In progress" className="segment-btn">
+              <IonLabel className="segment-label">In Progress</IonLabel>
+            </IonSegmentButton>
+          </IonSegment>
+        </IonItem>
+        
+        <IonList>
+          {filteredActiveTickets.length > 0 ? (
+            filteredActiveTickets.map((complaint: Complaint) => (
+              <IonItem
+                key={complaint.id}
+                button
+                onClick={() => handleComplaintClick(complaint)}
+              >
+                <IonLabel>
+                  <h2>
+                    {complaintTypes.find(
+                      (t) => t.id === parseInt(complaint.complaint_type)
+                    )?.name || "Unknown Type"}
+                  </h2>
+                  <p className="respondent-text">
+                    Respondent: {complaint.respondent || "Not specified"}
+                  </p>
+                  <p>
+                    <IonChip
+                      color={
+                        complaint.status === "New"
+                          ? "primary"
+                          : complaint.status === "Under review"
+                          ? "warning"
+                          : "tertiary"
+                      }
+                      outline={true}
+                    >
+                      {complaint.status}
+                    </IonChip>
+                  </p>
+                  <p>
+                    Date:{" "}
+                    {new Date(complaint.incident_date).toLocaleDateString()}
+                  </p>
+                </IonLabel>
+              </IonItem>
+            ))
+          ) : (
+            <IonItem>
+              <IonLabel className="ion-text-center">
+                No active tickets found
+              </IonLabel>
+            </IonItem>
+          )}
+        </IonList>
+      </IonCardContent>
+
+      {/* Records Section */}
+      <IonCardContent>
+        <div className="section-header">
+          <h2>Records</h2>
+          <small>Closed, Resolved, and Rejected complaints</small>
+        </div>
+        
+        <IonItem lines="none" className="status-filter">
+          <IonSegment
+            scrollable={true}
+            value={recordFilter}
+            className="status-segment"
+            onIonChange={(e: CustomEvent) => {
+              const value = e.detail.value as "all" | "Resolved" | "Closed" | "Rejected";
+              setRecordFilter(value);
+            }}
+          >
+            <IonSegmentButton value="all" className="segment-btn">
+              <IonLabel className="segment-label">All</IonLabel>
+            </IonSegmentButton>
+            <IonSegmentButton value="Resolved" className="segment-btn">
+              <IonLabel className="segment-label">Resolved</IonLabel>
+            </IonSegmentButton>
+            <IonSegmentButton value="Closed" className="segment-btn">
+              <IonLabel className="segment-label">Closed</IonLabel>
+            </IonSegmentButton>
+            <IonSegmentButton value="Rejected" className="segment-btn">
+              <IonLabel className="segment-label">Rejected</IonLabel>
+            </IonSegmentButton>
+          </IonSegment>
+        </IonItem>
+        
+        <IonList>
+          {filteredRecords.length > 0 ? (
+            filteredRecords.map((complaint: Complaint) => (
+              <IonItem
+                key={complaint.id}
+                button
+                onClick={() => handleComplaintClick(complaint)}
+              >
+                <IonLabel>
+                  <h2>
+                    {complaintTypes.find(
+                      (t) => t.id === parseInt(complaint.complaint_type)
+                    )?.name || "Unknown Type"}
+                  </h2>
+                  <p className="respondent-text">
+                    Respondent: {complaint.respondent || "Not specified"}
+                  </p>
+                  <p>
+                    <IonChip
+                      color={
+                        complaint.status === "Resolved"
+                          ? "success"
+                          : complaint.status === "Closed"
+                          ? "medium"
+                          : "danger"
+                      }
+                      outline={true}
+                    >
+                      {complaint.status}
+                    </IonChip>
+                  </p>
+                  <p>
+                    Date:{" "}
+                    {new Date(complaint.incident_date).toLocaleDateString()}
+                  </p>
+                </IonLabel>
+              </IonItem>
+            ))
+          ) : (
+            <IonItem>
+              <IonLabel className="ion-text-center">
+                No records found
+              </IonLabel>
+            </IonItem>
+          )}
+        </IonList>
+      </IonCardContent>
 
       {/* Chat Modal */}
       <IonModal
@@ -560,17 +576,23 @@ const TicketContainer: React.FC = () => {
         </IonHeader>
         <IonContent>
           <div className="chat-container">
-            {messages.map((msg, index) => (
-              <div
-                key={index}
-                className={`message ${
-                  msg.sender === "user" ? "user-message" : "admin-message"
-                }`}
-              >
-                <p>{msg.text}</p>
-                <small>{msg.timestamp}</small>
+            {messages.length > 0 ? (
+              messages.map((msg, index) => (
+                <div
+                  key={index}
+                  className={`message ${
+                    msg.sender === "user" ? "user-message" : "admin-message"
+                  }`}
+                >
+                  <p>{msg.text}</p>
+                  <small>{msg.timestamp}</small>
+                </div>
+              ))
+            ) : (
+              <div className="no-messages">
+                <p>No messages yet. Start a conversation!</p>
               </div>
-            ))}
+            )}
           </div>
         </IonContent>
         <IonFooter>
@@ -595,7 +617,7 @@ const TicketContainer: React.FC = () => {
         color={showToast?.success ? "success" : "danger"}
         onDidDismiss={() => setShowToast(null)}
       />
-    </>
+    </div>
   );
 };
 
