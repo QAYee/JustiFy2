@@ -16,11 +16,20 @@ import {
   IonText,
   IonImg,
   IonButtons,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonCardSubtitle,
 } from "@ionic/react";
-import { close } from "ionicons/icons";
+import {
+  close,
+  informationCircle,
+  chevronForward,
+  chevronBack,
+} from "ionicons/icons";
 import HomeContainer from "../../components/user/HomeContainer";
-
-
+import "./Home.css";
 
 interface NewsItem {
   title: string;
@@ -32,33 +41,73 @@ interface NewsItem {
 const Home: React.FC = () => {
   const [isNewsModalOpen, setIsNewsModalOpen] = useState(false);
   const [latestNews, setLatestNews] = useState<NewsItem | null>(null);
+  const [allNews, setAllNews] = useState<NewsItem[]>([]); // New state for all news
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
 
+  // Simulate login - replace with your actual login logic
   useEffect(() => {
-    const fetchLatestNews = async () => {
-      try {
-        const response = await fetch(
-          "http://127.0.0.1/justify/index.php/NewsController/getNews",
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-        const data = await response.json();
-
-        if (data.status && data.news.length > 0) {
-          // Get the most recent news item
-          const mostRecent = data.news[0];
-          setLatestNews(mostRecent);
-
-          // Show modal instead of alert
-          setIsNewsModalOpen(true);
-        }
-      } catch (error) {
-        console.error("Error fetching news:", error);
-      }
+    // This simulates a login - replace with your actual authentication check
+    const checkLoginStatus = () => {
+      // For demo purposes, we're setting logged in to true after 1 second
+      // Replace this with your actual login check
+      setTimeout(() => {
+        setIsLoggedIn(true);
+      }, 1000);
     };
 
-    fetchLatestNews();
+    checkLoginStatus();
   }, []);
+
+  // Fetch news when logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchNewsData();
+    }
+  }, [isLoggedIn]);
+
+  const fetchNewsData = async () => {
+    try {
+      const response = await fetch(
+        "http://127.0.0.1/justify/index.php/NewsController/getNews",
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      const data = await response.json();
+
+      if (data.status && data.news.length > 0) {
+        // Store all news items
+        setAllNews(data.news);
+
+        // Still get the most recent for the modal
+        const mostRecent = data.news[0];
+        setLatestNews(mostRecent);
+
+        // Show modal on login
+        setIsNewsModalOpen(true);
+      }
+    } catch (error) {
+      console.error("Error fetching news:", error);
+    }
+  };
+
+  // Function to navigate through news items (optional)
+  const showNextNews = () => {
+    if (currentNewsIndex < allNews.length - 1) {
+      const nextIndex = currentNewsIndex + 1;
+      setCurrentNewsIndex(nextIndex);
+      setLatestNews(allNews[nextIndex]);
+    }
+  };
+
+  const showPreviousNews = () => {
+    if (currentNewsIndex > 0) {
+      const prevIndex = currentNewsIndex - 1;
+      setCurrentNewsIndex(prevIndex);
+      setLatestNews(allNews[prevIndex]);
+    }
+  };
 
   return (
     <IonPage>
@@ -73,79 +122,116 @@ const Home: React.FC = () => {
         </IonHeader>
         <HomeContainer name="Home" />
 
-        {/* News Modal */}
-        <IonModal
-          isOpen={isNewsModalOpen}
-          onDidDismiss={() => setIsNewsModalOpen(false)}
-          className="news-modal"
-          presentingElement={undefined}
-          initialBreakpoint={0.75}
-          breakpoints={[0, 0.75, 1]}
-        >
-          <IonHeader className="ion-no-border">
-            <IonToolbar color="light">
-              <IonTitle size="large" className="ion-text-wrap">
-                {latestNews?.title}
-              </IonTitle>
-              <IonButtons slot="end">
-                <IonButton onClick={() => setIsNewsModalOpen(false)}>
-                  <IonIcon icon={close} size="large" />
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding news-content">
-            {latestNews?.image && (
-              <div className="news-image-container">
-                <IonImg
-                  src={`${latestNews.image}`}
-                  style={{
-                    width: "100%",
-                    maxHeight: "250px",
-                    objectFit: "cover",
-                    borderRadius: "12px",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                  }}
-                  onIonError={(e) => {
-                    const target = e.target as HTMLIonImgElement;
-                    target.style.display = "none";
-                  }}
-                />
-              </div>
-            )}
+        {/* Alert-Style News Card (without modal) */}
+        {isNewsModalOpen && (
+          <div className="alert-overlay">
+            <div
+              className="alert-backdrop"
+              onClick={() => setIsNewsModalOpen(false)}
+            ></div>
+            <div className="alert-container">
+              <IonCard className="alert-news-card">
+                <div className="card-header-container">
+                  <IonCardHeader>
+                    <IonCardTitle className="news-card-title">
+                      NEWS & ANNOUNCEMENTS
+                    </IonCardTitle>
+                      
+                    <IonCardSubtitle className="news-card-subtitle">
+                      {latestNews?.title}   
+                    </IonCardSubtitle>
 
-            <div className="news-content-container">
-              <IonText>
-                <p className="news-description">{latestNews?.description}</p>
-                <p className="news-timestamp">
-                  <small>
-                    Posted:{" "}
-                    {latestNews?.created_at &&
-                      new Date(latestNews.created_at).toLocaleDateString(
-                        "en-US",
-                        {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        }
-                      )}
-                  </small>
-                </p>
-              </IonText>
-            </div>
+                    
+                    <IonButtons slot="end" className="close-button-container">
+                      <IonButton
+                        onClick={() => setIsNewsModalOpen(false)}
+                        className="card-close-button"
+                      >
+                        <IonIcon icon={close} />
+                      </IonButton>
+                    </IonButtons>
+                  </IonCardHeader>
+                </div>
 
-            <div className="modal-actions">
-              <IonButton
-                expand="block"
-                onClick={() => setIsNewsModalOpen(false)}
-                shape="round"
-                className="close-button"
-              >
-                Close
-              </IonButton>
+                {latestNews?.image && (
+                  <div className="card-image-container">
+                    <IonImg
+                      src={`${latestNews.image}`}
+                      className="news-card-image"
+                      onIonError={(e) => {
+                        const target = e.target as HTMLIonImgElement;
+                        target.style.display = "none";
+                      }}
+                    />
+                  </div>
+                )}
+
+                <IonCardContent className="news-card-content">
+                  <p className="news-card-description">
+                    {latestNews?.description}
+                  </p>
+
+                  <div className="news-card-footer">
+                    <p className="news-card-timestamp">
+                      <IonIcon
+                        icon={informationCircle}
+                        className="timestamp-icon"
+                      />{" "}
+                      Posted:{" "}
+                      {latestNews?.created_at &&
+                        new Date(latestNews.created_at).toLocaleDateString(
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )}
+                    </p>
+
+                    {/* Optional: Add navigation buttons if you have multiple news items */}
+                    {allNews.length > 1 && (
+                      <div className="news-navigation">
+                        <div className="navigation-controls">
+                          <IonButton
+                            fill="clear"
+                            disabled={currentNewsIndex === 0}
+                            onClick={showPreviousNews}
+                            className="nav-button"
+                          >
+                            <IonIcon icon={chevronBack} />
+                          </IonButton>
+
+                          <p className="news-counter">
+                            {currentNewsIndex + 1} of {allNews.length}
+                          </p>
+
+                          <IonButton
+                            fill="clear"
+                            disabled={currentNewsIndex === allNews.length - 1}
+                            onClick={showNextNews}
+                            className="nav-button"
+                          >
+                            <IonIcon icon={chevronForward} />
+                          </IonButton>
+                        </div>
+                      </div>
+                    )}
+
+                    <IonButton
+                      expand="block"
+                      onClick={() => setIsNewsModalOpen(false)}
+                      shape="round"
+                      className="card-dismiss-button"
+                    >
+                      Got it
+                    </IonButton>
+                  </div>
+                </IonCardContent>
+              </IonCard>
             </div>
-          </IonContent>
-        </IonModal>
+          </div>
+        )}
       </IonContent>
     </IonPage>
   );
