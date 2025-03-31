@@ -8,18 +8,29 @@ import {
   IonPage,
   IonTitle,
   IonToolbar,
+  IonButton,
+  IonModal,
+  IonIcon,
+  IonItem,
+  IonLabel,
+  IonText,
+  IonImg,
+  IonButtons,
 } from "@ionic/react";
-import { useIonAlert } from "@ionic/react";
+import { close } from "ionicons/icons";
 import HomeContainer from "../../components/user/HomeContainer";
+
+
 
 interface NewsItem {
   title: string;
   description: string;
   created_at: string;
+  image?: string;
 }
 
 const Home: React.FC = () => {
-  const [presentAlert] = useIonAlert();
+  const [isNewsModalOpen, setIsNewsModalOpen] = useState(false);
   const [latestNews, setLatestNews] = useState<NewsItem | null>(null);
 
   useEffect(() => {
@@ -38,14 +49,8 @@ const Home: React.FC = () => {
           const mostRecent = data.news[0];
           setLatestNews(mostRecent);
 
-          presentAlert({
-            header: mostRecent.title,
-            message: mostRecent.description,
-            buttons: ["Close"],
-            htmlAttributes: {
-              "aria-label": "news alert dialog",
-            },
-          });
+          // Show modal instead of alert
+          setIsNewsModalOpen(true);
         }
       } catch (error) {
         console.error("Error fetching news:", error);
@@ -53,7 +58,7 @@ const Home: React.FC = () => {
     };
 
     fetchLatestNews();
-  }, [presentAlert]);
+  }, []);
 
   return (
     <IonPage>
@@ -67,6 +72,80 @@ const Home: React.FC = () => {
           <IonToolbar></IonToolbar>
         </IonHeader>
         <HomeContainer name="Home" />
+
+        {/* News Modal */}
+        <IonModal
+          isOpen={isNewsModalOpen}
+          onDidDismiss={() => setIsNewsModalOpen(false)}
+          className="news-modal"
+          presentingElement={undefined}
+          initialBreakpoint={0.75}
+          breakpoints={[0, 0.75, 1]}
+        >
+          <IonHeader className="ion-no-border">
+            <IonToolbar color="light">
+              <IonTitle size="large" className="ion-text-wrap">
+                {latestNews?.title}
+              </IonTitle>
+              <IonButtons slot="end">
+                <IonButton onClick={() => setIsNewsModalOpen(false)}>
+                  <IonIcon icon={close} size="large" />
+                </IonButton>
+              </IonButtons>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent className="ion-padding news-content">
+            {latestNews?.image && (
+              <div className="news-image-container">
+                <IonImg
+                  src={`${latestNews.image}`}
+                  style={{
+                    width: "100%",
+                    maxHeight: "250px",
+                    objectFit: "cover",
+                    borderRadius: "12px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  }}
+                  onIonError={(e) => {
+                    const target = e.target as HTMLIonImgElement;
+                    target.style.display = "none";
+                  }}
+                />
+              </div>
+            )}
+
+            <div className="news-content-container">
+              <IonText>
+                <p className="news-description">{latestNews?.description}</p>
+                <p className="news-timestamp">
+                  <small>
+                    Posted:{" "}
+                    {latestNews?.created_at &&
+                      new Date(latestNews.created_at).toLocaleDateString(
+                        "en-US",
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        }
+                      )}
+                  </small>
+                </p>
+              </IonText>
+            </div>
+
+            <div className="modal-actions">
+              <IonButton
+                expand="block"
+                onClick={() => setIsNewsModalOpen(false)}
+                shape="round"
+                className="close-button"
+              >
+                Close
+              </IonButton>
+            </div>
+          </IonContent>
+        </IonModal>
       </IonContent>
     </IonPage>
   );
