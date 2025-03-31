@@ -20,6 +20,8 @@ import {
   IonFooter,
   IonSelect,
   IonSelectOption,
+  IonSegment,
+  IonSegmentButton,
 } from "@ionic/react";
 import { sendOutline } from "ionicons/icons";
 
@@ -54,12 +56,32 @@ interface Complaint {
   incident_date: string;
   status: "pending" | "processing" | "resolved" | "rejected";
   user_id: number;
+  respondent: string; // Add this line
 }
 
-const complaintTypes: ComplaintType[] = [
-  { id: 1, name: "General Complaint", description: "General issues" },
-  { id: 2, name: "Technical Issue", description: "Technical problems" },
-  { id: 3, name: "Service Complaint", description: "Service related issues" },
+// Add this after your interfaces
+const DEFAULT_COMPLAINT_TYPES: ComplaintType[] = [
+  {
+    id: 1,
+    name: "Noise Complaint",
+    description: "Issues related to noise disturbances",
+  },
+  {
+    id: 2,
+    name: "Property Dispute",
+    description: "Conflicts regarding property",
+  },
+  {
+    id: 3,
+    name: "Public Disturbance",
+    description: "Issues affecting public peace",
+  },
+  { id: 4, name: "Utility Issue", description: "Problems with utilities" },
+  {
+    id: 5,
+    name: "Environmental Concern",
+    description: "Environmental related issues",
+  },
 ];
 
 const TicketContainer: React.FC = () => {
@@ -71,6 +93,7 @@ const TicketContainer: React.FC = () => {
   const [recentComplaints, setRecentComplaints] = useState<Complaint[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [complaintTypes, setComplaintTypes] = useState<ComplaintType[]>([]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -91,6 +114,7 @@ const TicketContainer: React.FC = () => {
         });
 
         fetchUserComplaints(userId);
+        fetchComplaintTypes(); // Add this line
       } catch (error) {
         console.error("Failed to parse user from localStorage:", error);
         setShowToast({
@@ -99,6 +123,11 @@ const TicketContainer: React.FC = () => {
         });
       }
     }
+  }, []);
+
+  // Add this useEffect after your existing useEffects
+  useEffect(() => {
+    fetchComplaintTypes();
   }, []);
 
   // Keep only the essential functions
@@ -229,7 +258,7 @@ const TicketContainer: React.FC = () => {
     }
   };
 
-  const handleComplaintClick = (complaint: ComplaintType & { id: number }) => {
+  const handleComplaintClick = (complaint: Complaint) => {
     if (!complaint?.id) {
       setShowToast({
         message: "Invalid complaint selected",
@@ -283,6 +312,35 @@ const TicketContainer: React.FC = () => {
     console.log("Filtered Complaints:", filteredComplaints);
   }, [searchQuery, statusFilter, recentComplaints]);
 
+  // Update fetchComplaintTypes to log the response
+  const fetchComplaintTypes = async () => {
+    try {
+      const response = await fetch(
+        "http://127.0.0.1/justify/index.php/ComplaintController/getComplaintTypes",
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.status && Array.isArray(data.types)) {
+        setComplaintTypes(data.types);
+      } else {
+        console.log("Using default complaint types");
+        setComplaintTypes(DEFAULT_COMPLAINT_TYPES);
+      }
+    } catch (error) {
+      console.error("Error fetching complaint types:", error);
+      console.log("Using default complaint types due to error");
+      setComplaintTypes(DEFAULT_COMPLAINT_TYPES);
+    }
+  };
+
   if (!user) {
     return <div className="dashboard-content">Loading user profile...</div>;
   }
@@ -290,44 +348,63 @@ const TicketContainer: React.FC = () => {
   return (
     <>
       <IonCardHeader>
-        <IonCardTitle>Your Recent Complaints</IonCardTitle>
+        <IonCardTitle
+          style={{
+            padding: "16px",
+            fontSize: "24px",
+            color: "#0066cc",
+            marginBottom: "16px",
+            fontWeight: "bold",
+          }}
+        >
+          Your Recent Complaints
+        </IonCardTitle>
         <div className="filter-container">
           <IonItem>
-            <IonLabel position="stacked">Search</IonLabel>
+            <IonLabel position="floating">Search Complaints</IonLabel>
             <IonInput
+              className="search-input"
               value={searchQuery}
               onIonChange={(e) => {
                 const value = e.detail.value || "";
-                console.log("Search value:", value);
                 setSearchQuery(value);
               }}
-              placeholder="Search by type or date..."
               debounce={300}
             />
           </IonItem>
-          <IonItem>
-            <IonLabel position="stacked">Status</IonLabel>
-            <IonSelect
+          <IonItem lines="none" className="status-filter">
+            <IonSegment
+              scrollable={true}
               value={statusFilter}
-              onIonChange={(e) => {
-                const value = e.detail.value;
-                console.log("Status value:", value);
+              className="status-segment"
+              onIonChange={(e: CustomEvent) => {
+                const value = e.detail.value as string;
                 setStatusFilter(value);
               }}
             >
-              <IonSelectOption value="all">All Status</IonSelectOption>
-              <IonSelectOption value="pending">Pending</IonSelectOption>
-              <IonSelectOption value="processing">Processing</IonSelectOption>
-              <IonSelectOption value="resolved">Resolved</IonSelectOption>
-              <IonSelectOption value="rejected">Rejected</IonSelectOption>
-            </IonSelect>
+              <IonSegmentButton value="all" className="segment-btn">
+                <IonLabel className="segment-label">All</IonLabel>
+              </IonSegmentButton>
+              <IonSegmentButton value="pending" className="segment-btn">
+                <IonLabel className="segment-label">Pending</IonLabel>
+              </IonSegmentButton>
+              <IonSegmentButton value="processing" className="segment-btn">
+                <IonLabel className="segment-label">Processing</IonLabel>
+              </IonSegmentButton>
+              <IonSegmentButton value="resolved" className="segment-btn">
+                <IonLabel className="segment-label">Resolved</IonLabel>
+              </IonSegmentButton>
+              <IonSegmentButton value="rejected" className="segment-btn">
+                <IonLabel className="segment-label">Rejected</IonLabel>
+              </IonSegmentButton>
+            </IonSegment>
           </IonItem>
         </div>
       </IonCardHeader>
       <IonCardContent>
         <IonList>
           {filteredComplaints.length > 0 ? (
-            filteredComplaints.map((complaint: any) => (
+            filteredComplaints.map((complaint: Complaint) => (
               <IonItem
                 key={complaint.id}
                 button
@@ -337,8 +414,11 @@ const TicketContainer: React.FC = () => {
                   <h2>
                     {complaintTypes.find(
                       (t) => t.id === parseInt(complaint.complaint_type)
-                    )?.name || "Unknown Complaint Type"}
+                    )?.name || "Unknown Type"}
                   </h2>
+                  <p className="respondent-text">
+                    Respondent: {complaint.respondent || "Not specified"}
+                  </p>
                   <p>
                     <IonChip
                       color={
@@ -356,7 +436,10 @@ const TicketContainer: React.FC = () => {
                         complaint.status.slice(1)}
                     </IonChip>
                   </p>
-                  <p>Date: {complaint.incident_date}</p>
+                  <p>
+                    Date:{" "}
+                    {new Date(complaint.incident_date).toLocaleDateString()}
+                  </p>
                 </IonLabel>
               </IonItem>
             ))

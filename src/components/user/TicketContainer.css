@@ -63,6 +63,14 @@
 
 ion-segment-button {
   --indicator-height: 3px;
+  --padding-start: 4px;
+  --padding-end: 4px;
+  min-width: auto;
+}
+
+ion-segment-button.segment-button-checked {
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-primary-contrast);
 }
 
 ion-badge {
@@ -74,17 +82,16 @@ ion-badge {
 }
 
 .filter-container {
-  display: flex;
-  gap: 1rem;
-  padding: 1rem;
+  padding: 16px;
   background: var(--ion-color-light);
   border-radius: 8px;
-  margin: 1rem 0;
+  margin: 16px;
 }
 
 .filter-container ion-item {
   flex: 1;
   --background: transparent;
+  margin-bottom: 0.5rem;
 }
 
 .filter-container ion-input,
@@ -93,4 +100,66 @@ ion-badge {
   --padding-end: 8px;
   background: var(--ion-color-light-shade);
   border-radius: 4px;
+  font-size: 1rem;
+}
+
+.search-input {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  --background: var(--ion-color-light-shade);
+  --border-radius: 8px;
+  font-size: 16px !important;
+  margin-top: 8px;
+}
+
+.status-filter {
+  margin-top: 16px;
+  --background: transparent;
+}
+
+.status-segment {
+  width: 100%;
+  --background: var(--ion-color-light-shade);
+  border-radius: 8px;
+  min-height: 48px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.segment-btn {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --background-checked: var(--ion-color-primary);
+  --color-checked: var(--ion-color-primary-contrast);
+  --indicator-color: transparent;
+  min-width: auto;
+  font-weight: 500;
+}
+
+.segment-label {
+  font-size: 14px !important;
+  text-transform: none;
+  letter-spacing: 0;
+  margin: 0 4px;
+  white-space: nowrap;
+}
+
+/* Improve contrast for selected state */
+ion-segment-button.segment-button-checked {
+  --color: var(--ion-color-light);
+  --background: var(--ion-color-primary);
+  border-radius: 6px;
+}
+
+/* Make sure text is visible in all states */
+ion-segment-button {
+  --color: var(--ion-color-dark);
+  opacity: 1 !important;
+}
+
+.respondent-text {
+  color: var(--ion-color-medium);
+  font-size: 0.9em;
+  margin: 4px 0;
 }
