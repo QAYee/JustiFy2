@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
+import type React from "react";
+import { useState, useEffect } from "react";
 import {
   IonAvatar,
   IonItem,
@@ -20,264 +20,563 @@ import {
   IonItemOption,
   IonRefresher,
   IonRefresherContent,
-} from "@ionic/react"
+  IonImg,
+  IonSkeletonText,
+  IonButton,
+  IonToast,
+  IonModal,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonButtons,
+  IonBackButton,
+  IonText,
+} from "@ionic/react";
 import {
   mailOutline,
   mailOpenOutline,
-  trashOutline,
   timeOutline,
-  checkmarkCircleOutline,
-  alertCircleOutline,
-  informationCircleOutline,
-} from "ionicons/icons"
+  megaphone,
+  refreshOutline,
+} from "ionicons/icons";
 
-interface Message {
-  id: number
-  sender: string
-  subject: string
-  preview: string
-  date: string
-  read: boolean
-  avatar?: string
-  type: "notification" | "update" | "alert" | "info"
-  important?: boolean
+interface Announcement {
+  target_all: any;
+  recipient_ids: boolean;
+  id: number;
+  title: string;
+  description: string;
+  image?: string;
+  created_at: string;
+  is_read: number;
+  contentType: string;
 }
 
-interface ContainerProps {
-  name: string
-}
-
-const InboxContainer: React.FC<ContainerProps> = ({ name }) => {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [searchText, setSearchText] = useState("")
-  const [loading, setLoading] = useState(true)
-
-  // Dummy messages data
-  const dummyMessages: Message[] = [
-    {
-      id: 1,
-      sender: "Barangay Office",
-      subject: "Complaint Status Update",
-      preview: "Your complaint #1001 regarding noise disturbance has been received and is now being processed.",
-      date: "2023-10-16",
-      read: false,
-      avatar: "https://ionicframework.com/docs/img/demos/avatar.svg",
-      type: "update",
-      important: true,
-    },
-    {
-      id: 2,
-      sender: "Community Services",
-      subject: "Free Medical Mission",
-      preview:
-        "Join us for the free medical mission on November 12, 2023. Services include general check-up, dental, and eye examination.",
-      date: "2023-10-15",
-      read: true,
-      avatar: "https://ionicframework.com/docs/img/demos/avatar.svg",
-      type: "notification",
-    },
-    {
-      id: 3,
-      sender: "Barangay Captain",
-      subject: "Important: Community Meeting",
-      preview:
-        "All residents are invited to attend the quarterly general assembly on November 5, 2023 at the Barangay Hall.",
-      date: "2023-10-14",
-      read: false,
-      avatar: "https://ionicframework.com/docs/img/demos/avatar.svg",
-      type: "alert",
-      important: true,
-    },
-    {
-      id: 4,
-      sender: "Water District Office",
-      subject: "Water Service Interruption",
-      preview:
-        "Please be advised that there will be a scheduled water service interruption on October 20, 2023 from 10 AM to 3 PM.",
-      date: "2023-10-13",
-      read: true,
-      avatar: "https://ionicframework.com/docs/img/demos/avatar.svg",
-      type: "info",
-    },
-    {
-      id: 5,
-      sender: "Barangay Office",
-      subject: "Document Request Approved",
-      preview: "Your request for a Barangay Clearance has been approved. You may claim it at the Barangay Hall.",
-      date: "2023-10-12",
-      read: true,
-      avatar: "https://ionicframework.com/docs/img/demos/avatar.svg",
-      type: "update",
-    },
-  ]
-
-  useEffect(() => {
-    // Simulate API call to fetch messages
-    const fetchMessages = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      setMessages(dummyMessages)
-      setLoading(false)
+// Add this new function at the top, outside the component
+const getCurrentUserId = (): number | undefined => {
+  // Check for user in localStorage - adapt these keys as needed for your auth system
+  try {
+    // First try the most common auth storage patterns
+    const authUser = localStorage.getItem("authUser");
+    if (authUser) {
+      const parsed = JSON.parse(authUser);
+      return parsed.id || parsed.userId || parsed.user_id;
     }
 
-    fetchMessages()
-  }, [])
+    // Check for a JWT token and decode it
+    const token = localStorage.getItem("token") || localStorage.getItem("jwt");
+    if (token) {
+      // Simple JWT parsing (payload is in the middle section)
+      const payload = token.split(".")[1];
+      if (payload) {
+        const decoded = JSON.parse(atob(payload));
+        return decoded.id || decoded.userId || decoded.sub;
+      }
+    }
+
+    // Direct user ID storage
+    const userId =
+      localStorage.getItem("userId") || localStorage.getItem("user_id");
+    if (userId) {
+      return parseInt(userId, 10);
+    }
+
+    // If all else fails, look for a hardcoded temporary value
+    return 1; // Default user ID for testing - replace with proper authentication
+  } catch (e) {
+    console.error("Error getting current user ID:", e);
+    return undefined;
+  }
+};
+
+const InboxContainer: React.FC<ContainerProps> = ({
+  name,
+  userId: propUserId,
+}) => {
+  // Initialize userId with the getCurrentUserId function
+  const [userId, setUserId] = useState<number | undefined>(
+    propUserId || getCurrentUserId()
+  );
+  const [needsLogin, setNeedsLogin] = useState(false);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [searchText, setSearchText] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+
+  // Add this state variable at the top of your component
+  const [isFetching, setIsFetching] = useState(false);
+
+  // Add these state variables inside your component
+  const [showModal, setShowModal] = useState(false);
+  const [selectedAnnouncement, setSelectedAnnouncement] =
+    useState<Announcement | null>(null);
+
+  // Make the getUnreadCount function more robust
+  const getUnreadCount = () => {
+    return announcements.filter((a) => a.is_read === 0).length;
+  };
+
+  // Update the useEffect to only check localStorage if needed
+  useEffect(() => {
+    if (userId) {
+      // We already have a userId, proceed to fetching announcements
+      fetchAnnouncements();
+    } else {
+      // No userId from props or initial check, show login required
+      setLoading(false);
+      setNeedsLogin(true);
+    }
+  }, [userId]);
+
+  // Fetch user-specific announcements
+  const fetchAnnouncements = async () => {
+    if (!userId || isFetching) {
+      // Skip if we're already fetching or don't have a userId
+      return;
+    }
+
+    setIsFetching(true);
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Make sure the endpoint includes user_id parameter
+      const endpoint = `http://127.0.0.1/justify/index.php/AnnouncementController/getUserAnnouncements?user_id=${userId}`;
+
+      const response = await fetch(endpoint, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        // Explicitly make this a GET request (default)
+        method: "GET",
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      const responseText = await response.text();
+      let data;
+
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        throw new Error("Invalid JSON response from server");
+      }
+
+      if (data.status && Array.isArray(data.announcements)) {
+        // Process announcements as returned by the backend
+        const validAnnouncements = data.announcements
+          .filter((announcement: any) => {
+            // Additional safety check - make sure announcements are meant for this user
+            return (
+              announcement &&
+              typeof announcement === "object" &&
+              announcement.id &&
+              announcement.title &&
+              announcement.description
+              // We trust the backend to only return announcements for this user
+            );
+          })
+          .map((announcement: any) => ({
+            ...announcement,
+            is_read: announcement.is_read === 1 ? 1 : 0,
+            created_at: announcement.created_at || new Date().toISOString(),
+          }));
+
+        setAnnouncements(validAnnouncements);
+      } else {
+        setAnnouncements([]);
+      }
+    } catch (error) {
+      // Error handling
+      setError(`Failed to fetch announcements: ${(error as Error).message}`);
+      setToastMessage(`Error: ${(error as Error).message}`);
+      setShowToast(true);
+      setAnnouncements([]);
+    } finally {
+      setLoading(false);
+      setIsFetching(false);
+    }
+  };
 
   const handleRefresh = async (event: CustomEvent) => {
-    // Simulate refreshing data
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setMessages(dummyMessages)
-    event.detail.complete()
-  }
+    await fetchAnnouncements();
+    event.detail.complete();
+  };
 
-  const markAsRead = (id: number) => {
-    setMessages(messages.map((message) => (message.id === id ? { ...message, read: true } : message)))
-  }
+  // Update to align with your backend implementation
 
-  const deleteMessage = (id: number) => {
-    setMessages(messages.filter((message) => message.id !== id))
-  }
-
-  const getFilteredMessages = () => {
-    if (!searchText) return messages
-
-    const searchLower = searchText.toLowerCase()
-    return messages.filter(
-      (message) =>
-        message.subject.toLowerCase().includes(searchLower) ||
-        message.sender.toLowerCase().includes(searchLower) ||
-        message.preview.toLowerCase().includes(searchLower),
-    )
-  }
-
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case "notification":
-        return informationCircleOutline
-      case "update":
-        return checkmarkCircleOutline
-      case "alert":
-        return alertCircleOutline
-      case "info":
-        return timeOutline
-      default:
-        return mailOutline
+  // Fix the markAsRead function to prevent loops
+  const markAsRead = async (announcementId: number) => {
+    // Add a check to prevent marking items that are already read
+    const announcement = announcements.find((a) => a.id === announcementId);
+    if (announcement && announcement.is_read === 1) {
+      // Already read, nothing to do
+      return;
     }
-  }
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case "notification":
-        return "primary"
-      case "update":
-        return "success"
-      case "alert":
-        return "danger"
-      case "info":
-        return "tertiary"
-      default:
-        return "medium"
+    try {
+      // First update UI optimistically (for responsiveness)
+      setAnnouncements((prev) =>
+        prev.map((item) =>
+          item.id === announcementId ? { ...item, is_read: 1 } : item
+        )
+      );
+
+      const response = await fetch(
+        "http://127.0.0.1/justify/index.php/AnnouncementController/markAsRead",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            announcement_id: announcementId,
+            user_id: userId,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Only show success toast if successful
+      if (data.status === "success") {
+        setToastMessage("Announcement marked as read");
+        setShowToast(true);
+      } else {
+        throw new Error(data.message || "Unknown error");
+      }
+    } catch (error) {
+      console.error("Error marking as read:", error);
+      setToastMessage(`Failed to mark as read: ${(error as Error).message}`);
+      setShowToast(true);
+
+      // Instead of re-fetching, just revert the optimistic update
+      setAnnouncements((prev) =>
+        prev.map((item) =>
+          item.id === announcementId ? { ...item, is_read: 0 } : item
+        )
+      );
     }
-  }
+  };
+
+  const getFilteredAnnouncements = () => {
+    if (!searchText) return announcements;
+
+    const searchLower = searchText.toLowerCase();
+    return announcements.filter(
+      (announcement) =>
+        announcement.title.toLowerCase().includes(searchLower) ||
+        announcement.description.toLowerCase().includes(searchLower)
+    );
+  };
+
+  // Optional: Add a function to manually set a test user for debugging
+  const useTestUser = () => {
+    const testId = 1; // Change this to a valid user ID in your system
+    setUserId(testId);
+    localStorage.setItem("userId", testId.toString());
+    fetchAnnouncements();
+  };
 
   return (
     <>
+      <IonToast
+        isOpen={showToast}
+        onDidDismiss={() => setShowToast(false)}
+        message={toastMessage}
+        duration={3000}
+      />
+
       <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
         <IonRefresherContent></IonRefresherContent>
       </IonRefresher>
 
-     
+      <IonCard>
         <IonCardHeader>
-          <IonCardTitle>
-            Inbox
+          <IonCardTitle className="ion-text-wrap">
+            Announcements
             <IonBadge color="primary" style={{ marginLeft: "8px" }}>
-              {messages.filter((m) => !m.read).length}
+              {getUnreadCount()}
             </IonBadge>
+            <IonButton
+              fill="clear"
+              size="small"
+              onClick={fetchAnnouncements}
+              style={{ float: "right" }}
+            >
+              <IonIcon icon={refreshOutline} />
+            </IonButton>
           </IonCardTitle>
         </IonCardHeader>
         <IonCardContent>
           <IonSearchbar
             value={searchText}
             onIonChange={(e) => setSearchText(e.detail.value!)}
-            placeholder="Search messages"
+            placeholder="Search announcements"
             animated
           />
 
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: "16px", marginBottom: "16px" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginTop: "16px",
+              marginBottom: "16px",
+            }}
+          >
             <IonChip outline={true} color="primary">
-              All Messages
+              All Announcements
             </IonChip>
             <IonChip outline={true}>
               Unread
               <IonBadge color="primary" style={{ marginLeft: "8px" }}>
-                {messages.filter((m) => !m.read).length}
-              </IonBadge>
-            </IonChip>
-            <IonChip outline={true}>
-              Important
-              <IonBadge color="danger" style={{ marginLeft: "8px" }}>
-                {messages.filter((m) => m.important).length}
+                {announcements.filter((a) => a.is_read === 0).length}
               </IonBadge>
             </IonChip>
           </div>
         </IonCardContent>
-    
+      </IonCard>
 
       <IonList>
         {loading ? (
-          <IonItem>
-            <IonLabel className="ion-text-center">Loading messages...</IonLabel>
-          </IonItem>
-        ) : getFilteredMessages().length > 0 ? (
-          getFilteredMessages().map((message) => (
-            <IonItemSliding key={message.id}>
-              <IonItem button onClick={() => markAsRead(message.id)}>
+          // Show skeletons when loading
+          Array(3)
+            .fill(null)
+            .map((_, index) => (
+              <IonItem key={`skeleton-${index}`}>
                 <IonAvatar slot="start">
-                  <img alt="" src={message.avatar || "https://ionicframework.com/docs/img/demos/avatar.svg"} />
+                  <IonSkeletonText animated />
                 </IonAvatar>
                 <IonLabel>
-                  <h2 style={{ fontWeight: message.read ? "normal" : "bold" }}>
-                    {message.subject}
-                    {message.important && (
-                      <IonBadge color="danger" style={{ marginLeft: "8px", fontSize: "10px" }}>
-                        Important
-                      </IonBadge>
-                    )}
+                  <h2>
+                    <IonSkeletonText animated style={{ width: "70%" }} />
                   </h2>
-                  <h3>{message.sender}</h3>
-                  <p>{message.preview}</p>
-                  <p style={{ fontSize: "12px", color: "#666" }}>{message.date}</p>
+                  <p>
+                    <IonSkeletonText animated style={{ width: "90%" }} />
+                  </p>
+                  <p>
+                    <IonSkeletonText animated style={{ width: "30%" }} />
+                  </p>
                 </IonLabel>
-                {!message.read && (
+              </IonItem>
+            ))
+        ) : needsLogin ? (
+          <IonItem>
+            <IonLabel className="ion-text-center ion-text-wrap">
+              <h2>Login Required</h2>
+              <p>Please login to view your announcements</p>
+              {/* Uncomment this for testing purposes */}
+              {/*
+              <IonButton 
+                size="small" 
+                onClick={useTestUser}
+                style={{ marginTop: "16px" }}
+              >
+                Use Test User
+              </IonButton>
+              */}
+            </IonLabel>
+          </IonItem>
+        ) : getFilteredAnnouncements().length > 0 ? (
+          getFilteredAnnouncements().map((announcement) => (
+            <IonItemSliding key={announcement.id}>
+              <IonItem
+                button
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent event bubbling
+
+                  // Set the selected announcement and show modal
+                  setSelectedAnnouncement(announcement);
+                  setShowModal(true);
+
+                  // Only mark as read if it's not already read
+                  if (announcement.is_read === 0) {
+                    markAsRead(announcement.id);
+                  }
+                }}
+              >
+                <IonLabel>
+                  <h2
+                    style={{
+                      fontWeight:
+                        announcement.is_read === 1 ? "normal" : "bold",
+                    }}
+                  >
+                    {announcement.title}
+                  </h2>
+                  <p style={{ fontSize: "12px", color: "#666" }}>
+                    <IonIcon
+                      icon={timeOutline}
+                      style={{ verticalAlign: "middle", marginRight: "4px" }}
+                    />
+                    {new Date(announcement.created_at).toLocaleString()}
+                  </p>
+                </IonLabel>
+                {announcement.is_read === 0 && (
                   <IonBadge color="primary" slot="end">
                     New
                   </IonBadge>
                 )}
-                <IonIcon
-                  color={getTypeColor(message.type)}
-                  icon={getTypeIcon(message.type)}
-                  slot="end"
-                  style={{ fontSize: "24px" }}
-                />
               </IonItem>
               <IonItemOptions side="end">
-                <IonItemOption color={message.read ? "primary" : "success"} onClick={() => markAsRead(message.id)}>
-                  <IonIcon slot="icon-only" icon={message.read ? mailOutline : mailOpenOutline} />
-                </IonItemOption>
-                <IonItemOption color="danger" onClick={() => deleteMessage(message.id)}>
-                  <IonIcon slot="icon-only" icon={trashOutline} />
+                <IonItemOption
+                  color={announcement.is_read === 1 ? "primary" : "success"}
+                  onClick={() => markAsRead(announcement.id)}
+                >
+                  <IonIcon
+                    slot="icon-only"
+                    icon={
+                      announcement.is_read === 1 ? mailOutline : mailOpenOutline
+                    }
+                  />
                 </IonItemOption>
               </IonItemOptions>
             </IonItemSliding>
           ))
         ) : (
           <IonItem>
-            <IonLabel className="ion-text-center">No messages found</IonLabel>
+            {error ? (
+              <IonLabel
+                className="ion-text-center ion-text-wrap"
+                color="danger"
+              >
+                {error}
+                <p>
+                  <IonButton size="small" onClick={fetchAnnouncements}>
+                    Retry
+                  </IonButton>
+                </p>
+              </IonLabel>
+            ) : (
+              <IonLabel className="ion-text-center">
+                No announcements found
+              </IonLabel>
+            )}
           </IonItem>
         )}
       </IonList>
+
+      <IonModal isOpen={showModal} onDidDismiss={() => setShowModal(false)}>
+        {selectedAnnouncement && (
+          <>
+            <IonHeader>
+              <IonToolbar color="primary">
+                <IonButtons slot="start">
+                  <IonButton onClick={() => setShowModal(false)}>
+                    Close
+                  </IonButton>
+                </IonButtons>
+                <IonTitle>{selectedAnnouncement.title}</IonTitle>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent className="ion-padding">
+              <div style={{ padding: "16px" }}>
+                {selectedAnnouncement.image && (
+                  <div style={{ textAlign: "center", margin: "16px 0" }}>
+                    <img
+                      src={selectedAnnouncement.image}
+                      alt="Announcement"
+                      style={{
+                        maxWidth: "100%",
+                        maxHeight: "300px",
+                        borderRadius: "8px",
+                      }}
+                      onError={(e) => {
+                        // Handle broken images
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = "none";
+                      }}
+                    />
+                  </div>
+                )}
+
+                <IonText>
+                  <h2>{selectedAnnouncement.title}</h2>
+
+                  <div
+                    style={{
+                      color: "#666",
+                      marginBottom: "16px",
+                      fontSize: "14px",
+                    }}
+                  >
+                    <IonIcon
+                      icon={timeOutline}
+                      style={{ verticalAlign: "middle", marginRight: "4px" }}
+                    />
+                    {new Date(selectedAnnouncement.created_at).toLocaleString()}
+
+                    {selectedAnnouncement.is_read === 1 ? (
+                      <span style={{ marginLeft: "10px", color: "#888" }}>
+                        <IonIcon
+                          icon={mailOpenOutline}
+                          style={{
+                            verticalAlign: "middle",
+                            marginRight: "4px",
+                          }}
+                        />
+                        Read
+                      </span>
+                    ) : (
+                      <span style={{ marginLeft: "10px", color: "#3880ff" }}>
+                        <IonIcon
+                          icon={mailOutline}
+                          style={{
+                            verticalAlign: "middle",
+                            marginRight: "4px",
+                          }}
+                        />
+                        New
+                      </span>
+                    )}
+                  </div>
+
+                  <p
+                    style={{
+                      whiteSpace: "pre-wrap",
+                      lineHeight: "1.6",
+                      fontSize: "16px",
+                    }}
+                  >
+                    {selectedAnnouncement.description}
+                  </p>
+                </IonText>
+
+                {/* Add any additional details you want to show */}
+              </div>
+            </IonContent>
+            <div style={{ padding: "16px", background: "#f4f5f8" }}>
+              {selectedAnnouncement.is_read === 0 && (
+                <IonButton
+                  expand="block"
+                  onClick={() => markAsRead(selectedAnnouncement.id)}
+                >
+                  Mark as Read
+                </IonButton>
+              )}
+              <IonButton
+                expand="block"
+                color="medium"
+                onClick={() => setShowModal(false)}
+              >
+                Close
+              </IonButton>
+            </div>
+          </>
+        )}
+      </IonModal>
     </>
-  )
-}
+  );
+};
 
-export default InboxContainer
-
+export default InboxContainer;
