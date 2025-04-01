@@ -24,8 +24,9 @@ import {
   IonCardTitle,
   IonCardSubtitle,
   IonImg,
+  IonAlert,
 } from "@ionic/react";
-import { newspaperOutline, timeOutline } from "ionicons/icons";
+import { newspaperOutline, timeOutline, pencil, trash } from "ionicons/icons";
 import "./NewsContainer.css";
 
 const NewsContainer: React.FC = () => {
@@ -35,6 +36,14 @@ const NewsContainer: React.FC = () => {
   const [news, setNews] = useState<any[]>([]);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [editMode, setEditMode] = useState(false);
+  const [editId, setEditId] = useState<number | null>(null);
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [updateFormData, setUpdateFormData] = useState({ title: "", description: "" });
+  const [updateImageFile, setUpdateImageFile] = useState<File | null>(null);
+  const [updatePreviewUrl, setUpdatePreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     fetchNews();
@@ -50,6 +59,11 @@ const NewsContainer: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (editMode) {
+      updateNews();
+      return;
+    }
 
     if (!formData.title || !formData.description || !imageFile) {
       setToastMessage("All fields are required");
@@ -117,6 +131,114 @@ const NewsContainer: React.FC = () => {
     event.detail.complete();
   };
 
+  const handleEdit = (news: any) => {
+    setEditMode(true);
+    setEditId(news.id);
+    setFormData({
+      title: news.title,
+      description: news.description,
+    });
+    if (news.image) {
+      setPreviewUrl(news.image);
+    }
+  };
+
+  const cancelEdit = () => {
+    setEditMode(false);
+    setEditId(null);
+    setFormData({ title: "", description: "" });
+    setImageFile(null);
+    setPreviewUrl(null);
+  };
+
+  const updateNews = async () => {
+    if (!formData.title || !formData.description) {
+      setToastMessage("Title and description are required");
+      setShowToast(true);
+      return;
+    }
+
+    const formDataToSend = new FormData();
+    formDataToSend.append("id", String(editId));
+    formDataToSend.append("title", formData.title);
+    formDataToSend.append("description", formData.description);
+
+    if (imageFile) {
+      formDataToSend.append("image", imageFile);
+    }
+
+    try {
+      const response = await fetch(
+        "http://127.0.0.1/justify/index.php/NewsController/updateNews",
+        {
+          method: "POST",
+          body: formDataToSend,
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.status === "success") {
+        setToastMessage("News updated successfully");
+        setShowToast(true);
+        // Reset form and exit edit mode
+        setFormData({ title: "", description: "" });
+        setImageFile(null);
+        setPreviewUrl(null);
+        setEditMode(false);
+        setEditId(null);
+        fetchNews(); // Refresh news list
+      } else {
+        setToastMessage(data.message || "Failed to update news");
+        setShowToast(true);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setToastMessage("Failed to update news");
+      setShowToast(true);
+    }
+  };
+
+  const confirmDelete = (id: number) => {
+    setDeleteId(id);
+    setShowDeleteAlert(true);
+  };
+
+  const deleteNews = async () => {
+    if (!deleteId) return;
+
+    try {
+      const response = await fetch(
+        "http://127.0.0.1/justify/index.php/NewsController/deleteNews",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: deleteId }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.status === "success") {
+        setToastMessage("News deleted successfully");
+        setShowToast(true);
+        fetchNews(); // Refresh news list
+      } else {
+        setToastMessage(data.message || "Failed to delete news");
+        setShowToast(true);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setToastMessage("Failed to delete news");
+      setShowToast(true);
+    } finally {
+      setShowDeleteAlert(false);
+      setDeleteId(null);
+    }
+  };
+
   return (
     <IonContent className="ion-padding" color="light">
       <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
@@ -127,8 +249,14 @@ const NewsContainer: React.FC = () => {
         <IonRow>
           <IonCol sizeMd="6" offsetMd="3">
             <IonCardHeader>
-              <IonCardTitle>Create News</IonCardTitle>
-              <IonCardSubtitle>Add a new news article</IonCardSubtitle>
+              <IonCardTitle>
+                {editMode ? "Update News" : "Create News"}
+              </IonCardTitle>
+              <IonCardSubtitle>
+                {editMode
+                  ? "Edit existing news article"
+                  : "Add a new news article"}
+              </IonCardSubtitle>
             </IonCardHeader>
             <IonCardContent>
               <form onSubmit={handleSubmit}>
@@ -181,13 +309,28 @@ const NewsContainer: React.FC = () => {
                     </IonItem>
                   )}
 
-                  <IonButton
-                    className="ion-margin-top"
-                    expand="block"
-                    type="submit"
-                  >
-                    Create News
-                  </IonButton>
+                  <div className="form-buttons">
+                    <IonButton
+                      className="ion-margin-top"
+                      expand="block"
+                      type="submit"
+                      color={editMode ? "warning" : "primary"}
+                    >
+                      {editMode ? "Update News" : "Create News"}
+                    </IonButton>
+
+                    {editMode && (
+                      <IonButton
+                        className="ion-margin-top"
+                        expand="block"
+                        type="button"
+                        color="medium"
+                        onClick={cancelEdit}
+                      >
+                        Cancel
+                      </IonButton>
+                    )}
+                  </div>
                 </IonList>
               </form>
             </IonCardContent>
@@ -207,6 +350,23 @@ const NewsContainer: React.FC = () => {
                         {new Date(item.created_at).toLocaleString()}
                       </small>
                     </div>
+
+                    <div className="news-actions">
+                      <IonButton
+                        fill="clear"
+                        color="primary"
+                        onClick={() => handleEdit(item)}
+                      >
+                        <IonIcon slot="icon-only" icon={pencil} />
+                      </IonButton>
+                      <IonButton
+                        fill="clear"
+                        color="danger"
+                        onClick={() => confirmDelete(item.id)}
+                      >
+                        <IonIcon slot="icon-only" icon={trash} />
+                      </IonButton>
+                    </div>
                   </IonCardContent>
                 </IonCard>
               ))}
@@ -220,6 +380,30 @@ const NewsContainer: React.FC = () => {
         onDidDismiss={() => setShowToast(false)}
         message={toastMessage}
         duration={2000}
+      />
+
+      <IonAlert
+        isOpen={showDeleteAlert}
+        onDidDismiss={() => setShowDeleteAlert(false)}
+        cssClass="delete-alert"
+        header="Confirm Delete"
+        message="Are you sure you want to delete this news article? This action cannot be undone."
+        buttons={[
+          {
+            text: "Cancel",
+            role: "cancel",
+            cssClass: "cancel-button",
+            handler: () => {
+              setShowDeleteAlert(false);
+              setDeleteId(null);
+            },
+          },
+          {
+            text: "Delete",
+            cssClass: "delete-button",
+            handler: deleteNews,
+          },
+        ]}
       />
     </IonContent>
   );

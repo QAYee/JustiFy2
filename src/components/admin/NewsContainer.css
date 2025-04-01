@@ -58,9 +58,78 @@
   font-size: 16px;
 }
 
+.news-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+}
+
+.form-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 10px 0;
+}
+
+.delete-alert .delete-button {
+  color: var(--ion-color-danger);
+}
+
 @media (max-width: 768px) {
   .form-card,
   .news-card {
     margin-inline: 0;
+  }
+}
+
+/* Modal styles */
+.update-modal {
+  --height: auto;
+  --max-height: 90%;
+  --width: 90%;
+  --max-width: 500px;
+  --border-radius: 10px;
+}
+
+/* Make sure inputs are visible */
+.update-modal ion-item {
+  --background: white;
+  margin-bottom: 8px;
+}
+
+.update-modal ion-label {
+  --color: var(--ion-color-dark);
+  font-weight: 500;
+}
+
+.update-modal ion-input,
+.update-modal ion-textarea {
+  --color: black;
+  --placeholder-color: #999;
+}
+
+.file-input {
+  margin: 10px 0;
+  width: 100%;
+}
+
+.preview-container {
+  width: 100%;
+  padding: 10px 0;
+}
+
+.preview-image {
+  max-height: 200px;
+  object-fit: contain;
+  border: 1px solid #eee;
+  border-radius: 8px;
+}
+
+@media (min-width: 768px) {
+  .update-modal {
+    --width: 70%;
   }
 }
