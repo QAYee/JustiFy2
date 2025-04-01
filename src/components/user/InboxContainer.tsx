@@ -576,29 +576,17 @@ const InboxContainer: React.FC<ContainerProps> = ({
                     />
                     {new Date(selectedAnnouncement.created_at).toLocaleString()}
 
-                    {selectedAnnouncement.is_read === 1 ? (
-                      <span style={{ marginLeft: "10px", color: "#888" }}>
-                        <IonIcon
-                          icon={mailOpenOutline}
-                          style={{
-                            verticalAlign: "middle",
-                            marginRight: "4px",
-                          }}
-                        />
-                        Read
-                      </span>
-                    ) : (
-                      <span style={{ marginLeft: "10px", color: "#3880ff" }}>
-                        <IonIcon
-                          icon={mailOutline}
-                          style={{
-                            verticalAlign: "middle",
-                            marginRight: "4px",
-                          }}
-                        />
-                        New
-                      </span>
-                    )}
+                    {/* Always show as "Read" in the modal since we mark it when opening */}
+                    <span style={{ marginLeft: "10px", color: "#888" }}>
+                      <IonIcon
+                        icon={mailOpenOutline}
+                        style={{
+                          verticalAlign: "middle",
+                          marginRight: "4px",
+                        }}
+                      />
+                      Read
+                    </span>
                   </div>
 
                   <p
@@ -611,19 +599,10 @@ const InboxContainer: React.FC<ContainerProps> = ({
                     {selectedAnnouncement.description}
                   </p>
                 </IonText>
-
-                {/* Add any additional details you want to show */}
               </div>
             </IonContent>
             <div style={{ padding: "16px", background: "#f4f5f8" }}>
-              {selectedAnnouncement.is_read === 0 && (
-                <IonButton
-                  expand="block"
-                  onClick={() => markAsRead(selectedAnnouncement.id)}
-                >
-                  Mark as Read
-                </IonButton>
-              )}
+              {/* Removed the "Mark as Read" button */}
               <IonButton
                 expand="block"
                 color="medium"
