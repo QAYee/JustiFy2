@@ -53,21 +53,38 @@ interface Announcement {
   contentType: string;
 }
 
-// Add this new function at the top, outside the component
+// Improve the getCurrentUserId function for better auth integration
 const getCurrentUserId = (): number | undefined => {
-  // Check for user in localStorage - adapt these keys as needed for your auth system
   try {
-    // First try the most common auth storage patterns
+    // First check for user in authUser - most common auth pattern
     const authUser = localStorage.getItem("authUser");
     if (authUser) {
       const parsed = JSON.parse(authUser);
       return parsed.id || parsed.userId || parsed.user_id;
     }
 
+    // Check for a user object directly
+    const user = localStorage.getItem("user");
+    if (user) {
+      const parsed = JSON.parse(user);
+      return parsed.id || parsed.userId || parsed.user_id;
+    }
+
+    // Check for session storage if local storage was unsuccessful
+    const sessionUser =
+      sessionStorage.getItem("authUser") || sessionStorage.getItem("user");
+    if (sessionUser) {
+      const parsed = JSON.parse(sessionUser);
+      return parsed.id || parsed.userId || parsed.user_id;
+    }
+
     // Check for a JWT token and decode it
-    const token = localStorage.getItem("token") || localStorage.getItem("jwt");
+    const token =
+      localStorage.getItem("token") ||
+      localStorage.getItem("jwt") ||
+      sessionStorage.getItem("token") ||
+      sessionStorage.getItem("jwt");
     if (token) {
-      // Simple JWT parsing (payload is in the middle section)
       const payload = token.split(".")[1];
       if (payload) {
         const decoded = JSON.parse(atob(payload));
@@ -77,13 +94,16 @@ const getCurrentUserId = (): number | undefined => {
 
     // Direct user ID storage
     const userId =
-      localStorage.getItem("userId") || localStorage.getItem("user_id");
+      localStorage.getItem("userId") ||
+      localStorage.getItem("user_id") ||
+      sessionStorage.getItem("userId") ||
+      sessionStorage.getItem("user_id");
     if (userId) {
       return parseInt(userId, 10);
     }
 
-    // If all else fails, look for a hardcoded temporary value
-    return 1; // Default user ID for testing - replace with proper authentication
+    console.warn("No authenticated user found - using default ID for testing");
+    return undefined; // Return undefined instead of defaulting to 1
   } catch (e) {
     console.error("Error getting current user ID:", e);
     return undefined;
@@ -119,17 +139,57 @@ const InboxContainer: React.FC<ContainerProps> = ({
     return announcements.filter((a) => a.is_read === 0).length;
   };
 
-  // Update the useEffect to only check localStorage if needed
+  // Update the useEffect to handle authentication better
   useEffect(() => {
-    if (userId) {
-      // We already have a userId, proceed to fetching announcements
-      fetchAnnouncements();
-    } else {
-      // No userId from props or initial check, show login required
-      setLoading(false);
-      setNeedsLogin(true);
-    }
-  }, [userId]);
+    const checkAuth = async () => {
+      setLoading(true);
+
+      // Try to get user ID from props or local storage
+      const currentUserId = propUserId || getCurrentUserId();
+
+      if (currentUserId) {
+        setUserId(currentUserId);
+        await fetchAnnouncements();
+      } else {
+        // Try to fetch the current user from your auth API endpoint
+        try {
+          const response = await fetch(
+            "http://127.0.0.1/justify/index.php/UserController/getCurrentUser",
+            {
+              credentials: "include", // Include cookies if using cookie-based auth
+              headers: {
+                Authorization: `Bearer ${
+                  localStorage.getItem("token") ||
+                  sessionStorage.getItem("token") ||
+                  ""
+                }`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (response.ok) {
+            const userData = await response.json();
+            if (userData && userData.id) {
+              setUserId(userData.id);
+              await fetchAnnouncements();
+              return;
+            }
+          }
+          // If we reach here, user is not authenticated
+          setNeedsLogin(true);
+        } catch (error) {
+          console.error("Error fetching current user:", error);
+          setError("Failed to authenticate user. Please login again.");
+          setNeedsLogin(true);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   // Fetch user-specific announcements
   const fetchAnnouncements = async () => {
