@@ -47,6 +47,7 @@ import ATicket from "./pages/admin/Ticket";
 import ADashboard from "./pages/admin/Dashboard";
 import TicketContainer from "./components/admin/TicketContainer";
 import News from "./pages/admin/News";
+import Message from "./pages/user/Message";
 
 /* Core CSS */
 import "@ionic/react/css/core.css";
@@ -251,8 +252,9 @@ const UserApp: React.FC = () => {
         <Route exact path="/home" component={Home} />
         <Route exact path="/complain" component={Complain} />
         <Route exact path="/inbox" component={Inbox} />
-        <Route exact path="/record" component={Record} />
+        {/* <Route exact path="/record" component={Record} /> */}
         <Route exact path="/ticket" component={Ticket} />
+        <Route exact path="/message" component={Message} />
         <Route>
           <Redirect to="/home" />
         </Route>
@@ -275,9 +277,10 @@ const UserApp: React.FC = () => {
           <IonIcon icon={mail} />
           <IonLabel>Inbox</IonLabel>
         </IonTabButton>
-        <IonTabButton tab="record" href="/record">
-          <IonIcon icon={documentText} />
-          <IonLabel>Records</IonLabel>
+        {/* <IonTabButton tab="record" href="/record"> */}
+        <IonTabButton tab="message" href="/message">
+          <IonIcon icon={mail} />
+          <IonLabel>Message</IonLabel>
         </IonTabButton>
       </IonTabBar>
     </IonTabs>

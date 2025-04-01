@@ -1,0 +1,227 @@
+/* Main container layout */
+.chat-container-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Content area that holds the messages */
+.chat-content-area {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 70px; /* Space for the fixed input */
+}
+
+/* Message card */
+.message-card {
+  margin: 0;
+  box-shadow: none;
+  height: 100%;
+}
+
+/* Message container */
+.message-container {
+  overflow-y: auto;
+  padding: 12px;
+}
+
+/* Fixed input container at the bottom */
+.fixed-input-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--ion-background-color, #fff);
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+/* Input styling */
+.message-input-container {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  background-color: var(--ion-background-color, #fff);
+}
+
+.message-input {
+  flex: 1;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --color: var(--ion-text-color);
+  --placeholder-color: var(--ion-color-step-600);
+  --background: var(--ion-color-light, #f4f5f8);
+  --border-radius: 18px;
+  margin: 0;
+  max-height: 100px; /* Prevent too much expansion */
+}
+
+.send-button {
+  margin-left: 8px;
+}
+
+.message-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.message-wrapper.admin {
+  align-items: flex-start;
+}
+
+.message-wrapper.user {
+  align-items: flex-end;
+}
+
+.message-content {
+  display: flex;
+  align-items: flex-start;
+  max-width: 80%;
+}
+
+.admin .message-content {
+  flex-direction: row;
+}
+
+.user .message-content {
+  flex-direction: row-reverse;
+}
+
+.message-avatar {
+  width: 35px;
+  height: 35px;
+  margin-right: 8px;
+}
+
+.user .message-avatar {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+.message-bubble {
+  border-radius: 18px;
+  padding: 10px 16px;
+  position: relative;
+  margin: 4px;
+  word-break: break-word;
+}
+
+.admin .message-bubble {
+  background-color: #f4f5f8;
+  color: #000;
+}
+
+.user .message-bubble {
+  background-color: #3880ff;
+  color: #fff;
+}
+
+.message-meta {
+  font-size: 12px;
+  color: #888;
+  margin: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.admin .message-meta {
+  justify-content: flex-start;
+}
+
+.user .message-meta {
+  justify-content: flex-end;
+}
+
+/* Add these new styles */
+.chat-container-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.message-card {
+  margin-bottom: 0;
+  height: 100%;
+}
+
+.footer-no-border {
+  --border: none;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Error container */
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  text-align: center;
+  padding: 20px;
+}
+
+.error-container p {
+  color: var(--ion-color-danger);
+  margin-bottom: 20px;
+}
+
+/* Empty container */
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--ion-color-medium);
+  text-align: center;
+}
+
+/* Adjust chat background in dark mode */
+@media (prefers-color-scheme: dark) {
+  .message-input {
+    --background: var(--ion-color-step-100, #1e1e1e);
+    --color: var(--ion-text-color, #ffffff);
+  }
+
+  .admin .message-bubble {
+    background-color: var(--ion-color-step-150, #2a2a2a);
+    color: var(--ion-text-color, #ffffff);
+  }
+
+  .user .message-bubble {
+    background-color: var(--ion-color-primary, #3880ff);
+    color: var(--ion-color-primary-contrast, #ffffff);
+  }
+
+  .message-meta {
+    color: var(--ion-color-step-600, #999999);
+  }
+}
+
+/* Ensure light mode colors are explicit */
+@media (prefers-color-scheme: light) {
+  .message-input {
+    --background: #f4f5f8;
+    --color: #000000;
+  }
+
+  .admin .message-bubble {
+    background-color: #f4f5f8;
+    color: #000000;
+  }
+
+  .user .message-bubble {
+    background-color: #3880ff;
+    color: #ffffff;
+  }
+
+  .message-meta {
+    color: #888888;
+  }
+}
