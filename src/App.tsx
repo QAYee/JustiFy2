@@ -48,6 +48,7 @@ import ADashboard from "./pages/admin/Dashboard";
 import TicketContainer from "./components/admin/TicketContainer";
 import News from "./pages/admin/News";
 import Message from "./pages/user/Message";
+import AMessage from "./pages/admin/Message";
 
 /* Core CSS */
 import "@ionic/react/css/core.css";
@@ -182,8 +183,13 @@ const AdminApp: React.FC = () => {
         <Route exact path="/admin/home" component={AHome} />
         <Route exact path="/admin/complain" component={AComplain} />
         <Route exact path="/admin/inbox" component={AInbox} />
-        <Route exact path="/admin/record" component={ARecord} />
+        {/* <Route exact path="/admin/record" component={ARecord} /> */}
+        <Route exact path="/admin/ticket" component={ATicket} />
         <Route exact path="/admin/news" component={News} />
+        <Route exact path="/admin/message" component={AMessage} />
+        {/* <Route exact path="/admin/message" component={Message} /> */}
+        {/* <Route exact path="/admin/record" component={ARecord} /> */}
+        {/* <Route exact path="/admin/ticket" component={TicketContainer} /> */}
         {/* <Route exact path="/admin/ticket" component={ATicket} /> */}
         {/* <Route
           path="/admin/ticket"
@@ -215,9 +221,13 @@ const AdminApp: React.FC = () => {
           <IonIcon icon={mail} />
           <IonLabel>Inbox</IonLabel>
         </IonTabButton>
-        <IonTabButton tab="admin-record" href="/admin/record">
+        {/* <IonTabButton tab="admin-record" href="/admin/record">
           <IonIcon icon={documentText} />
           <IonLabel>Records</IonLabel>
+        </IonTabButton> */}
+        <IonTabButton tab="admin-message" href="/admin/message">
+          <IonIcon icon={mail} />
+          <IonLabel>Message</IonLabel>
         </IonTabButton>
       </IonTabBar>
     </IonTabs>

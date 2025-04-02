@@ -331,18 +331,12 @@ const MessageContainer: React.FC<{ name: string }> = ({ name }) => {
                 <div
                   key={message.id}
                   className={`message-wrapper ${
-                    message.isAdmin ? "admin" : "user"
+                    message.isAdmin ? "user" : "admin"
                   }`}
                 >
                   <div className="message-content">
                     {message.isAdmin && (
                       <IonAvatar className="message-avatar">
-                        <IonIcon
-                          icon={personCircleOutline}
-                          size="large"
-                          color="primary"
-                          style={{ width: "100%", height: "100%" }}
-                        />
                       </IonAvatar>
                     )}
                     <div className="message-bubble">
