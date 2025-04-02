@@ -44,6 +44,7 @@ const Home: React.FC = () => {
   const [allNews, setAllNews] = useState<NewsItem[]>([]); // New state for all news
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
   // Simulate login - replace with your actual login logic
   useEffect(() => {
@@ -136,12 +137,11 @@ const Home: React.FC = () => {
                     <IonCardTitle className="news-card-title">
                       NEWS & ANNOUNCEMENTS
                     </IonCardTitle>
-                      
+
                     <IonCardSubtitle className="news-card-subtitle">
-                      {latestNews?.title}   
+                      {latestNews?.title}
                     </IonCardSubtitle>
 
-                    
                     <IonButtons slot="end" className="close-button-container">
                       <IonButton
                         onClick={() => setIsNewsModalOpen(false)}
@@ -167,9 +167,29 @@ const Home: React.FC = () => {
                 )}
 
                 <IonCardContent className="news-card-content">
-                  <p className="news-card-description">
-                    {latestNews?.description}
-                  </p>
+                  {latestNews?.description && (
+                    <>
+                      <p className="news-card-description">
+                        {latestNews.description.length > 150 &&
+                        !showFullDescription
+                          ? `${latestNews.description.substring(0, 150)}...`
+                          : latestNews.description}
+                      </p>
+
+                      {latestNews.description.length > 150 && (
+                        <IonButton
+                          fill="clear"
+                          size="small"
+                          className="see-more-button"
+                          onClick={() =>
+                            setShowFullDescription(!showFullDescription)
+                          }
+                        >
+                          {showFullDescription ? "Show Less" : "See More"}
+                        </IonButton>
+                      )}
+                    </>
+                  )}
 
                   <div className="news-card-footer">
                     <p className="news-card-timestamp">
