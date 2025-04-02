@@ -1,7 +1,6 @@
 import type React from "react"
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from "@ionic/react"
-import InboxContainer from "../../components/admin/InboxContainer"
-
+import StatisticsContainer from "../../components/admin/StatisticsContainer"
 const Inbox: React.FC = () => {
   return (
     <IonPage>
@@ -14,7 +13,7 @@ const Inbox: React.FC = () => {
         <IonHeader collapse="condense">
           <IonToolbar></IonToolbar>
         </IonHeader>
-        <InboxContainer name="name" />
+        <StatisticsContainer name={""}  />
       </IonContent>
     </IonPage>
   )

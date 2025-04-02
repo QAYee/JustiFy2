@@ -27,6 +27,9 @@ import {
   ticket,
   newspaper,
   logOut,
+  statsChart,
+  megaphone
+
 } from "ionicons/icons";
 import { useState, useEffect } from "react";
 
@@ -41,9 +44,9 @@ import Record from "./pages/user/Record";
 import Ticket from "./pages/user/Ticket";
 import AHome from "./pages/admin/Home";
 import AComplain from "./pages/admin/Complain";
-import AInbox from "./pages/admin/Inbox";
+import AInbox from "./pages/admin/Statistics";
 import ARecord from "./pages/admin/Record";
-import ATicket from "./pages/admin/Ticket";
+import AStatistics from "./pages/admin/Statistics";
 import ADashboard from "./pages/admin/Dashboard";
 import TicketContainer from "./components/admin/TicketContainer";
 import News from "./pages/admin/News";
@@ -184,7 +187,7 @@ const AdminApp: React.FC = () => {
         <Route exact path="/admin/complain" component={AComplain} />
         <Route exact path="/admin/inbox" component={AInbox} />
         {/* <Route exact path="/admin/record" component={ARecord} /> */}
-        <Route exact path="/admin/ticket" component={ATicket} />
+        <Route exact path="/admin/statistics" component={AStatistics} />
         <Route exact path="/admin/news" component={News} />
         <Route exact path="/admin/message" component={AMessage} />
         {/* <Route exact path="/admin/message" component={Message} /> */}
@@ -206,7 +209,7 @@ const AdminApp: React.FC = () => {
           <IonLabel>Complaints</IonLabel>
         </IonTabButton>
         <IonTabButton tab="admin-news" href="/admin/news">
-          <IonIcon icon={newspaper} />
+          <IonIcon icon={megaphone} />
           <IonLabel>News</IonLabel>
         </IonTabButton>
         {/* <IonTabButton tab="admin-ticket" href="/admin/ticket">
@@ -217,9 +220,9 @@ const AdminApp: React.FC = () => {
           <IonIcon icon={home} />
           <IonLabel>Home</IonLabel>
         </IonTabButton>
-        <IonTabButton tab="admin-inbox" href="/admin/inbox">
-          <IonIcon icon={mail} />
-          <IonLabel>Inbox</IonLabel>
+        <IonTabButton tab="admin-statistics" href="/admin/statistics">
+          <IonIcon icon={statsChart} />
+          <IonLabel>statistics</IonLabel>
         </IonTabButton>
         {/* <IonTabButton tab="admin-record" href="/admin/record">
           <IonIcon icon={documentText} />
