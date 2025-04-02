@@ -904,7 +904,8 @@ const ComplainContainer: React.FC = () => {
                   <div
                     style={{
                       backgroundColor:
-                        msg.sender === "admin" ? "#DCF8C6" : "#E8E8E8",
+                        msg.sender === "admin" ? "#007aff" : "#e4e4e4",
+                      color: msg.sender === "admin" ? "#fff" : "#000",
                       borderRadius: "12px",
                       padding: "8px 12px",
                       maxWidth: "70%",
