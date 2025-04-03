@@ -125,13 +125,18 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
 
       // Fetch complaints statistics
       const complaintResponse = await fetch(
-        `/api/statistics/complaints?${params}`
+        `http://127.0.0.1/justify/index.php/StatisticsController/complaints?${params}`
       );
       const complaintData = await complaintResponse.json();
 
       // Fetch user statistics
-      const userResponse = await fetch(`/api/statistics/users?${params}`);
+      const userResponse = await fetch(`http://127.0.0.1/justify/index.php/StatisticsController/users?${params}`);
       const userData = await userResponse.json();
+
+      // Check if the responses were successful based on the status flag in response
+      if (!complaintData.status || !userData.status) {
+        throw new Error("API returned error status");
+      }
 
       setStats({
         complaints: {
@@ -150,67 +155,10 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
       setLoading(false);
     } catch (error) {
       console.error("Error fetching statistics:", error);
-
-      // Fallback to mock data if API fails
-      const mockData: StatisticsData = {
-        complaints: {
-          total: 20,
-          monthly: [
-            { month: "Jan", count: 1 },
-            { month: "Feb", count: 2 },
-            { month: "Mar", count: 15 },
-            { month: "Apr", count: 2 },
-            { month: "May", count: 0 },
-            { month: "Jun", count: 0 },
-            { month: "Jul", count: 0 },
-            { month: "Aug", count: 0 },
-            { month: "Sep", count: 0 },
-            { month: "Oct", count: 0 },
-            { month: "Nov", count: 0 },
-            { month: "Dec", count: 0 },
-          ],
-          byStatus: [
-            { status: "New", count: 0 },
-            { status: "Under review", count: 4 },
-            { status: "In progress", count: 2 },
-            { status: "Resolved", count: 2 },
-            { status: "Closed", count: 2 },
-            { status: "Rejected", count: 10 },
-          ],
-          byType: [
-            { type: "Noise Complaint", count: 3 },
-            { type: "Property Dispute", count: 3 },
-            { type: "Public Disturbance", count: 7 },
-            { type: "Maintenance Issue", count: 2 },
-            { type: "Other", count: 5 },
-          ],
-        },
-        users: {
-          total: 5,
-          monthly: [
-            { month: "Jan", count: 1 },
-            { month: "Feb", count: 1 },
-            { month: "Mar", count: 3 },
-            { month: "Apr", count: 0 },
-            { month: "May", count: 0 },
-            { month: "Jun", count: 0 },
-            { month: "Jul", count: 0 },
-            { month: "Aug", count: 0 },
-            { month: "Sep", count: 0 },
-            { month: "Oct", count: 0 },
-            { month: "Nov", count: 0 },
-            { month: "Dec", count: 0 },
-          ],
-          byRole: [
-            { role: "Admin", count: 1 },
-            { role: "Staff", count: 1 },
-            { role: "User", count: 3 },
-          ],
-        },
-      };
-
-      setStats(mockData);
       setLoading(false);
+      // You might want to implement proper error handling here
+      // For example:
+      // setError("Failed to load statistics data. Please try again later.");
     }
   };
 
@@ -436,164 +384,156 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
 
   return (
     <>
-     
-        <IonCardHeader>
-          <IonCardTitle>{name}</IonCardTitle>
-        </IonCardHeader>
-        <IonCardContent>
-          {/* Date filtering controls */}
-          <IonGrid>
-            <IonRow>
-              <IonCol size="12" sizeMd="4">
-                <IonItem>
-                  <IonLabel>Year</IonLabel>
-                  <IonSelect
-                    value={filter.year}
-                    onIonChange={(e) => handleYearChange(e.detail.value)}
-                    interface="popover"
-                  >
-                    {availableYears.map((year) => (
-                      <IonSelectOption key={year} value={year}>
-                        {year}
-                      </IonSelectOption>
-                    ))}
-                  </IonSelect>
-                </IonItem>
-              </IonCol>
-              <IonCol size="12" sizeMd="4">
-                <IonItem>
-                  <IonLabel>Month</IonLabel>
-                  <IonSelect
-                    value={filter.month}
-                    onIonChange={(e) => handleMonthChange(e.detail.value)}
-                    interface="popover"
-                  >
-                    <IonSelectOption value={null}>All Months</IonSelectOption>
-                    {monthNames.map((month, index) => (
-                      <IonSelectOption key={month} value={month}>
-                        {month}
-                      </IonSelectOption>
-                    ))}
-                  </IonSelect>
-                </IonItem>
-              </IonCol>
-              <IonCol
-                size="12"
-                sizeMd="4"
-                className="ion-text-end ion-padding-top"
-              >
-                <IonButton fill="outline" onClick={handleResetFilters}>
-                  Reset Filters
-                </IonButton>
-              </IonCol>
-            </IonRow>
-          </IonGrid>
+      <IonCardHeader>
+        <IonCardTitle>{name}</IonCardTitle>
+      </IonCardHeader>
+      <IonCardContent>
+        {/* Date filtering controls */}
+        <IonGrid>
+          <IonRow>
+            <IonCol size="12" sizeMd="4">
+              <IonItem>
+                <IonLabel>Year</IonLabel>
+                <IonSelect
+                  value={filter.year}
+                  onIonChange={(e) => handleYearChange(e.detail.value)}
+                  interface="popover"
+                >
+                  {availableYears.map((year) => (
+                    <IonSelectOption key={year} value={year}>
+                      {year}
+                    </IonSelectOption>
+                  ))}
+                </IonSelect>
+              </IonItem>
+            </IonCol>
+            <IonCol size="12" sizeMd="4">
+              <IonItem>
+                <IonLabel>Month</IonLabel>
+                <IonSelect
+                  value={filter.month}
+                  onIonChange={(e) => handleMonthChange(e.detail.value)}
+                  interface="popover"
+                >
+                  <IonSelectOption value={null}>All Months</IonSelectOption>
+                  {monthNames.map((month, index) => (
+                    <IonSelectOption key={month} value={month}>
+                      {month}
+                    </IonSelectOption>
+                  ))}
+                </IonSelect>
+              </IonItem>
+            </IonCol>
+            <IonCol
+              size="12"
+              sizeMd="4"
+              className="ion-text-end ion-padding-top"
+            >
+              <IonButton fill="outline" onClick={handleResetFilters}>
+                Reset Filters
+              </IonButton>
+            </IonCol>
+          </IonRow>
+        </IonGrid>
 
-          <IonSegment
-            value={activeTab}
-            onIonChange={(e) => setActiveTab(e.detail.value as string)}
-          >
-            <IonSegmentButton value="complaints">
-              <IonLabel>Complaints</IonLabel>
-            </IonSegmentButton>
-            <IonSegmentButton value="users">
-              <IonLabel>Users</IonLabel>
-            </IonSegmentButton>
-          </IonSegment>
+        <IonSegment
+          value={activeTab}
+          onIonChange={(e) => setActiveTab(e.detail.value as string)}
+        >
+          <IonSegmentButton value="complaints">
+            <IonLabel>Complaints</IonLabel>
+          </IonSegmentButton>
+          <IonSegmentButton value="users">
+            <IonLabel>Users</IonLabel>
+          </IonSegmentButton>
+        </IonSegment>
 
-          {loading ? (
-            <div className="ion-text-center ion-padding">
-              <IonSpinner name="circular" />
-              <p>Loading statistics...</p>
-            </div>
-          ) : (
-            <>
-              {activeTab === "complaints" && stats && (
-                <IonGrid>
-                  <IonRow>
-                    <IonCol size="12">
-                      <div className="stats-header ion-text-center">
-                        <h2>
-                          Total Complaints: {stats.complaints.total}
-                          {filter.month && (
-                            <span className="filter-info">
-                              {" "}
-                              ({filter.month} {filter.year})
-                            </span>
-                          )}
-                          {!filter.month && (
-                            <span className="filter-info">
-                              {" "}
-                              ({filter.year})
-                            </span>
-                          )}
-                        </h2>
-                      </div>
-                    </IonCol>
-                  </IonRow>
-                  <IonRow>
-                    <IonCol size="12" sizeMd="6">
-                      <div className="canvas-container">
-                        <canvas ref={complaintsChartRef}></canvas>
-                      </div>
-                    </IonCol>
-                    <IonCol size="12" sizeMd="6">
-                      <div className="canvas-container">
-                        <canvas ref={complaintsStatusChartRef}></canvas>
-                      </div>
-                    </IonCol>
-                  </IonRow>
-                  <IonRow>
-                    <IonCol size="12">
-                      <div className="canvas-container">
-                        <canvas ref={complaintsTypeChartRef}></canvas>
-                      </div>
-                    </IonCol>
-                  </IonRow>
-                </IonGrid>
-              )}
+        {loading ? (
+          <div className="ion-text-center ion-padding">
+            <IonSpinner name="circular" />
+            <p>Loading statistics...</p>
+          </div>
+        ) : (
+          <>
+            {activeTab === "complaints" && stats && (
+              <IonGrid>
+                <IonRow>
+                  <IonCol size="12">
+                    <div className="stats-header ion-text-center">
+                      <h2>
+                        Total Complaints: {stats.complaints.total}
+                        {filter.month && (
+                          <span className="filter-info">
+                            {" "}
+                            ({filter.month} {filter.year})
+                          </span>
+                        )}
+                        {!filter.month && (
+                          <span className="filter-info"> ({filter.year})</span>
+                        )}
+                      </h2>
+                    </div>
+                  </IonCol>
+                </IonRow>
+                <IonRow>
+                  <IonCol size="12" sizeMd="6">
+                    <div className="canvas-container">
+                      <canvas ref={complaintsChartRef}></canvas>
+                    </div>
+                  </IonCol>
+                  <IonCol size="12" sizeMd="6">
+                    <div className="canvas-container">
+                      <canvas ref={complaintsStatusChartRef}></canvas>
+                    </div>
+                  </IonCol>
+                </IonRow>
+                <IonRow>
+                  <IonCol size="12">
+                    <div className="canvas-container">
+                      <canvas ref={complaintsTypeChartRef}></canvas>
+                    </div>
+                  </IonCol>
+                </IonRow>
+              </IonGrid>
+            )}
 
-              {activeTab === "users" && stats && (
-                <IonGrid>
-                  <IonRow>
-                    <IonCol size="12">
-                      <div className="stats-header ion-text-center">
-                        <h2>
-                          Total Users: {stats.users.total}
-                          {filter.month && (
-                            <span className="filter-info">
-                              {" "}
-                              ({filter.month} {filter.year})
-                            </span>
-                          )}
-                          {!filter.month && (
-                            <span className="filter-info">
-                              {" "}
-                              ({filter.year})
-                            </span>
-                          )}
-                        </h2>
-                      </div>
-                    </IonCol>
-                  </IonRow>
-                  <IonRow>
-                    <IonCol size="12" sizeMd="7">
-                      <div className="canvas-container">
-                        <canvas ref={usersChartRef}></canvas>
-                      </div>
-                    </IonCol>
-                    <IonCol size="12" sizeMd="5">
-                      <div className="canvas-container">
-                        <canvas ref={usersRoleChartRef}></canvas>
-                      </div>
-                    </IonCol>
-                  </IonRow>
-                </IonGrid>
-              )}
-            </>
-          )}
-        </IonCardContent>
-      
+            {activeTab === "users" && stats && (
+              <IonGrid>
+                <IonRow>
+                  <IonCol size="12">
+                    <div className="stats-header ion-text-center">
+                      <h2>
+                        Total Users: {stats.users.total}
+                        {filter.month && (
+                          <span className="filter-info">
+                            {" "}
+                            ({filter.month} {filter.year})
+                          </span>
+                        )}
+                        {!filter.month && (
+                          <span className="filter-info"> ({filter.year})</span>
+                        )}
+                      </h2>
+                    </div>
+                  </IonCol>
+                </IonRow>
+                <IonRow>
+                  <IonCol size="12" sizeMd="7">
+                    <div className="canvas-container">
+                      <canvas ref={usersChartRef}></canvas>
+                    </div>
+                  </IonCol>
+                  <IonCol size="12" sizeMd="5">
+                    <div className="canvas-container">
+                      <canvas ref={usersRoleChartRef}></canvas>
+                    </div>
+                  </IonCol>
+                </IonRow>
+              </IonGrid>
+            )}
+          </>
+        )}
+      </IonCardContent>
     </>
   );
 };
