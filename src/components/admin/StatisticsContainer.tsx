@@ -21,6 +21,10 @@ import {
 } from "@ionic/react";
 import { mailOutline, peopleOutline, flagOutline } from "ionicons/icons";
 import Chart from "chart.js/auto";
+import ChartDataLabels from "chartjs-plugin-datalabels";
+import { Chart as ChartJS, ArcElement } from "chart.js";
+
+ChartJS.register(ChartDataLabels);
 
 interface ContainerProps {
   name: string;
@@ -39,6 +43,8 @@ interface ComplaintsByType {
 interface ComplaintsByMonth {
   month: string;
   count: number;
+  day?: number;
+  date?: string;
 }
 
 interface StatisticsData {
@@ -50,7 +56,7 @@ interface StatisticsData {
   };
   users: {
     total: number;
-    monthly: { month: string; count: number }[];
+    monthly: { month: string; count: number; day?: number; date?: string }[];
     byRole: { role: string; count: number }[];
   };
 }
@@ -130,7 +136,9 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
       const complaintData = await complaintResponse.json();
 
       // Fetch user statistics
-      const userResponse = await fetch(`http://127.0.0.1/justify/index.php/StatisticsController/users?${params}`);
+      const userResponse = await fetch(
+        `http://127.0.0.1/justify/index.php/StatisticsController/users?${params}`
+      );
       const userData = await userResponse.json();
 
       // Check if the responses were successful based on the status flag in response
@@ -138,16 +146,24 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
         throw new Error("API returned error status");
       }
 
+      // Determine if we're using daily or monthly data based on month filter
+      const complaintsDataPoints = month
+        ? complaintData.daily || []
+        : complaintData.monthly || [];
+      const usersDataPoints = month
+        ? userData.daily || []
+        : userData.monthly || [];
+
       setStats({
         complaints: {
           total: complaintData.total || 0,
-          monthly: complaintData.monthly || [],
+          monthly: complaintsDataPoints,
           byStatus: complaintData.byStatus || [],
           byType: complaintData.byType || [],
         },
         users: {
           total: userData.total || 0,
-          monthly: userData.monthly || [],
+          monthly: usersDataPoints,
           byRole: userData.byRole || [],
         },
       });
@@ -196,14 +212,54 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
     if (complaintsChartRef.current) {
       const ctx = complaintsChartRef.current.getContext("2d");
       if (ctx) {
+        let dataLabels = [];
+        let dataPoints = [];
+
+        if (filter.month) {
+          // Get number of days in the selected month
+          const monthIndex = monthNames.indexOf(filter.month);
+          const daysInMonth = new Date(
+            filter.year,
+            monthIndex + 1,
+            0
+          ).getDate();
+
+          // Create array of all days in month
+          dataLabels = Array.from(
+            { length: daysInMonth },
+            (_, i) => `Day ${i + 1}`
+          );
+
+          // Initialize data points with zeros
+          dataPoints = Array(daysInMonth).fill(0);
+
+          // Fill in actual data where available
+          stats.complaints.monthly.forEach((item) => {
+            const day = item.day || parseInt(item.date?.split("-")[2] || "0");
+            if (day > 0 && day <= daysInMonth) {
+              dataPoints[day - 1] = item.count;
+            }
+          });
+        } else {
+          // Monthly view - use data as is
+          dataLabels = stats.complaints.monthly.map((item) => item.month);
+          dataPoints = stats.complaints.monthly.map((item) => item.count);
+        }
+
+        const chartTitle = filter.month
+          ? `Daily Complaints for ${filter.month} ${filter.year}`
+          : `Monthly Complaints ${filter.year}`;
+
         chartInstances.current.complaints = new Chart(ctx, {
           type: "line",
           data: {
-            labels: stats.complaints.monthly.map((item) => item.month),
+            labels: dataLabels,
             datasets: [
               {
-                label: "Complaints per Month",
-                data: stats.complaints.monthly.map((item) => item.count),
+                label: filter.month
+                  ? "Complaints per Day"
+                  : "Complaints per Month",
+                data: dataPoints,
                 borderColor: "rgb(75, 192, 192)",
                 backgroundColor: "rgba(75, 192, 192, 0.2)",
                 tension: 0.3,
@@ -219,9 +275,82 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
               },
               title: {
                 display: true,
-                text: `Monthly Complaints ${filter.year}${
-                  filter.month ? " - " + filter.month : ""
-                }`,
+                text: chartTitle,
+              },
+            },
+          },
+        });
+      }
+    }
+
+    // User chart - similar changes
+    if (usersChartRef.current) {
+      const ctx = usersChartRef.current.getContext("2d");
+      if (ctx) {
+        let dataLabels = [];
+        let dataPoints = [];
+
+        if (filter.month) {
+          // Get number of days in the selected month
+          const monthIndex = monthNames.indexOf(filter.month);
+          const daysInMonth = new Date(
+            filter.year,
+            monthIndex + 1,
+            0
+          ).getDate();
+
+          // Create array of all days in month
+          dataLabels = Array.from(
+            { length: daysInMonth },
+            (_, i) => `Day ${i + 1}`
+          );
+
+          // Initialize data points with zeros
+          dataPoints = Array(daysInMonth).fill(0);
+
+          // Fill in actual data where available
+          stats.users.monthly.forEach((item) => {
+            const day = item.day || parseInt(item.date?.split("-")[2] || "0");
+            if (day > 0 && day <= daysInMonth) {
+              dataPoints[day - 1] = item.count;
+            }
+          });
+        } else {
+          // Monthly view - use data as is
+          dataLabels = stats.users.monthly.map((item) => item.month);
+          dataPoints = stats.users.monthly.map((item) => item.count);
+        }
+
+        const chartTitle = filter.month
+          ? `Daily User Registrations for ${filter.month} ${filter.year}`
+          : `Monthly User Registrations ${filter.year}`;
+
+        chartInstances.current.users = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: dataLabels,
+            datasets: [
+              {
+                label: filter.month
+                  ? "User Registrations per Day"
+                  : "User Registrations per Month",
+                data: dataPoints,
+                borderColor: "rgb(153, 102, 255)",
+                backgroundColor: "rgba(153, 102, 255, 0.2)",
+                tension: 0.3,
+                fill: true,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: "top",
+              },
+              title: {
+                display: true,
+                text: chartTitle,
               },
             },
           },
@@ -233,6 +362,12 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
     if (complaintsStatusChartRef.current) {
       const ctx = complaintsStatusChartRef.current.getContext("2d");
       if (ctx) {
+        // Calculate total for percentages
+        const statusTotal = stats.complaints.byStatus.reduce(
+          (sum, item) => sum + item.count,
+          0
+        );
+
         chartInstances.current.complaintsStatus = new Chart(ctx, {
           type: "doughnut",
           data: {
@@ -261,6 +396,26 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
               title: {
                 display: true,
                 text: "Complaints by Status",
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    const label = context.label || "";
+                    const value = context.raw || 0;
+                    const percentage = ((Number(value) / statusTotal) * 100).toFixed(1);
+                    return `${label}: ${value} (${percentage}%)`;
+                  },
+                },
+              },
+              datalabels: {
+                formatter: (value, context) => {
+                  const percentage = ((value / statusTotal) * 100).toFixed(1);
+                  return `${percentage}%`;
+                },
+                color: "#fff",
+                font: {
+                  weight: "bold",
+                },
               },
             },
           },
@@ -308,47 +463,16 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
       }
     }
 
-    // Create user registrations chart
-    if (usersChartRef.current) {
-      const ctx = usersChartRef.current.getContext("2d");
-      if (ctx) {
-        chartInstances.current.users = new Chart(ctx, {
-          type: "line",
-          data: {
-            labels: stats.users.monthly.map((item) => item.month),
-            datasets: [
-              {
-                label: "User Registrations per Month",
-                data: stats.users.monthly.map((item) => item.count),
-                borderColor: "rgb(153, 102, 255)",
-                backgroundColor: "rgba(153, 102, 255, 0.2)",
-                tension: 0.3,
-                fill: true,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: {
-                position: "top",
-              },
-              title: {
-                display: true,
-                text: `Monthly User Registrations ${filter.year}${
-                  filter.month ? " - " + filter.month : ""
-                }`,
-              },
-            },
-          },
-        });
-      }
-    }
-
     // Create users by role chart
     if (usersRoleChartRef.current) {
       const ctx = usersRoleChartRef.current.getContext("2d");
       if (ctx) {
+        // Calculate total for percentages
+        const roleTotal = stats.users.byRole.reduce(
+          (sum, item) => sum + item.count,
+          0
+        );
+
         chartInstances.current.usersRole = new Chart(ctx, {
           type: "pie",
           data: {
@@ -374,6 +498,26 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
               title: {
                 display: true,
                 text: "Users by Role",
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    const label = context.label || "";
+                    const value = context.raw || 0;
+                    const percentage = ((Number(value) / roleTotal) * 100).toFixed(1);
+                    return `${label}: ${value} (${percentage}%)`;
+                  },
+                },
+              },
+              datalabels: {
+                formatter: (value, context) => {
+                  const percentage = ((value / roleTotal) * 100).toFixed(1);
+                  return `${percentage}%`;
+                },
+                color: "#fff",
+                font: {
+                  weight: "bold",
+                },
               },
             },
           },
