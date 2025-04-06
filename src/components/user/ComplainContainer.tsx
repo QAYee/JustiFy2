@@ -46,7 +46,7 @@ interface ComplaintType {
 
 const ComplainContainer: React.FC = () => {
   const [user, setUser] = useState<{ id: number; name: string } | null>(null);
-  const [respondent, setRespondent] = useState("");
+  const respondent = "Barangay Officials"; // Fixed value that cannot be changed
   const [details, setDetails] = useState("");
   const [incidentDate, setIncidentDate] = useState("");
   const [complaintType, setComplaintType] = useState<number>(1);
@@ -62,8 +62,9 @@ const ComplainContainer: React.FC = () => {
   const [newMessage, setNewMessage] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [otherComplaintType, setOtherComplaintType] = useState(""); // Add this for "Others" option
 
-  // Updated complaint types
+  // Updated and expanded complaint types
   const complaintTypes: ComplaintType[] = [
     {
       id: 1,
@@ -89,6 +90,31 @@ const ComplainContainer: React.FC = () => {
       id: 5,
       name: "Environmental Concern",
       description: "Issues related to pollution, waste disposal, etc.",
+    },
+    {
+      id: 6,
+      name: "Vandalism",
+      description: "Destruction or defacement of public/private property",
+    },
+    {
+      id: 7,
+      name: "Illegal Construction",
+      description: "Construction without proper permits or approvals",
+    },
+    {
+      id: 8,
+      name: "Parking Violation",
+      description: "Improper parking or blocking access to property",
+    },
+    {
+      id: 9,
+      name: "Animal Complaint",
+      description: "Issues related to pets, strays, or wildlife",
+    },
+    {
+      id: 10,
+      name: "Others",
+      description: "Any other issue not listed above",
     },
   ];
 
@@ -179,87 +205,110 @@ const ComplainContainer: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!user) {
-        setShowToast({
-            message: "You must be logged in to submit a complaint.",
-            success: false,
-        });
-        return;
+      setShowToast({
+        message: "You must be logged in to submit a complaint.",
+        success: false,
+      });
+      return;
     }
 
-    if (!respondent.trim() || !details.trim() || !incidentDate) {
-        setShowToast({
-            message: "Please fill in all required fields.",
-            success: false,
-        });
-        return;
+    if (!details.trim() || !incidentDate) {
+      setShowToast({
+        message: "Please fill in all required fields.",
+        success: false,
+      });
+      return;
     }
+
+    // Validate that "Others" complaint type has a description
+    if (complaintType === 10 && !otherComplaintType.trim()) {
+      setShowToast({
+        message: "Please specify your complaint type",
+        success: false,
+      });
+      return;
+    }
+
+    // Find the selected complaint type name from the array
+    const selectedComplaintType = complaintTypes.find(
+      (type) => type.id === complaintType
+    );
+    const complaintTypeName = selectedComplaintType
+      ? selectedComplaintType.name
+      : "";
 
     const formData = new FormData();
     formData.append("user_id", user.id.toString());
     formData.append("complainant", user.name);
-    formData.append("respondent", respondent);
+    formData.append("respondent", respondent); // Use the fixed value
     formData.append("details", details);
     formData.append("incident_date", incidentDate);
-    formData.append("complaint_type", complaintType.toString());
+
+    // Use the complaint type name instead of the ID
+    formData.append(
+      "complaint_type",
+      complaintType === 10 ? otherComplaintType : complaintTypeName
+    );
+
+    // We still might want to keep the complaint type ID for reference
+    formData.append("complaint_type_id", complaintType.toString());
 
     if (selectedImage) {
-        formData.append("image", selectedImage);
+      formData.append("image", selectedImage);
     }
 
     setLoading(true);
 
     try {
-        const response = await fetch(
-            "http://127.0.0.1/justify/index.php/ComplaintController/create",
-            {
-                method: "POST",
-                body: formData,
-            }
-        );
-
-        if (!response.ok) {
-            const text = await response.text();
-            console.error("Server response:", text);
-            throw new Error(`Server error: ${response.status}`);
+      const response = await fetch(
+        "http://127.0.0.1/justify/index.php/ComplaintController/create",
+        {
+          method: "POST",
+          body: formData,
         }
+      );
 
-        let result;
-        try {
-            result = await response.json();
-        } catch (e) {
-            console.error("JSON parse error:", e);
-            throw new Error("Invalid response from server");
-        }
+      if (!response.ok) {
+        const text = await response.text();
+        console.error("Server response:", text);
+        throw new Error(`Server error: ${response.status}`);
+      }
 
-        if (result.status) {
-            setShowToast({
-                message: `Complaint submitted successfully!`,
-                success: true,
-            });
+      let result;
+      try {
+        result = await response.json();
+      } catch (e) {
+        console.error("JSON parse error:", e);
+        throw new Error("Invalid response from server");
+      }
 
-            // Reset form and refresh list
-            setRespondent("");
-            setDetails("");
-            setIncidentDate("");
-            setComplaintType(1);
-            fetchUserComplaints(user.id);
-        } else {
-            throw new Error(result.message || "Failed to submit complaint");
-        }
-    } catch (error) {
-        console.error("Error submitting complaint:", error);
+      if (result.status) {
         setShowToast({
-            message:
-                error instanceof Error
-                    ? error.message
-                    : "Failed to connect to server. Please check your connection.",
-            success: false,
+          message: `Complaint submitted successfully!`,
+          success: true,
         });
-    } finally {
-        setLoading(false);
-    }
-};
 
+        // Reset form and refresh list
+        setDetails("");
+        setIncidentDate("");
+        setComplaintType(1);
+        fetchUserComplaints(user.id);
+      } else {
+        throw new Error(result.message || "Failed to submit complaint");
+      }
+    } catch (error) {
+      console.error("Error submitting complaint:", error);
+      setShowToast({
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to connect to server. Please check your connection.",
+        success: false,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchMessages = async (complaintId: number) => {
     try {
@@ -409,16 +458,25 @@ const ComplainContainer: React.FC = () => {
                 </IonSelect>
               </IonItem>
 
+              {/* Show additional input field when "Others" is selected */}
+              {complaintType === 10 && (
+                <IonItem lines="full" className="form-item">
+                  <IonLabel position="stacked" className="required-field">
+                    Specify Complaint Type
+                  </IonLabel>
+                  <IonInput
+                    placeholder="Enter your specific complaint type"
+                    value={otherComplaintType}
+                    onIonChange={(e) => setOtherComplaintType(e.detail.value!)}
+                  />
+                </IonItem>
+              )}
+
               <IonItem lines="full" className="form-item">
                 <IonLabel position="stacked" className="required-field">
                   Respondent
                 </IonLabel>
-                <IonInput
-                  placeholder="Enter respondent's name"
-                  value={respondent}
-                  onIonChange={(e) => setRespondent(e.detail.value!)}
-                  clearInput={true}
-                >
+                <IonInput value={respondent} readonly disabled={true}>
                   <IonIcon slot="start" icon={personOutline} />
                 </IonInput>
               </IonItem>
@@ -531,8 +589,6 @@ const ComplainContainer: React.FC = () => {
 
           {/* Recent complaints preview */}
           {/* Recent complaints with chat functionality */}
-
-
         </div>
         {showToast && (
           <IonToast
