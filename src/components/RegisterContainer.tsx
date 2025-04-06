@@ -281,10 +281,7 @@ const RegisterContainer: React.FC = () => {
         isOpen={showPicker}
         onDidDismiss={() => setShowPicker(false)}
         className="datetime-modal"
-        breakpoints={[0, 0.5, 0.8]}
-        initialBreakpoint={0.5}
       >
-        <IonContent>
           <div className="ion-padding">
             <h2>Select Birthdate</h2>
             <IonDatetime
@@ -299,7 +296,7 @@ const RegisterContainer: React.FC = () => {
               className="custom-datetime"
             />
           </div>
-        </IonContent>
+        
       </IonModal>
 
       <IonItem className="register-form-item">
