@@ -408,7 +408,7 @@ const TicketContainer: React.FC = () => {
           Your Recent Complaints
         </IonCardTitle>
         <div className="filter-container">
-          <IonItem lines="full" className="search-item">
+          
             <IonLabel position="stacked" color="primary">
               <strong>Search Complaints</strong>
             </IonLabel>
@@ -423,7 +423,7 @@ const TicketContainer: React.FC = () => {
               debounce={300}
               clearInput={true}
             />
-          </IonItem>
+          
         </div>
       </IonCardHeader>
 
@@ -452,13 +452,13 @@ const TicketContainer: React.FC = () => {
 
       {/* Active Tickets Tab Content */}
       {activeTab === "tickets" && (
-        <IonCardContent>
+        <>
           <div className="section-header">
             <h2>Active Tickets</h2>
             <small>New, Under Review, and In Progress complaints</small>
           </div>
 
-          <IonItem lines="none" className="status-filter">
+          
             <IonSegment
               scrollable={true}
               value={ticketFilter}
@@ -485,7 +485,7 @@ const TicketContainer: React.FC = () => {
                 <IonLabel className="segment-label">In Progress</IonLabel>
               </IonSegmentButton>
             </IonSegment>
-          </IonItem>
+          
 
           <IonList>
             {filteredActiveTickets.length > 0 ? (
@@ -533,18 +533,18 @@ const TicketContainer: React.FC = () => {
               </IonItem>
             )}
           </IonList>
-        </IonCardContent>
+        </>
       )}
 
       {/* Records Tab Content */}
       {activeTab === "records" && (
-        <IonCardContent>
+        <>
           <div className="section-header">
             <h2>Records</h2>
             <small>Closed, Resolved, and Rejected complaints</small>
           </div>
 
-          <IonItem lines="none" className="status-filter">
+         
             <IonSegment
               scrollable={true}
               value={recordFilter}
@@ -571,7 +571,7 @@ const TicketContainer: React.FC = () => {
                 <IonLabel className="segment-label">Rejected</IonLabel>
               </IonSegmentButton>
             </IonSegment>
-          </IonItem>
+          
 
           <IonList>
             {filteredRecords.length > 0 ? (
@@ -619,7 +619,7 @@ const TicketContainer: React.FC = () => {
               </IonItem>
             )}
           </IonList>
-        </IonCardContent>
+        </>
       )}
 
       {/* Chat Modal */}
