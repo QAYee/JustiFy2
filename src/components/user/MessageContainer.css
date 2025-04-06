@@ -1,158 +1,229 @@
+/* Main colors */
+:root {
+  --primary-color: #002fa7;
+  --secondary-color: #9be368;
+  --primary-light: rgba(0, 47, 167, 0.1);
+  --primary-medium: rgba(0, 47, 167, 0.2);
+  --text-on-primary: white;
+  --text-on-secondary: #002fa7;
+}
+
 /* Main container layout */
 .chat-container-wrapper {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  position: relative;
+  height: 100%;
+ 
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Content area that holds the messages */
 .chat-content-area {
   flex: 1;
-  overflow-y: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   padding-bottom: 70px; /* Space for the fixed input */
 }
 
-/* Message card */
-.message-card {
-  margin: 0;
-  box-shadow: none;
-  height: 100%;
+/* Chat header */
+.chat-header {
+  background-color: var(--primary-color);
+  border-bottom: 2px solid var(--secondary-color);
+  padding: 16px;
+}
+
+.chat-header ion-card-title {
+  color: var(--text-on-primary);
+  display: flex;
+  align-items: center;
+  font-size: 22px;
+}
+
+.chat-title-icon {
+  margin-right: 10px;
+  font-size: 24px;
+  color: var(--secondary-color);
+}
+
+/* Chat content */
+.chat-content {
+  background-color: var(--primary-light);
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
 }
 
 /* Message container */
 .message-container {
-  overflow-y: auto;
-  padding: 12px;
-}
-
-/* Fixed input container at the bottom */
-.fixed-input-container {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--ion-background-color, #fff);
-  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-}
-
-/* Input styling */
-.message-input-container {
   display: flex;
-  align-items: center;
-  padding: 10px 12px;
-  background-color: var(--ion-background-color, #fff);
+  flex-direction: column;
+  gap: 12px;
 }
 
-.message-input {
-  flex: 1;
-  --padding-top: 8px;
-  --padding-bottom: 8px;
-  --padding-start: 12px;
-  --padding-end: 12px;
-  --color: var(--ion-text-color);
-  --placeholder-color: var(--ion-color-step-600);
-  --background: var(--ion-color-light, #f4f5f8);
-  --border-radius: 18px;
-  margin: 0;
-  max-height: 100px; /* Prevent too much expansion */
-}
-
-.send-button {
-  margin-left: 8px;
-}
-
+/* Message wrapper */
 .message-wrapper {
   display: flex;
   flex-direction: column;
-  margin-bottom: 16px;
-}
-
-.message-wrapper.admin {
-  align-items: flex-start;
-}
-
-.message-wrapper.user {
-  align-items: flex-end;
-}
-
-.message-content {
-  display: flex;
-  align-items: flex-start;
   max-width: 80%;
 }
 
-.admin .message-content {
-  flex-direction: row;
+.message-wrapper.user {
+  align-self: flex-end;
 }
 
-.user .message-content {
-  flex-direction: row-reverse;
+.message-wrapper.admin {
+  align-self: flex-start;
+}
+
+/* Message content with avatar and bubble */
+.message-content {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
 }
 
 .message-avatar {
   width: 35px;
   height: 35px;
-  margin-right: 8px;
+  --border-radius: 50%;
+  background-color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.user .message-avatar {
-  margin-right: 0;
-  margin-left: 8px;
+.message-avatar ion-icon {
+  font-size: 22px;
+  color: var(--text-on-primary);
 }
 
+/* Message bubble */
 .message-bubble {
+  padding: 12px 16px;
   border-radius: 18px;
-  padding: 10px 16px;
   position: relative;
-  margin: 4px;
   word-break: break-word;
 }
 
 .admin .message-bubble {
-  background-color: #f4f5f8;
-  color: #000;
+  background-color: white;
+  color: #333;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .user .message-bubble {
-  background-color: #3880ff;
-  color: #fff;
+  background-color: var(--secondary-color);
+  color: var(--text-on-secondary);
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.admin-name {
+  display: block;
+  color: var(--primary-color);
+  margin-bottom: 4px;
+}
+
+.message-text {
+  line-height: 1.4;
+}
+
+/* Message metadata */
 .message-meta {
-  font-size: 12px;
-  color: #888;
-  margin: 0 12px;
   display: flex;
   align-items: center;
-  gap: 4px;
-}
-
-.admin .message-meta {
-  justify-content: flex-start;
+  gap: 6px;
+  font-size: 11px;
+  margin: 4px 8px;
 }
 
 .user .message-meta {
   justify-content: flex-end;
+  color: var(--text-on-primary);
 }
 
-/* Add these new styles */
-.chat-container-wrapper {
+.admin .message-meta {
+  color: var(--text-on-primary);
+}
+
+.message-time {
+  opacity: 0.8;
+}
+
+.message-status {
+  display: flex;
+  align-items: center;
+}
+
+/* Fixed input container */
+.fixed-input-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--primary-medium);
+  border-top: 1px solid var(--secondary-color);
+  padding: 12px;
+  z-index: 1000;
+}
+
+/* Input container */
+.message-input-container {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border-radius: 24px;
+  padding: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Input styling */
+.message-input {
+  --background: transparent;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  --padding-start: 16px;
+  --padding-end: 8px;
+  --placeholder-color: #666;
+  --color: #333;
+  flex: 1;
+  margin: 0;
+  max-height: 120px;
+}
+
+.send-button {
+  margin: 0;
+  --background: var(--secondary-color);
+  --background-activated: #8ad259;
+  --background-focused: #8ad259;
+  --color: var(--text-on-secondary);
+  height: 40px;
+  width: 40px;
+  --border-radius: 20px;
+  --box-shadow: none;
+}
+
+.send-button.button-disabled {
+  --background: #e0e0e0;
+  --color: #999;
+}
+
+/* Loading container */
+.loading-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  height: 200px;
 }
 
-.message-card {
-  margin-bottom: 0;
-  height: 100%;
-}
-
-.footer-no-border {
-  --border: none;
-  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+.loading-container p {
+  color: var(--text-on-primary);
 }
 
 /* Error container */
@@ -161,14 +232,15 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 16px;
   height: 200px;
   text-align: center;
   padding: 20px;
 }
 
 .error-container p {
-  color: var(--ion-color-danger);
-  margin-bottom: 20px;
+  color: #ff4961;
+  margin-bottom: 0;
 }
 
 /* Empty container */
@@ -177,51 +249,37 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 16px;
   height: 200px;
-  color: var(--ion-color-medium);
   text-align: center;
+  color: var(--text-on-primary);
 }
 
-/* Adjust chat background in dark mode */
-@media (prefers-color-scheme: dark) {
-  .message-input {
-    --background: var(--ion-color-step-100, #1e1e1e);
-    --color: var(--ion-text-color, #ffffff);
-  }
+.empty-icon {
+  font-size: 48px;
+  opacity: 0.8;
+}
 
+/* Override Ionic's default colors */
+ion-toast.toast-primary {
+  --background: var(--primary-color);
+  --color: var(--text-on-primary);
+  --button-color: var(--secondary-color);
+}
+
+/* Ensure consistent colors in both light and dark mode */
+@media (prefers-color-scheme: dark), (prefers-color-scheme: light) {
   .admin .message-bubble {
-    background-color: var(--ion-color-step-150, #2a2a2a);
-    color: var(--ion-text-color, #ffffff);
+    background-color: white;
+    color: #333;
   }
 
   .user .message-bubble {
-    background-color: var(--ion-color-primary, #3880ff);
-    color: var(--ion-color-primary-contrast, #ffffff);
+    background-color: var(--secondary-color);
+    color: var(--text-on-secondary);
   }
 
-  .message-meta {
-    color: var(--ion-color-step-600, #999999);
-  }
-}
-
-/* Ensure light mode colors are explicit */
-@media (prefers-color-scheme: light) {
   .message-input {
-    --background: #f4f5f8;
-    --color: #000000;
-  }
-
-  .admin .message-bubble {
-    background-color: #f4f5f8;
-    color: #000000;
-  }
-
-  .user .message-bubble {
-    background-color: #3880ff;
-    color: #ffffff;
-  }
-
-  .message-meta {
-    color: #888888;
+    --color: #333;
   }
 }

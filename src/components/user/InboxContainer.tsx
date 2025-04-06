@@ -361,7 +361,7 @@ const InboxContainer: React.FC<ContainerProps> = ({
         <IonRefresherContent></IonRefresherContent>
       </IonRefresher>
 
-      <IonCard>
+      
         <IonCardHeader>
           <IonCardTitle className="ion-text-wrap">
             Announcements
@@ -378,12 +378,14 @@ const InboxContainer: React.FC<ContainerProps> = ({
             </IonButton>
           </IonCardTitle>
         </IonCardHeader>
-        <IonCardContent>
+        
           <IonSearchbar
             value={searchText}
             onIonChange={(e) => setSearchText(e.detail.value!)}
             placeholder="Search announcements"
             animated
+            color={"primary"}
+            style={{ borderRadius: "8px" }}
           />
 
           <div
@@ -404,8 +406,8 @@ const InboxContainer: React.FC<ContainerProps> = ({
               </IonBadge>
             </IonChip>
           </div>
-        </IonCardContent>
-      </IonCard>
+        
+      
 
       <IonList>
         {loading ? (

@@ -19,6 +19,7 @@ import {
   checkmarkDoneOutline,
   timeOutline,
   personCircleOutline,
+  chatbubblesOutline,
 } from "ionicons/icons";
 import "./MessageContainer.css";
 
@@ -296,33 +297,45 @@ const MessageContainer: React.FC<{ name: string }> = ({ name }) => {
   };
 
   return (
-    <div className="chat-container-wrapper">
+    <>
       <IonToast
         isOpen={showToast}
         onDidDismiss={() => setShowToast(false)}
         message={toastMessage}
         duration={3000}
         position="top"
+        color="primary"
       />
 
       <div className="chat-content-area">
-        <IonCardHeader>
-          <IonCardTitle>Chat with Admin</IonCardTitle>
+        <IonCardHeader className="chat-header">
+          <IonCardTitle>
+            <IonIcon icon={chatbubblesOutline} className="chat-title-icon" />
+            Chat with Admin
+          </IonCardTitle>
         </IonCardHeader>
 
-        <IonCardContent>
+    
           {loading ? (
             <div className="loading-container">
-              <IonSpinner />
+              <IonSpinner color="secondary" />
               <p>Loading conversation...</p>
             </div>
           ) : error ? (
             <div className="error-container">
               <p>{error}</p>
-              <IonButton onClick={fetchMessages}>Try Again</IonButton>
+              <IonButton color="secondary" onClick={fetchMessages}>
+                Try Again
+              </IonButton>
             </div>
           ) : messages.length === 0 ? (
             <div className="empty-container">
+              <IonIcon
+                icon={chatbubblesOutline}
+                color="light"
+                size="large"
+                className="empty-icon"
+              />
               <p>No messages yet. Start a conversation!</p>
             </div>
           ) : (
@@ -331,29 +344,30 @@ const MessageContainer: React.FC<{ name: string }> = ({ name }) => {
                 <div
                   key={message.id}
                   className={`message-wrapper ${
-                    message.isAdmin ? "user" : "admin"
+                    message.isAdmin ?  "user" :"admin"
                   }`}
                 >
                   <div className="message-content">
-                    {message.isAdmin && (
-                      <IonAvatar className="message-avatar">
-                      </IonAvatar>
-                    )}
+                 
                     <div className="message-bubble">
-                      {message.isAdmin && <strong>Admin</strong>}
-                      <div>{message.text}</div>
+                      {message.isAdmin && (
+                        <strong className="admin-name">Admin</strong>
+                      )}
+                      <div className="message-text">{message.text}</div>
                     </div>
                   </div>
                   <div className="message-meta">
-                    {formatMessageTime(message.timestamp)}
-                    {!message.isAdmin && getMessageStatusIcon(message.status)}
+                    <span className="message-time">
+                      {formatMessageTime(message.timestamp)}
+                    </span>
+                    
                   </div>
                 </div>
               ))}
               <div ref={messageEndRef} />
             </div>
           )}
-        </IonCardContent>
+        
       </div>
 
       <div className="fixed-input-container">
@@ -376,17 +390,22 @@ const MessageContainer: React.FC<{ name: string }> = ({ name }) => {
           />
           <IonButton
             className="send-button"
-            fill="clear"
+            color="secondary"
+            fill="solid"
             onClick={handleSendMessage}
             disabled={
               !newMessage.trim() || loading || !currentUserId || sending
             }
           >
-            <IonIcon slot="icon-only" icon={sendOutline} />
+            {sending ? (
+              <IonSpinner name="dots" />
+            ) : (
+              <IonIcon slot="icon-only" icon={sendOutline} />
+            )}
           </IonButton>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
