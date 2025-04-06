@@ -44,6 +44,11 @@
 
 .form-item {
   margin-bottom: 16px;
+  --background: transparent;
+  --border-color: #d7d8da;
+  --border-width: 0 0 1px 0;
+  --border-style: solid;
+  --padding-start: 0;
 }
 
 .form-label {
@@ -99,6 +104,32 @@
   white-space: pre-wrap;
   display: block;
   resize: none;
+  --background: transparent;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  --border-radius: 8px;
+  --color: #333;
+  background-color: rgba(
+    242,
+    242,
+    242,
+    0.8
+  ) !important; /* Light gray background that matches form */
+  border: 1px solid #d7d8da;
+  margin-top: 8px;
+}
+
+.complaint-details::part(textarea) {
+  background: transparent;
+  color: #333;
+}
+
+/* Make sure the icon is properly aligned */
+.complaint-details ion-icon {
+  margin-right: 8px;
+  color: var(--ion-color-medium);
 }
 
 @media (max-width: 576px) {

@@ -22,8 +22,19 @@ import {
   IonSelectOption,
   IonSegment,
   IonSegmentButton,
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonCard,
+  IonTab,
+  IonTabs,
+  IonTabBar,
+  IonTabButton,
+  IonBadge,
+  IonPage,
 } from "@ionic/react";
-import { sendOutline } from "ionicons/icons";
+import { sendOutline, documentsOutline, ticketOutline } from "ionicons/icons";
+import "./TicketContainer.css";
 
 interface UserData {
   name: string;
@@ -107,12 +118,17 @@ const TicketContainer: React.FC = () => {
   const [showToast, setShowToast] = useState<ShowToast | null>(null);
   const [recentComplaints, setRecentComplaints] = useState<Complaint[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   // Separate filters for tickets and records
-  const [ticketFilter, setTicketFilter] = useState<"all" | "New" | "Under review" | "In progress">("all");
-  const [recordFilter, setRecordFilter] = useState<"all" | "Resolved" | "Closed" | "Rejected">("all");
-  
+  const [ticketFilter, setTicketFilter] = useState<
+    "all" | "New" | "Under review" | "In progress"
+  >("all");
+  const [recordFilter, setRecordFilter] = useState<
+    "all" | "Resolved" | "Closed" | "Rejected"
+  >("all");
+
   const [complaintTypes, setComplaintTypes] = useState<ComplaintType[]>([]);
+  const [activeTab, setActiveTab] = useState<string>("tickets"); // New state for tab control
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -298,10 +314,12 @@ const TicketContainer: React.FC = () => {
         (t) => t.id === parseInt(complaint.complaint_type)
       );
       const typeMatches = complaintType?.name.toLowerCase().includes(query);
-      
+
       // Check if the date matches search
-      const dateMatches = complaint.incident_date?.toLowerCase().includes(query);
-      
+      const dateMatches = complaint.incident_date
+        ?.toLowerCase()
+        .includes(query);
+
       // If search query doesn't match anything, filter out this complaint
       if (!typeMatches && !dateMatches) {
         return false;
@@ -320,12 +338,12 @@ const TicketContainer: React.FC = () => {
 
   // Filter complaints for active tickets section
   const filteredActiveTickets = recentComplaints
-    .filter(complaint => isActiveTicket(complaint.status))
+    .filter((complaint) => isActiveTicket(complaint.status))
     .filter(filterComplaint);
 
   // Filter complaints for records section
   const filteredRecords = recentComplaints
-    .filter(complaint => isRecord(complaint.status))
+    .filter((complaint) => isRecord(complaint.status))
     .filter(filterComplaint);
 
   // Debug monitoring for filters
@@ -365,10 +383,8 @@ const TicketContainer: React.FC = () => {
     }
   };
 
-  
-
   return (
-    <div>
+    <div className="ticket-container">
       <IonCardHeader>
         <IonCardTitle
           style={{
@@ -382,8 +398,10 @@ const TicketContainer: React.FC = () => {
           Your Recent Complaints
         </IonCardTitle>
         <div className="filter-container">
-          <IonItem>
-            <IonLabel position="floating">Search Complaints</IonLabel>
+          <IonItem lines="full" className="search-item">
+            <IonLabel position="stacked" color="primary">
+              <strong>Search Complaints</strong>
+            </IonLabel>
             <IonInput
               className="search-input"
               value={searchQuery}
@@ -391,171 +409,208 @@ const TicketContainer: React.FC = () => {
                 const value = e.detail.value || "";
                 setSearchQuery(value);
               }}
+              placeholder="Type to search by complaint type or date..."
               debounce={300}
+              clearInput={true}
             />
           </IonItem>
         </div>
       </IonCardHeader>
-      
-      {/* Active Tickets Section */}
-      <IonCardContent>
-        <div className="section-header">
-          <h2>Active Tickets</h2>
-          <small>New, Under Review, and In Progress complaints</small>
-        </div>
-        
-        <IonItem lines="none" className="status-filter">
-          <IonSegment
-            scrollable={true}
-            value={ticketFilter}
-            className="status-segment"
-            onIonChange={(e: CustomEvent) => {
-              const value = e.detail.value as "all" | "New" | "Under review" | "In progress";
-              setTicketFilter(value);
-            }}
-          >
-            <IonSegmentButton value="all" className="segment-btn">
-              <IonLabel className="segment-label">All</IonLabel>
-            </IonSegmentButton>
-            <IonSegmentButton value="New" className="segment-btn">
-              <IonLabel className="segment-label">New</IonLabel>
-            </IonSegmentButton>
-            <IonSegmentButton value="Under review" className="segment-btn">
-              <IonLabel className="segment-label">Under Review</IonLabel>
-            </IonSegmentButton>
-            <IonSegmentButton value="In progress" className="segment-btn">
-              <IonLabel className="segment-label">In Progress</IonLabel>
-            </IonSegmentButton>
-          </IonSegment>
-        </IonItem>
-        
-        <IonList>
-          {filteredActiveTickets.length > 0 ? (
-            filteredActiveTickets.map((complaint: Complaint) => (
-              <IonItem
-                key={complaint.id}
-                button
-                onClick={() => handleComplaintClick(complaint)}
-              >
-                <IonLabel>
-                  <h2>
-                    {complaintTypes.find(
-                      (t) => t.id === parseInt(complaint.complaint_type)
-                    )?.name || "Unknown Type"}
-                  </h2>
-                  <p className="respondent-text">
-                    Respondent: {complaint.respondent || "Not specified"}
-                  </p>
-                  <p>
-                    <IonChip
-                      color={
-                        complaint.status === "New"
-                          ? "primary"
-                          : complaint.status === "Under review"
-                          ? "warning"
-                          : "tertiary"
-                      }
-                      outline={true}
-                    >
-                      {complaint.status}
-                    </IonChip>
-                  </p>
-                  <p>
-                    Date:{" "}
-                    {new Date(complaint.incident_date).toLocaleDateString()}
-                  </p>
-                </IonLabel>
-              </IonItem>
-            ))
-          ) : (
-            <IonItem>
-              <IonLabel className="ion-text-center">
-                No active tickets found
-              </IonLabel>
-            </IonItem>
-          )}
-        </IonList>
-      </IonCardContent>
 
-      {/* Records Section */}
-      <IonCardContent>
-        <div className="section-header">
-          <h2>Records</h2>
-          <small>Closed, Resolved, and Rejected complaints</small>
-        </div>
-        
-        <IonItem lines="none" className="status-filter">
-          <IonSegment
-            scrollable={true}
-            value={recordFilter}
-            className="status-segment"
-            onIonChange={(e: CustomEvent) => {
-              const value = e.detail.value as "all" | "Resolved" | "Closed" | "Rejected";
-              setRecordFilter(value);
-            }}
-          >
-            <IonSegmentButton value="all" className="segment-btn">
-              <IonLabel className="segment-label">All</IonLabel>
-            </IonSegmentButton>
-            <IonSegmentButton value="Resolved" className="segment-btn">
-              <IonLabel className="segment-label">Resolved</IonLabel>
-            </IonSegmentButton>
-            <IonSegmentButton value="Closed" className="segment-btn">
-              <IonLabel className="segment-label">Closed</IonLabel>
-            </IonSegmentButton>
-            <IonSegmentButton value="Rejected" className="segment-btn">
-              <IonLabel className="segment-label">Rejected</IonLabel>
-            </IonSegmentButton>
-          </IonSegment>
-        </IonItem>
-        
-        <IonList>
-          {filteredRecords.length > 0 ? (
-            filteredRecords.map((complaint: Complaint) => (
-              <IonItem
-                key={complaint.id}
-                button
-                onClick={() => handleComplaintClick(complaint)}
-              >
-                <IonLabel>
-                  <h2>
-                    {complaintTypes.find(
-                      (t) => t.id === parseInt(complaint.complaint_type)
-                    )?.name || "Unknown Type"}
-                  </h2>
-                  <p className="respondent-text">
-                    Respondent: {complaint.respondent || "Not specified"}
-                  </p>
-                  <p>
-                    <IonChip
-                      color={
-                        complaint.status === "Resolved"
-                          ? "success"
-                          : complaint.status === "Closed"
-                          ? "medium"
-                          : "danger"
-                      }
-                      outline={true}
-                    >
-                      {complaint.status}
-                    </IonChip>
-                  </p>
-                  <p>
-                    Date:{" "}
-                    {new Date(complaint.incident_date).toLocaleDateString()}
-                  </p>
+      {/* Tabs to switch between tickets and records */}
+      <div className="tab-container">
+        <IonSegment
+          value={activeTab}
+          onIonChange={(e) => setActiveTab(e.detail.value as string)}
+        >
+          <IonSegmentButton value="tickets" className="tab-button">
+            <IonLabel>Active Tickets</IonLabel>
+            {filteredActiveTickets.length > 0 && (
+              <IonBadge color="primary">
+                {filteredActiveTickets.length}
+              </IonBadge>
+            )}
+          </IonSegmentButton>
+          <IonSegmentButton value="records" className="tab-button">
+            <IonLabel>Records</IonLabel>
+            {filteredRecords.length > 0 && (
+              <IonBadge color="medium">{filteredRecords.length}</IonBadge>
+            )}
+          </IonSegmentButton>
+        </IonSegment>
+      </div>
+
+      {/* Active Tickets Tab Content */}
+      {activeTab === "tickets" && (
+        <IonCardContent>
+          <div className="section-header">
+            <h2>Active Tickets</h2>
+            <small>New, Under Review, and In Progress complaints</small>
+          </div>
+
+          <IonItem lines="none" className="status-filter">
+            <IonSegment
+              scrollable={true}
+              value={ticketFilter}
+              className="status-segment"
+              onIonChange={(e: CustomEvent) => {
+                const value = e.detail.value as
+                  | "all"
+                  | "New"
+                  | "Under review"
+                  | "In progress";
+                setTicketFilter(value);
+              }}
+            >
+              <IonSegmentButton value="all" className="segment-btn">
+                <IonLabel className="segment-label">All</IonLabel>
+              </IonSegmentButton>
+              <IonSegmentButton value="New" className="segment-btn">
+                <IonLabel className="segment-label">New</IonLabel>
+              </IonSegmentButton>
+              <IonSegmentButton value="Under review" className="segment-btn">
+                <IonLabel className="segment-label">Under Review</IonLabel>
+              </IonSegmentButton>
+              <IonSegmentButton value="In progress" className="segment-btn">
+                <IonLabel className="segment-label">In Progress</IonLabel>
+              </IonSegmentButton>
+            </IonSegment>
+          </IonItem>
+
+          <IonList>
+            {filteredActiveTickets.length > 0 ? (
+              filteredActiveTickets.map((complaint: Complaint) => (
+                <IonItem
+                  key={complaint.id}
+                  button
+                  onClick={() => handleComplaintClick(complaint)}
+                >
+                  <IonLabel>
+                    <h2>
+                      {complaintTypes.find(
+                        (t) => t.id === parseInt(complaint.complaint_type)
+                      )?.name || "Unknown Type"}
+                    </h2>
+                    <p className="respondent-text">
+                      Respondent: {complaint.respondent || "Not specified"}
+                    </p>
+                    <p>
+                      <IonChip
+                        color={
+                          complaint.status === "New"
+                            ? "primary"
+                            : complaint.status === "Under review"
+                            ? "warning"
+                            : "tertiary"
+                        }
+                        outline={true}
+                      >
+                        {complaint.status}
+                      </IonChip>
+                    </p>
+                    <p>
+                      Date:{" "}
+                      {new Date(complaint.incident_date).toLocaleDateString()}
+                    </p>
+                  </IonLabel>
+                </IonItem>
+              ))
+            ) : (
+              <IonItem>
+                <IonLabel className="ion-text-center">
+                  No active tickets found
                 </IonLabel>
               </IonItem>
-            ))
-          ) : (
-            <IonItem>
-              <IonLabel className="ion-text-center">
-                No records found
-              </IonLabel>
-            </IonItem>
-          )}
-        </IonList>
-      </IonCardContent>
+            )}
+          </IonList>
+        </IonCardContent>
+      )}
+
+      {/* Records Tab Content */}
+      {activeTab === "records" && (
+        <IonCardContent>
+          <div className="section-header">
+            <h2>Records</h2>
+            <small>Closed, Resolved, and Rejected complaints</small>
+          </div>
+
+          <IonItem lines="none" className="status-filter">
+            <IonSegment
+              scrollable={true}
+              value={recordFilter}
+              className="status-segment"
+              onIonChange={(e: CustomEvent) => {
+                const value = e.detail.value as
+                  | "all"
+                  | "Resolved"
+                  | "Closed"
+                  | "Rejected";
+                setRecordFilter(value);
+              }}
+            >
+              <IonSegmentButton value="all" className="segment-btn">
+                <IonLabel className="segment-label">All</IonLabel>
+              </IonSegmentButton>
+              <IonSegmentButton value="Resolved" className="segment-btn">
+                <IonLabel className="segment-label">Resolved</IonLabel>
+              </IonSegmentButton>
+              <IonSegmentButton value="Closed" className="segment-btn">
+                <IonLabel className="segment-label">Closed</IonLabel>
+              </IonSegmentButton>
+              <IonSegmentButton value="Rejected" className="segment-btn">
+                <IonLabel className="segment-label">Rejected</IonLabel>
+              </IonSegmentButton>
+            </IonSegment>
+          </IonItem>
+
+          <IonList>
+            {filteredRecords.length > 0 ? (
+              filteredRecords.map((complaint: Complaint) => (
+                <IonItem
+                  key={complaint.id}
+                  button
+                  onClick={() => handleComplaintClick(complaint)}
+                >
+                  <IonLabel>
+                    <h2>
+                      {complaintTypes.find(
+                        (t) => t.id === parseInt(complaint.complaint_type)
+                      )?.name || "Unknown Type"}
+                    </h2>
+                    <p className="respondent-text">
+                      Respondent: {complaint.respondent || "Not specified"}
+                    </p>
+                    <p>
+                      <IonChip
+                        color={
+                          complaint.status === "Resolved"
+                            ? "success"
+                            : complaint.status === "Closed"
+                            ? "medium"
+                            : "danger"
+                        }
+                        outline={true}
+                      >
+                        {complaint.status}
+                      </IonChip>
+                    </p>
+                    <p>
+                      Date:{" "}
+                      {new Date(complaint.incident_date).toLocaleDateString()}
+                    </p>
+                  </IonLabel>
+                </IonItem>
+              ))
+            ) : (
+              <IonItem>
+                <IonLabel className="ion-text-center">
+                  No records found
+                </IonLabel>
+              </IonItem>
+            )}
+          </IonList>
+        </IonCardContent>
+      )}
 
       {/* Chat Modal */}
       <IonModal

@@ -1,9 +1,4 @@
 /* Add to your styles */
-.ticket-container {
-  background-color: #f5f5f5;
-  min-height: 100vh;
-  padding: 1rem;
-}
 
 .chat-container {
   padding: 1rem;
@@ -82,10 +77,11 @@ ion-badge {
 }
 
 .filter-container {
-  margin: 16px 0;
-  padding: 16px;
-  background: var(--ion-color-light);
+  margin: 0 0 16px 0;
+  padding: 10px 16px;
+  
   border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .filter-container ion-item {
@@ -108,10 +104,17 @@ ion-badge {
   --padding-end: 16px;
   --padding-top: 12px;
   --padding-bottom: 12px;
-  --background: var(--ion-color-light-shade);
   --border-radius: 8px;
+  --color: #333333;
+  --placeholder-color: #666666;
+  --placeholder-opacity: 0.8;
   font-size: 16px !important;
   margin-top: 8px;
+  border: 1px solid #d7d8da;
+}
+
+.search-input::part(input) {
+  color: #333333;
 }
 
 .status-filter {
@@ -162,7 +165,7 @@ ion-segment-button {
   opacity: 1 !important;
 }
 
-respondent-text {
+.respondent-text {
   color: var(--ion-color-medium);
   font-size: 14px;
   margin: 4px 0;
@@ -178,11 +181,12 @@ respondent-text {
   color: var(--ion-color-dark);
   font-size: 20px;
   font-weight: 600;
-  margin: 0;
+  margin: 0 0 4px 0;
+  color: #333;
 }
 
 .section-header small {
-  color: var(--ion-color-medium);
+  color: #666;
   font-size: 14px;
 }
 
@@ -217,4 +221,29 @@ ion-chip {
 .tab-btn ion-label {
   font-size: 16px;
   font-weight: 500;
+}
+
+/* New styles for tab container */
+.tab-container {
+  margin: 0 16px;
+}
+
+.tab-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: 500;
+}
+
+.tab-button ion-badge {
+  margin-top: 4px;
+}
+
+.search-item {
+  --background: white;
+  --border-color: #d7d8da;
+  --border-width: 1px;
+  --border-style: solid;
+  --border-radius: 8px;
+  --padding-start: 0;
 }
