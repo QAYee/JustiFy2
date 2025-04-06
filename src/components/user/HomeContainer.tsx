@@ -1,4 +1,4 @@
-import type React from "react"
+import type React from "react";
 import {
   IonCard,
   IonCardContent,
@@ -13,7 +13,7 @@ import {
   IonList,
   IonChip,
   IonAvatar,
-} from "@ionic/react"
+} from "@ionic/react";
 import {
   notificationsOutline,
   calendarOutline,
@@ -23,10 +23,11 @@ import {
   personOutline,
   timeOutline,
   alertCircleOutline,
-} from "ionicons/icons"
+} from "ionicons/icons";
+import "./HomeContainer.css";
 
 interface ContainerProps {
-  name: string
+  name: string;
 }
 
 const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
@@ -62,14 +63,15 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
         "Free medical check-ups, dental services, and eye examinations will be available at the barangay hall from 8 AM to 3 PM.",
       important: true,
     },
-  ]
+  ];
 
   // Dummy recent activities
   const recentActivities = [
     {
       id: 1,
       type: "Complaint Filed",
-      description: "Your noise complaint against Pedro Santos has been received.",
+      description:
+        "Your noise complaint against Pedro Santos has been received.",
       date: "October 16, 2023",
       status: "pending",
     },
@@ -87,27 +89,37 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
       date: "October 10, 2023",
       status: "resolved",
     },
-  ]
+  ];
 
   return (
-    <div className="ion-padding">
+    <div className="home-container">
       {/* Welcome Card */}
-      
-        <img
-          alt="Barangay Hall"
-          src="https://ionicframework.com/docs/img/demos/card-media.png"
-          style={{ maxHeight: "200px", objectFit: "cover", width: "100%" }}
-        />
+      <IonCard className="welcome-card">
+        <div className="banner-image">
+          <img
+            alt="Barangay Hall"
+            src="https://ionicframework.com/docs/img/demos/card-media.png"
+            style={{ maxHeight: "200px", objectFit: "cover", width: "100%" }}
+          />
+          <div className="banner-overlay"></div>
+        </div>
         <IonCardHeader>
           <IonCardSubtitle>Welcome to</IonCardSubtitle>
           <IonCardTitle>JustiFy Community Portal</IonCardTitle>
         </IonCardHeader>
         <IonCardContent>
           <p>
-            Your one-stop platform for community services, complaint management, and local updates. Stay connected with
-            your barangay officials and fellow residents.
+            Your one-stop platform for community services, complaint management,
+            and local updates. Stay connected with your barangay officials and
+            fellow residents.
           </p>
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: "16px" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginTop: "16px",
+            }}
+          >
             <IonButton fill="clear" href="/complain">
               File a Complaint
               <IonIcon slot="end" icon={arrowForwardOutline} />
@@ -115,17 +127,15 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
             <IonButton fill="clear" href="/inbox">
               <IonIcon slot="start" icon={notificationsOutline} />
               Notifications
-              <IonBadge color="danger" style={{ marginLeft: "8px" }}>
-                3
-              </IonBadge>
+              <IonBadge style={{ marginLeft: "8px" }}>3</IonBadge>
             </IonButton>
           </div>
         </IonCardContent>
-      
+      </IonCard>
 
       {/* Announcements Section */}
-      <h2 style={{ margin: "24px 0 16px", fontSize: "20px", fontWeight: "600" }}>
-        <IonIcon icon={megaphoneOutline} style={{ marginRight: "8px", verticalAlign: "middle" }} />
+      <h2 className="section-header">
+        <IonIcon icon={megaphoneOutline} />
         Announcements & Events
       </h2>
 
@@ -140,7 +150,11 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
             <IonCardSubtitle>
               {announcement.subtitle}
               {announcement.important && (
-                <IonChip color="danger" outline={true} style={{ marginLeft: "8px" }}>
+                <IonChip
+                  color="danger"
+                  outline={true}
+                  style={{ marginLeft: "8px" }}
+                >
                   <IonIcon icon={alertCircleOutline} />
                   <IonLabel>Important</IonLabel>
                 </IonChip>
@@ -150,8 +164,8 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
           </IonCardHeader>
           <IonCardContent>
             <p style={{ marginBottom: "12px" }}>{announcement.content}</p>
-            <p style={{ display: "flex", alignItems: "center", color: "#666" }}>
-              <IonIcon icon={calendarOutline} style={{ marginRight: "6px" }} />
+            <p className="date-text">
+              <IonIcon icon={calendarOutline} />
               {announcement.date}
             </p>
             <IonButton fill="clear" size="small" style={{ marginTop: "8px" }}>
@@ -163,8 +177,8 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
       ))}
 
       {/* Recent Activities Section */}
-      <h2 style={{ margin: "24px 0 16px", fontSize: "20px", fontWeight: "600" }}>
-        <IonIcon icon={timeOutline} style={{ marginRight: "8px", verticalAlign: "middle" }} />
+      <h2 className="section-header">
+        <IonIcon icon={timeOutline} />
         Recent Activities
       </h2>
 
@@ -176,12 +190,17 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
           {recentActivities.map((activity) => (
             <IonItem key={activity.id}>
               <IonAvatar slot="start">
-                <IonIcon icon={personOutline} style={{ fontSize: "24px", margin: "8px" }} />
+                <IonIcon
+                  icon={personOutline}
+                  style={{ fontSize: "24px", margin: "8px" }}
+                />
               </IonAvatar>
               <IonLabel>
                 <h2>{activity.type}</h2>
                 <p>{activity.description}</p>
-                <p style={{ fontSize: "12px", color: "#666" }}>{activity.date}</p>
+                <p style={{ fontSize: "12px", color: "#666" }}>
+                  {activity.date}
+                </p>
               </IonLabel>
               {activity.status === "pending" && (
                 <IonChip color="warning" outline={true}>
@@ -210,8 +229,8 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
       </IonCard>
 
       {/* News Section */}
-      <h2 style={{ margin: "24px 0 16px", fontSize: "20px", fontWeight: "600" }}>
-        <IonIcon icon={newspaperOutline} style={{ marginRight: "8px", verticalAlign: "middle" }} />
+      <h2 className="section-header">
+        <IonIcon icon={newspaperOutline} />
         Community News
       </h2>
 
@@ -227,8 +246,9 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
         </IonCardHeader>
         <IonCardContent>
           <p>
-            The new community park will be inaugurated on November 30. The park features playground equipment, walking
-            paths, and a basketball court for residents to enjoy.
+            The new community park will be inaugurated on November 30. The park
+            features playground equipment, walking paths, and a basketball court
+            for residents to enjoy.
           </p>
           <IonButton fill="clear" size="small" style={{ marginTop: "8px" }}>
             Read Full Story
@@ -236,9 +256,23 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
           </IonButton>
         </IonCardContent>
       </IonCard>
+
+      {/* Call to action */}
+      <IonCard>
+        <IonCardContent>
+          <h2 style={{ color: "var(--primary-color)", marginTop: 0 }}>
+            Get Involved in Your Community
+          </h2>
+          <p>
+            Participate in upcoming events and help make our community better.
+          </p>
+          <IonButton className="secondary-button" expand="block">
+            Volunteer Opportunities
+          </IonButton>
+        </IonCardContent>
+      </IonCard>
     </div>
-  )
-}
+  );
+};
 
-export default HomeContainer
-
+export default HomeContainer;

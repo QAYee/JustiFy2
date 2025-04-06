@@ -1,0 +1,154 @@
+/* Main color variables */
+:root {
+  --primary-color: #002fa7;
+  --secondary-color: #9be368;
+  --primary-light: rgba(0, 47, 167, 0.1);
+  --primary-medium: rgba(0, 47, 167, 0.2);
+  --text-on-primary: white;
+  --text-on-secondary: #002fa7;
+  --dark-text: #333333;
+}
+
+.home-container {
+
+  color: var(--text-on-primary);
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.section-header {
+  margin: 24px 0 16px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-on-primary);
+  display: flex;
+  align-items: center;
+}
+
+.section-header ion-icon {
+  margin-right: 8px;
+  vertical-align: middle;
+  color: var(--secondary-color);
+}
+
+/* Card styling */
+ion-card {
+  margin-bottom: 20px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+ion-card-header {
+  background-color: var(--primary-color);
+  color: var(--text-on-primary);
+}
+
+ion-card-title {
+  color: var(--text-on-primary) !important;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+ion-card-subtitle {
+  color: var(--secondary-color) !important;
+  font-weight: 500;
+}
+
+ion-card-content {
+  background-color: white;
+  color: var(--dark-text);
+  padding: 16px;
+}
+
+/* Button styling */
+ion-button[fill="clear"] {
+  --color: var(--primary-color);
+  font-weight: 500;
+}
+
+ion-button[fill="solid"] {
+  --background: var(--primary-color);
+  --color: var(--text-on-primary);
+}
+
+ion-button.secondary-button {
+  --background: var(--secondary-color);
+  --color: var(--text-on-secondary);
+}
+
+/* List styling */
+ion-list {
+  background-color: transparent !important;
+}
+
+ion-item {
+  --background: white;
+  --border-color: var(--primary-light);
+  margin-bottom: 4px;
+}
+
+ion-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Badge and chip styling */
+ion-badge {
+  --background: var(--secondary-color);
+  --color: var(--text-on-secondary);
+}
+
+ion-chip[color="primary"] {
+  --background: var(--primary-color);
+  --color: var(--text-on-primary);
+}
+
+ion-chip[color="success"] {
+  --background: var(--secondary-color);
+  --color: var(--text-on-secondary);
+}
+
+/* Other elements */
+.date-text {
+  display: flex;
+  align-items: center;
+  color: #666;
+}
+
+.date-text ion-icon {
+  margin-right: 6px;
+}
+
+/* Welcome card */
+.welcome-card {
+  background-color: var(--primary-color);
+}
+
+.welcome-card ion-card-content {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* Activity item */
+.activity-status {
+  display: flex;
+  align-items: center;
+}
+
+/* Banner background */
+.banner-image {
+  position: relative;
+}
+
+.banner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(rgba(0, 47, 167, 0.4), rgba(0, 47, 167, 0.8));
+}
+
+/* Avatar styling */
+ion-avatar {
+  background-color: var(--primary-light);
+}
