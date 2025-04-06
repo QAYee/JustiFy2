@@ -63,7 +63,8 @@ interface ShowToast {
 
 interface Complaint {
   id: number;
-  complaint_type: string;
+  complaint_type: string; // This could be a string ID or a direct string name
+  complaint_type_id?: number; // Optional ID if stored separately
   incident_date: string;
   status:
     | "New"
@@ -393,6 +394,21 @@ const TicketContainer: React.FC = () => {
     }
   };
 
+  // Helper function to get complaint type name from ID or direct string
+  const getComplaintTypeName = (complaint: Complaint): string => {
+    if (!complaint.complaint_type) return "Unknown Type";
+
+    // First check if complaint_type is already a name (string)
+    if (isNaN(Number(complaint.complaint_type))) {
+      return complaint.complaint_type;
+    }
+
+    // Otherwise, look it up from the complaint types array by ID
+    const typeId = parseInt(complaint.complaint_type);
+    const foundType = complaintTypes.find((type) => type.id === typeId);
+    return foundType?.name || "Unknown Type";
+  };
+
   return (
     <div className="ticket-container">
       <IonCardHeader>
@@ -408,22 +424,20 @@ const TicketContainer: React.FC = () => {
           Your Recent Complaints
         </IonCardTitle>
         <div className="filter-container">
-          
-            <IonLabel position="stacked" color="primary">
-              <strong>Search Complaints</strong>
-            </IonLabel>
-            <IonInput
-              className="search-input"
-              value={searchQuery}
-              onIonChange={(e) => {
-                const value = e.detail.value || "";
-                setSearchQuery(value);
-              }}
-              placeholder="Type to search by complaint type or date..."
-              debounce={300}
-              clearInput={true}
-            />
-          
+          <IonLabel position="stacked" color="primary">
+            <strong>Search Complaints</strong>
+          </IonLabel>
+          <IonInput
+            className="search-input"
+            value={searchQuery}
+            onIonChange={(e) => {
+              const value = e.detail.value || "";
+              setSearchQuery(value);
+            }}
+            placeholder="Type to search by complaint type or date..."
+            debounce={300}
+            clearInput={true}
+          />
         </div>
       </IonCardHeader>
 
@@ -458,34 +472,32 @@ const TicketContainer: React.FC = () => {
             <small>New, Under Review, and In Progress complaints</small>
           </div>
 
-          
-            <IonSegment
-              scrollable={true}
-              value={ticketFilter}
-              className="status-segment"
-              onIonChange={(e: CustomEvent) => {
-                const value = e.detail.value as
-                  | "all"
-                  | "New"
-                  | "Under review"
-                  | "In progress";
-                setTicketFilter(value);
-              }}
-            >
-              <IonSegmentButton value="all" className="segment-btn">
-                <IonLabel className="segment-label">All</IonLabel>
-              </IonSegmentButton>
-              <IonSegmentButton value="New" className="segment-btn">
-                <IonLabel className="segment-label">New</IonLabel>
-              </IonSegmentButton>
-              <IonSegmentButton value="Under review" className="segment-btn">
-                <IonLabel className="segment-label">Under Review</IonLabel>
-              </IonSegmentButton>
-              <IonSegmentButton value="In progress" className="segment-btn">
-                <IonLabel className="segment-label">In Progress</IonLabel>
-              </IonSegmentButton>
-            </IonSegment>
-          
+          <IonSegment
+            scrollable={true}
+            value={ticketFilter}
+            className="status-segment"
+            onIonChange={(e: CustomEvent) => {
+              const value = e.detail.value as
+                | "all"
+                | "New"
+                | "Under review"
+                | "In progress";
+              setTicketFilter(value);
+            }}
+          >
+            <IonSegmentButton value="all" className="segment-btn">
+              <IonLabel className="segment-label">All</IonLabel>
+            </IonSegmentButton>
+            <IonSegmentButton value="New" className="segment-btn">
+              <IonLabel className="segment-label">New</IonLabel>
+            </IonSegmentButton>
+            <IonSegmentButton value="Under review" className="segment-btn">
+              <IonLabel className="segment-label">Under Review</IonLabel>
+            </IonSegmentButton>
+            <IonSegmentButton value="In progress" className="segment-btn">
+              <IonLabel className="segment-label">In Progress</IonLabel>
+            </IonSegmentButton>
+          </IonSegment>
 
           <IonList>
             {filteredActiveTickets.length > 0 ? (
@@ -496,11 +508,7 @@ const TicketContainer: React.FC = () => {
                   onClick={() => handleComplaintClick(complaint)}
                 >
                   <IonLabel>
-                    <h2>
-                      {complaintTypes.find(
-                        (t) => t.id === parseInt(complaint.complaint_type)
-                      )?.name || "Unknown Type"}
-                    </h2>
+                    <h2>{getComplaintTypeName(complaint)}</h2>
                     <p className="respondent-text">
                       Respondent: {complaint.respondent || "Not specified"}
                     </p>
@@ -544,34 +552,32 @@ const TicketContainer: React.FC = () => {
             <small>Closed, Resolved, and Rejected complaints</small>
           </div>
 
-         
-            <IonSegment
-              scrollable={true}
-              value={recordFilter}
-              className="status-segment"
-              onIonChange={(e: CustomEvent) => {
-                const value = e.detail.value as
-                  | "all"
-                  | "Resolved"
-                  | "Closed"
-                  | "Rejected";
-                setRecordFilter(value);
-              }}
-            >
-              <IonSegmentButton value="all" className="segment-btn">
-                <IonLabel className="segment-label">All</IonLabel>
-              </IonSegmentButton>
-              <IonSegmentButton value="Resolved" className="segment-btn">
-                <IonLabel className="segment-label">Resolved</IonLabel>
-              </IonSegmentButton>
-              <IonSegmentButton value="Closed" className="segment-btn">
-                <IonLabel className="segment-label">Closed</IonLabel>
-              </IonSegmentButton>
-              <IonSegmentButton value="Rejected" className="segment-btn">
-                <IonLabel className="segment-label">Rejected</IonLabel>
-              </IonSegmentButton>
-            </IonSegment>
-          
+          <IonSegment
+            scrollable={true}
+            value={recordFilter}
+            className="status-segment"
+            onIonChange={(e: CustomEvent) => {
+              const value = e.detail.value as
+                | "all"
+                | "Resolved"
+                | "Closed"
+                | "Rejected";
+              setRecordFilter(value);
+            }}
+          >
+            <IonSegmentButton value="all" className="segment-btn">
+              <IonLabel className="segment-label">All</IonLabel>
+            </IonSegmentButton>
+            <IonSegmentButton value="Resolved" className="segment-btn">
+              <IonLabel className="segment-label">Resolved</IonLabel>
+            </IonSegmentButton>
+            <IonSegmentButton value="Closed" className="segment-btn">
+              <IonLabel className="segment-label">Closed</IonLabel>
+            </IonSegmentButton>
+            <IonSegmentButton value="Rejected" className="segment-btn">
+              <IonLabel className="segment-label">Rejected</IonLabel>
+            </IonSegmentButton>
+          </IonSegment>
 
           <IonList>
             {filteredRecords.length > 0 ? (
@@ -582,11 +588,7 @@ const TicketContainer: React.FC = () => {
                   onClick={() => handleComplaintClick(complaint)}
                 >
                   <IonLabel>
-                    <h2>
-                      {complaintTypes.find(
-                        (t) => t.id === parseInt(complaint.complaint_type)
-                      )?.name || "Unknown Type"}
-                    </h2>
+                    <h2>{getComplaintTypeName(complaint)}</h2>
                     <p className="respondent-text">
                       Respondent: {complaint.respondent || "Not specified"}
                     </p>
