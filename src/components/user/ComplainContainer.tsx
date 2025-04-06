@@ -180,9 +180,23 @@ const ComplainContainer: React.FC = () => {
     }
   };
 
+  // Updated handleDateChange function to capture both date and time
   const handleDateChange = (e: CustomEvent) => {
-    const selectedDate = e.detail.value!.split("T")[0]; // Extract only the date part (YYYY-MM-DD)
-    setIncidentDate(selectedDate);
+    const selectedDateTime = e.detail.value!;
+
+    // Format the datetime value
+    const date = new Date(selectedDateTime);
+
+    // Create formatted string (YYYY-MM-DD HH:MM)
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}`;
+
+    setIncidentDate(formattedDateTime);
     setShowDatePicker(false);
   };
 
@@ -407,200 +421,195 @@ const ComplainContainer: React.FC = () => {
 
   return (
     <>
-    
-        <div className="complaint-form-container">
-          <h2 className="form-title">Barangay Complaint Form</h2>
-          <p className="form-subtitle">
-            Please provide accurate information to help us process your
-            complaint efficiently.
-          </p>
+      <div className="complaint-form-container">
+        <h2 className="form-title">Barangay Complaint Form</h2>
+        <p className="form-subtitle">
+          Please provide accurate information to help us process your complaint
+          efficiently.
+        </p>
 
-          <IonCardHeader>
-            <IonCardTitle>Complaint Information</IonCardTitle>
-          </IonCardHeader>
+        <IonCardHeader>
+          <IonCardTitle>Complaint Information</IonCardTitle>
+        </IonCardHeader>
 
-          
-            <div className="form-section">
-              <h3 className="section-title">Complainant Details</h3>
+        <div className="form-section">
+          <h3 className="section-title">Complainant Details</h3>
 
-              <IonItem lines="full" className="form-item">
-                <IonLabel position="stacked" className="required-field">
-                  Complainant
-                </IonLabel>
-                <IonInput
-                  value={user ? user.name : ""}
-                  readonly
-                  placeholder="Your name"
+          <IonItem lines="full" className="form-item">
+            <IonLabel position="stacked" className="required-field">
+              Complainant
+            </IonLabel>
+            <IonInput
+              value={user ? user.name : ""}
+              readonly
+              placeholder="Your name"
+            >
+              <IonIcon slot="start" icon={personOutline} />
+            </IonInput>
+          </IonItem>
+        </div>
+
+        <div className="form-section">
+          <h3 className="section-title">Complaint Details</h3>
+
+          <IonItem lines="full" className="form-item">
+            <IonLabel position="stacked" className="required-field">
+              Complaint Type
+            </IonLabel>
+            <IonSelect
+              value={complaintType}
+              onIonChange={(e) => setComplaintType(e.detail.value)}
+              interface="popover"
+              placeholder="Select complaint type"
+            >
+              {complaintTypes.map((type) => (
+                <IonSelectOption key={type.id} value={type.id}>
+                  {type.name}
+                </IonSelectOption>
+              ))}
+            </IonSelect>
+          </IonItem>
+
+          {/* Show additional input field when "Others" is selected */}
+          {complaintType === 10 && (
+            <IonItem lines="full" className="form-item">
+              <IonLabel position="stacked" className="required-field">
+                Specify Complaint Type
+              </IonLabel>
+              <IonInput
+                placeholder="Enter your specific complaint type"
+                value={otherComplaintType}
+                onIonChange={(e) => setOtherComplaintType(e.detail.value!)}
+              />
+            </IonItem>
+          )}
+
+          <IonItem lines="full" className="form-item">
+            <IonLabel position="stacked" className="required-field">
+              Respondent
+            </IonLabel>
+            <IonInput value={respondent} readonly disabled={true}>
+              <IonIcon slot="start" icon={personOutline} />
+            </IonInput>
+          </IonItem>
+
+          <IonItem lines="full" className="form-item">
+            <IonLabel position="stacked" className="required-field">
+              Date of Incident
+            </IonLabel>
+            <IonInput
+              placeholder="YYYY-MM-DD HH:MM"
+              value={incidentDate}
+              readonly
+              onClick={() => setShowDatePicker(true)}
+            >
+              <IonIcon slot="start" icon={calendarOutline} />
+            </IonInput>
+          </IonItem>
+
+          {/* Modified date picker modal with time component */}
+          <IonModal
+            isOpen={showDatePicker}
+            onDidDismiss={() => setShowDatePicker(false)}
+          >
+            <IonContent>
+              <IonDatetime
+                value={incidentDate}
+                presentation="date-time" // Changed from "date" to "date-time"
+                onIonChange={handleDateChange}
+                minuteValues="0,15,30,45" // Optional: add minute intervals of 15
+                firstDayOfWeek={1}
+                locale="en-US"
+              />
+              <div style={{ padding: "10px" }}>
+                <IonButton
+                  expand="block"
+                  onClick={() => setShowDatePicker(false)}
                 >
-                  <IonIcon slot="start" icon={personOutline} />
-                </IonInput>
-              </IonItem>
-            </div>
+                  Done
+                </IonButton>
+              </div>
+            </IonContent>
+          </IonModal>
 
-            <div className="form-section">
-              <h3 className="section-title">Complaint Details</h3>
+          <IonItem lines="full" className="form-item">
+            <IonLabel position="stacked" className="required-field">
+              Complaint Details
+            </IonLabel>
+            <IonTextarea
+              placeholder="Provide detailed description of your complaint"
+              value={details}
+              onIonChange={(e) => setDetails(e.detail.value!)}
+              rows={6}
+              className="complaint-details"
+            >
+              <IonIcon slot="start" icon={documentTextOutline} />
+            </IonTextarea>
+          </IonItem>
 
-              <IonItem lines="full" className="form-item">
-                <IonLabel position="stacked" className="required-field">
-                  Complaint Type
-                </IonLabel>
-                <IonSelect
-                  value={complaintType}
-                  onIonChange={(e) => setComplaintType(e.detail.value)}
-                  interface="popover"
-                  placeholder="Select complaint type"
-                >
-                  {complaintTypes.map((type) => (
-                    <IonSelectOption key={type.id} value={type.id}>
-                      {type.name}
-                    </IonSelectOption>
-                  ))}
-                </IonSelect>
-              </IonItem>
-
-              {/* Show additional input field when "Others" is selected */}
-              {complaintType === 10 && (
-                <IonItem lines="full" className="form-item">
-                  <IonLabel position="stacked" className="required-field">
-                    Specify Complaint Type
-                  </IonLabel>
-                  <IonInput
-                    placeholder="Enter your specific complaint type"
-                    value={otherComplaintType}
-                    onIonChange={(e) => setOtherComplaintType(e.detail.value!)}
-                  />
-                </IonItem>
-              )}
-
-              <IonItem lines="full" className="form-item">
-                <IonLabel position="stacked" className="required-field">
-                  Respondent
-                </IonLabel>
-                <IonInput value={respondent} readonly disabled={true}>
-                  <IonIcon slot="start" icon={personOutline} />
-                </IonInput>
-              </IonItem>
-
-              <IonItem lines="full" className="form-item">
-                <IonLabel position="stacked" className="required-field">
-                  Date of Incident
-                </IonLabel>
-                <IonInput
-                  placeholder="YYYY-MM-DD"
-                  value={incidentDate}
-                  readonly
-                  onClick={() => setShowDatePicker(true)}
-                >
-                  <IonIcon slot="start" icon={calendarOutline} />
-                </IonInput>
-              </IonItem>
-
-              <IonModal
-                isOpen={showDatePicker}
-                onDidDismiss={() => setShowDatePicker(false)}
-              >
-                <IonContent>
-                  <IonDatetime
-                    value={incidentDate}
-                    presentation="date"
-                    onIonChange={handleDateChange}
-                  />
-                  <IonButton
-                    expand="block"
-                    onClick={() => setShowDatePicker(false)}
-                  >
-                    Done
-                  </IonButton>
-                </IonContent>
-              </IonModal>
-
-              <IonItem lines="full" className="form-item">
-                <IonLabel position="stacked" className="required-field">
-                  Complaint Details
-                </IonLabel>
-                <IonTextarea
-                  placeholder="Provide detailed description of your complaint"
-                  value={details}
-                  onIonChange={(e) => setDetails(e.detail.value!)}
-                  rows={6}
-                  className="complaint-details"
-                >
-                  <IonIcon slot="start" icon={documentTextOutline} />
-                </IonTextarea>
-              </IonItem>
-
-              <IonItem lines="full" className="form-item">
-                <IonLabel position="stacked">Attachment (Optional)</IonLabel>
-                <div className="image-upload-container">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    style={{ display: "none" }}
-                    id="image-upload"
-                  />
-                  <IonButton
-                    className="image-upload-button"
-                    expand="block"
-                    color="primary"
-                    fill="outline"
-                    onClick={() =>
-                      document.getElementById("image-upload")?.click()
-                    }
-                  >
-                    <IonIcon slot="start" icon={imageOutline} />
-                    Choose Image
-                  </IonButton>
-                  {imagePreview && (
-                    <div className="image-preview">
-                      <img src={imagePreview} alt="Preview" />
-                      <IonButton
-                        fill="clear"
-                        color="danger"
-                        onClick={removeImage}
-                      >
-                        <IonIcon slot="icon-only" icon={closeCircleOutline} />
-                      </IonButton>
-                    </div>
-                  )}
-                </div>
-              </IonItem>
-            </div>
-
-            <div className="form-actions">
-              
+          <IonItem lines="full" className="form-item">
+            <IonLabel position="stacked">Attachment (Optional)</IonLabel>
+            <div className="image-upload-container">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                style={{ display: "none" }}
+                id="image-upload"
+              />
               <IonButton
+                className="image-upload-button"
                 expand="block"
                 color="primary"
-                className="form-button"
-                onClick={handleSubmit}
-                disabled={loading}
+                fill="outline"
+                onClick={() => document.getElementById("image-upload")?.click()}
               >
-                {loading ? (
-                  <IonSpinner name="dots" />
-                ) : (
-                  <>
-                    <IonIcon slot="start" icon={sendOutline} />
-                    Submit Complaint
-                  </>
-                )}
+                <IonIcon slot="start" icon={imageOutline} />
+                Choose Image
               </IonButton>
+              {imagePreview && (
+                <div className="image-preview">
+                  <img src={imagePreview} alt="Preview" />
+                  <IonButton fill="clear" color="danger" onClick={removeImage}>
+                    <IonIcon slot="icon-only" icon={closeCircleOutline} />
+                  </IonButton>
+                </div>
+              )}
             </div>
-         
-
-          {/* Recent complaints preview */}
-          {/* Recent complaints with chat functionality */}
+          </IonItem>
         </div>
-        {showToast && (
-          <IonToast
-            isOpen={!!showToast}
-            message={showToast.message}
-            duration={3000}
-            color={showToast.success ? "success" : "danger"}
-            onDidDismiss={() => setShowToast(null)}
-          />
-        )}
-      
+
+        <div className="form-actions">
+          <IonButton
+            expand="block"
+            color="primary"
+            className="form-button"
+            onClick={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? (
+              <IonSpinner name="dots" />
+            ) : (
+              <>
+                <IonIcon slot="start" icon={sendOutline} />
+                Submit Complaint
+              </>
+            )}
+          </IonButton>
+        </div>
+
+        {/* Recent complaints preview */}
+        {/* Recent complaints with chat functionality */}
+      </div>
+      {showToast && (
+        <IonToast
+          isOpen={!!showToast}
+          message={showToast.message}
+          duration={3000}
+          color={showToast.success ? "success" : "danger"}
+          onDidDismiss={() => setShowToast(null)}
+        />
+      )}
     </>
   );
 };
