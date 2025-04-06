@@ -61,52 +61,7 @@ ion-card-content {
   padding: 16px;
 }
 
-/* Button styling */
-ion-button[fill="clear"] {
-  --color: var(--primary-color);
-  font-weight: 500;
-}
 
-ion-button[fill="solid"] {
-  --background: var(--primary-color);
-  --color: var(--text-on-primary);
-}
-
-ion-button.secondary-button {
-  --background: var(--secondary-color);
-  --color: var(--text-on-secondary);
-}
-
-/* List styling */
-ion-list {
-  background-color: transparent !important;
-}
-
-ion-item {
-  --background: white;
-  --border-color: var(--primary-light);
-  margin-bottom: 4px;
-}
-
-ion-item:last-child {
-  margin-bottom: 0;
-}
-
-/* Badge and chip styling */
-ion-badge {
-  --background: var(--secondary-color);
-  --color: var(--text-on-secondary);
-}
-
-ion-chip[color="primary"] {
-  --background: var(--primary-color);
-  --color: var(--text-on-primary);
-}
-
-ion-chip[color="success"] {
-  --background: var(--secondary-color);
-  --color: var(--text-on-secondary);
-}
 
 /* Other elements */
 .date-text {
@@ -124,9 +79,6 @@ ion-chip[color="success"] {
   background-color: var(--primary-color);
 }
 
-.welcome-card ion-card-content {
-  background-color: rgba(255, 255, 255, 0.9);
-}
 
 /* Activity item */
 .activity-status {
@@ -148,7 +100,3 @@ ion-chip[color="success"] {
   background: linear-gradient(rgba(0, 47, 167, 0.4), rgba(0, 47, 167, 0.8));
 }
 
-/* Avatar styling */
-ion-avatar {
-  background-color: var(--primary-light);
-}
