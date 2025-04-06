@@ -66,14 +66,22 @@ interface DateFilter {
   month: string | null;
 }
 
-// Map numeric complaint types to readable names
+// No need for complaint type mapping since we're using names directly now
+// Remove or comment out the old mapping
+/*
 const complaintTypeMap: { [key: number]: string } = {
   1: "Noise Complaint",
   2: "Property Dispute",
   3: "Public Disturbance",
-  4: "Maintenance Issue",
-  5: "Other",
+  4: "Utility Issue",
+  5: "Environmental Concern",
+  6: "Vandalism",
+  7: "Illegal Construction",
+  8: "Parking Violation",
+  9: "Animal Complaint",
+  10: "Others",
 };
+*/
 
 const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
   const [activeTab, setActiveTab] = useState<string>("complaints");
@@ -402,7 +410,10 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
                   label: function (context) {
                     const label = context.label || "";
                     const value = context.raw || 0;
-                    const percentage = ((Number(value) / statusTotal) * 100).toFixed(1);
+                    const percentage = (
+                      (Number(value) / statusTotal) *
+                      100
+                    ).toFixed(1);
                     return `${label}: ${value} (${percentage}%)`;
                   },
                 },
@@ -427,34 +438,93 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
     if (complaintsTypeChartRef.current) {
       const ctx = complaintsTypeChartRef.current.getContext("2d");
       if (ctx) {
+        // Define consistent colors for complaint types
+        const complaintTypeColors: { [key: string]: string } = {
+          "Noise Complaint": "rgba(255, 99, 132, 0.6)",
+          "Property Dispute": "rgba(54, 162, 235, 0.6)",
+          "Public Disturbance": "rgba(255, 206, 86, 0.6)",
+          "Utility Issue": "rgba(75, 192, 192, 0.6)",
+          "Environmental Concern": "rgba(153, 102, 255, 0.6)",
+          Vandalism: "rgba(255, 159, 64, 0.6)",
+          "Illegal Construction": "rgba(201, 203, 207, 0.6)",
+          "Parking Violation": "rgba(255, 99, 71, 0.6)",
+          "Animal Complaint": "rgba(46, 204, 113, 0.6)",
+          Others: "rgba(142, 68, 173, 0.6)",
+          Unknown: "rgba(100, 100, 100, 0.6)",
+          // Default color for any other types or custom entries
+          default: "rgba(153, 102, 255, 0.6)",
+        };
+
+        // Sort data by count (descending) for better visualization
+        const sortedData = [...stats.complaints.byType].sort(
+          (a, b) => b.count - a.count
+        );
+
+        // Show only top 10 complaint types if there are more
+        const displayData = sortedData.slice(0, 10);
+
+        // Get background colors based on type names
+        const backgroundColors = displayData.map(
+          (item) =>
+            complaintTypeColors[item.type] || complaintTypeColors.default
+        );
+
+        console.log("Complaint types data:", stats.complaints.byType);
+
         chartInstances.current.complaintsType = new Chart(ctx, {
           type: "bar",
           data: {
-            labels: stats.complaints.byType.map((item) => item.type),
+            labels: displayData.map((item) => item.type),
             datasets: [
               {
-                label: "Complaints by Type",
-                data: stats.complaints.byType.map((item) => item.count),
-                backgroundColor: "rgba(153, 102, 255, 0.6)",
+                label: "Number of Complaints",
+                data: displayData.map((item) => item.count),
+                backgroundColor: backgroundColors,
+                borderColor: backgroundColors.map((color) =>
+                  color.replace("0.6", "1")
+                ),
+                borderWidth: 1,
               },
             ],
           },
           options: {
             responsive: true,
+            indexAxis: "y", // Makes horizontal bar chart for better readability
             plugins: {
               legend: {
-                position: "top",
+                display: false, // Hide legend as we're using colored bars
               },
               title: {
                 display: true,
                 text: "Complaints by Type",
+                font: {
+                  size: 16,
+                  weight: "bold",
+                },
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    return `${context.raw} complaints`;
+                  },
+                },
               },
             },
             scales: {
-              y: {
+              x: {
                 beginAtZero: true,
                 ticks: {
                   precision: 0, // Only show whole numbers
+                },
+                title: {
+                  display: true,
+                  text: "Number of Complaints",
+                },
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: "Complaint Type",
                 },
               },
             },
@@ -504,7 +574,10 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
                   label: function (context) {
                     const label = context.label || "";
                     const value = context.raw || 0;
-                    const percentage = ((Number(value) / roleTotal) * 100).toFixed(1);
+                    const percentage = (
+                      (Number(value) / roleTotal) *
+                      100
+                    ).toFixed(1);
                     return `${label}: ${value} (${percentage}%)`;
                   },
                 },
@@ -633,7 +706,10 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
                 </IonRow>
                 <IonRow>
                   <IonCol size="12">
-                    <div className="canvas-container">
+                    <div
+                      className="canvas-container"
+                      style={{ minHeight: "400px" }}
+                    >
                       <canvas ref={complaintsTypeChartRef}></canvas>
                     </div>
                   </IonCol>

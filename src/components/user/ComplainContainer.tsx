@@ -64,7 +64,7 @@ const ComplainContainer: React.FC = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [otherComplaintType, setOtherComplaintType] = useState(""); // Add this for "Others" option
 
-  // Updated and expanded complaint types
+  // Updated complaint types to match backend mapping
   const complaintTypes: ComplaintType[] = [
     {
       id: 1,
