@@ -600,7 +600,13 @@ const ComplainContainer: React.FC = () => {
   }, [selectedComplaint?.id]);
 
   return (
-    <IonContent className="ion-padding" color="light">
+    <IonContent
+      className="ion-padding"
+      style={{
+        "--background": "#f0f4ff", // Light blue-tinted background
+        color: "#333",
+      }}
+    >
       <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
         <IonRefresherContent></IonRefresherContent>
       </IonRefresher>
@@ -615,10 +621,30 @@ const ComplainContainer: React.FC = () => {
         />
       )}
 
-      <IonCardHeader>
-        <IonCardTitle>Complaints Dashboard</IonCardTitle>
-      </IonCardHeader>
-      <IonCardContent>
+      <div
+        style={{
+          background: "#002fa7",
+          color: "white",
+          padding: "16px",
+          borderRadius: "10px 10px 0 0",
+          marginBottom: "0",
+          boxShadow: "0 4px 12px rgba(0, 47, 167, 0.12)",
+        }}
+      >
+        <h1 style={{ margin: "0", fontSize: "1.2rem", fontWeight: "bold" }}>
+          Complaints Dashboard
+        </h1>
+      </div>
+
+      <div
+        style={{
+          background: "#ffffff",
+          padding: "16px",
+          borderRadius: "0 0 10px 10px",
+          marginBottom: "16px",
+          boxShadow: "0 4px 12px rgba(0, 47, 167, 0.12)",
+        }}
+      >
         <div
           style={{
             display: "flex",
@@ -651,6 +677,7 @@ const ComplainContainer: React.FC = () => {
           onIonChange={(e) => setSearchText(e.detail.value!)}
           placeholder="Search complaints"
           animated
+          style={{ "--background": "#f0f4ff", "--color": "#002fa7" }}
         />
 
         <div
@@ -664,7 +691,13 @@ const ComplainContainer: React.FC = () => {
           }}
         >
           <IonSegment
-            style={{ width: "100%" }}
+            style={{
+              width: "100%",
+              "--background": "#f0f4ff",
+              "--color": "#002fa7",
+              "--color-checked": "#ffffff",
+              "--background-checked": "#002fa7",
+            }}
             className="status-segment"
             scrollable={true}
             value={filter}
@@ -693,17 +726,21 @@ const ComplainContainer: React.FC = () => {
             value={sortBy}
             onIonChange={(e) => setSortBy(e.detail.value)}
             placeholder="Sort by"
+            style={{
+              "--placeholder-color": "#002fa7",
+              "--color": "#002fa7",
+            }}
           >
             <IonSelectOption value="date">Date (Newest)</IonSelectOption>
             <IonSelectOption value="name">Complainant Name</IonSelectOption>
             <IonSelectOption value="status">Status</IonSelectOption>
           </IonSelect>
         </div>
-      </IonCardContent>
+      </div>
 
       {loading && (
         <div className="ion-text-center ion-padding">
-          <IonSpinner name="dots" />
+          <IonSpinner name="dots" style={{ color: "#002fa7" }} />
         </div>
       )}
 
@@ -716,7 +753,7 @@ const ComplainContainer: React.FC = () => {
       />
 
       {!loading && !error && (
-        <IonList>
+        <IonList style={{ background: "transparent" }}>
           {getFilteredComplaints().length > 0 ? (
             getFilteredComplaints().map((complaint) => (
               <IonItemSliding key={complaint.id} className="complaint-item">
@@ -728,6 +765,15 @@ const ComplainContainer: React.FC = () => {
                     fetchMessages(complaint.id);
                   }}
                   className="complaint-content"
+                  style={{
+                    "--background": "#ffffff",
+                    "--background-hover": "#e6efff",
+                    "--border-color": "#002fa7",
+                    borderLeft: "4px solid #002fa7",
+                    marginBottom: "8px",
+                    borderRadius: "4px",
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                  }}
                 >
                   <IonLabel className="ion-text-wrap">
                     <h2
@@ -736,6 +782,7 @@ const ComplainContainer: React.FC = () => {
                         alignItems: "center",
                         flexWrap: "wrap",
                         gap: "4px",
+                        color: "#002fa7",
                       }}
                     >
                       <span style={{ wordBreak: "break-word" }}>
@@ -787,6 +834,7 @@ const ComplainContainer: React.FC = () => {
                         handleStatusUpdate(complaint.id, "Under review")
                       }
                       title="Under Review"
+                      style={{ "--background": "#002fa7" }}
                     >
                       <div className="ion-item-option-content">
                         <IonIcon icon={timeOutline} />
@@ -801,6 +849,7 @@ const ComplainContainer: React.FC = () => {
                         handleStatusUpdate(complaint.id, "In progress")
                       }
                       title="In Progress"
+                      style={{ "--background": "#6b92d5" }}
                     >
                       <div className="ion-item-option-content">
                         <IonIcon icon={timeOutline} />
@@ -816,6 +865,7 @@ const ComplainContainer: React.FC = () => {
                           handleStatusUpdate(complaint.id, "Resolved")
                         }
                         title="Resolve"
+                        style={{ "--background": "#9be368" }}
                       >
                         <div className="ion-item-option-content">
                           <IonIcon icon={checkmarkCircleOutline} />
@@ -848,7 +898,11 @@ const ComplainContainer: React.FC = () => {
                       </div>
                     </IonItemOption>
                   )}
-                  <IonItemOption color="primary" title="Email">
+                  <IonItemOption
+                    color="primary"
+                    title="Email"
+                    style={{ "--background": "#002fa7" }}
+                  >
                     <div className="ion-item-option-content">
                       <IonIcon icon={mailOutline} />
                       <span className="ion-hide-sm-down">Email</span>
@@ -858,7 +912,7 @@ const ComplainContainer: React.FC = () => {
               </IonItemSliding>
             ))
           ) : (
-            <IonItem>
+            <IonItem style={{ "--background": "transparent" }}>
               <IonLabel className="ion-text-center">
                 No complaints found matching your criteria.
               </IonLabel>
@@ -874,22 +928,36 @@ const ComplainContainer: React.FC = () => {
       <IonModal
         isOpen={!!selectedComplaint}
         onDidDismiss={() => setSelectedComplaint(null)}
+        style={{ "--background": "#f0f4ff" }}
       >
         <IonHeader>
-          <IonToolbar>
+          <IonToolbar style={{ "--background": "#002fa7", "--color": "white" }}>
             <IonTitle>
               {selectedComplaint
                 ? `Complaint #${selectedComplaint.id}`
                 : "Chat"}
             </IonTitle>
-            <IonButton slot="end" onClick={() => setSelectedComplaint(null)}>
+            <IonButton
+              slot="end"
+              onClick={() => setSelectedComplaint(null)}
+              style={{ "--background": "#9be368", "--color": "#002fa7" }}
+            >
               Close
             </IonButton>
           </IonToolbar>
         </IonHeader>
 
-        <IonContent className="ion-padding">
-          <IonCard>
+        <IonContent
+          className="ion-padding"
+          style={{ "--background": "#f0f4ff" }}
+        >
+          <IonCard
+            style={{
+              "--background": "white",
+              boxShadow: "0 4px 12px rgba(0, 47, 167, 0.12)",
+            }}
+          >
+           
             <ComplaintDetails
               selectedComplaint={selectedComplaint}
               handleStatusUpdate={handleStatusUpdate}
@@ -914,7 +982,7 @@ const ComplainContainer: React.FC = () => {
                   <div
                     style={{
                       backgroundColor:
-                        msg.sender === "admin" ? "#007aff" : "#333",
+                        msg.sender === "admin" ? "#002fa7" : "#444444",
                       color: msg.sender === "admin" ? "#fff" : "#e4e4e4",
                       borderRadius: "12px",
                       padding: "8px 12px",
@@ -928,7 +996,7 @@ const ComplainContainer: React.FC = () => {
                     <small
                       style={{
                         fontSize: "0.75rem",
-                        color: "#666",
+                        color: msg.sender === "admin" ? "#cfe1ff" : "#aaa",
                         display: "block",
                         textAlign: "right",
                       }}
@@ -968,7 +1036,7 @@ const ComplainContainer: React.FC = () => {
         </IonContent>
 
         <IonFooter>
-          <IonItem>
+          <IonItem style={{ "--background": "#002fa7", "--color": "white" }}>
             <IonInput
               placeholder={
                 ["Resolved", "Closed", "Rejected"].includes(
@@ -983,6 +1051,11 @@ const ComplainContainer: React.FC = () => {
               disabled={["Resolved", "Closed", "Rejected"].includes(
                 selectedComplaint?.status || ""
               )}
+              style={{
+                "--placeholder-color": "rgba(255,255,255,0.7)",
+                "--color": "white",
+                "--padding-start": "12px",
+              }}
             />
             <IonButton
               onClick={handleSendMessage}
@@ -991,6 +1064,7 @@ const ComplainContainer: React.FC = () => {
                   selectedComplaint?.status || ""
                 ) || !newMessage.trim()
               }
+              style={{ "--background": "#9be368", "--color": "#002fa7" }}
             >
               <IonIcon icon={sendOutline} />
             </IonButton>

@@ -17,6 +17,7 @@ import {
   IonTitle,
   IonButtons,
   IonButton,
+  IonContent,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import {
@@ -29,8 +30,7 @@ import {
   logOut,
   statsChart,
   megaphone,
-  helpCircle
-
+  helpCircle,
 } from "ionicons/icons";
 import { useState, useEffect } from "react";
 
@@ -67,9 +67,54 @@ import "@ionic/react/css/palettes/dark.system.css";
 /* Theme */
 import "./theme/variables.css";
 
-setupIonicReact();
+// Custom CSS for app-wide styles
+import "./App.css";
+
+// Configure Ionic with custom colors
+setupIonicReact({
+  mode: "md",
+  animated: true,
+});
+
+// Custom CSS to inject our color scheme
+const injectCustomStyles = () => {
+  const style = document.createElement("style");
+  style.innerHTML = `
+    :root {
+      --ion-color-primary: #002fa7;
+      --ion-color-primary-rgb: 0, 47, 167;
+      --ion-color-primary-contrast: #ffffff;
+      --ion-color-primary-contrast-rgb: 255, 255, 255;
+      --ion-color-primary-shade: #002993;
+      --ion-color-primary-tint: #1a44b0;
+      
+      --ion-color-secondary: #9be368;
+      --ion-color-secondary-rgb: 155, 227, 104;
+      --ion-color-secondary-contrast: #002fa7;
+      --ion-color-secondary-contrast-rgb: 0, 47, 167;
+      --ion-color-secondary-shade: #88c85c;
+      --ion-color-secondary-tint: #a5e678;
+      
+      --ion-background-color: #f0f4ff;
+      --ion-background-color-rgb: 240, 244, 255;
+      
+      --ion-text-color: #333333;
+      --ion-text-color-rgb: 51, 51, 51;
+      
+      --ion-tab-bar-background: #002fa7;
+      --ion-tab-bar-color: rgba(255, 255, 255, 0.7);
+      --ion-tab-bar-color-selected: #9be368;
+    }
+  `;
+  document.head.appendChild(style);
+};
 
 const App: React.FC = () => {
+  useEffect(() => {
+    // Inject custom styles
+    injectCustomStyles();
+  }, []);
+
   return (
     <IonApp>
       <IonReactRouter>
@@ -162,13 +207,13 @@ const AdminApp: React.FC = () => {
   return (
     <IonTabs>
       <IonHeader>
-        <IonToolbar color="primary">
+        <IonToolbar style={{ "--background": "#002fa7", "--color": "white" }}>
           <IonTitle>JustiFy Admin Portal</IonTitle>
           <IonButtons slot="end">
-            <IonButton href="/admin/dashboard">
+            <IonButton href="/admin/dashboard" style={{ "--color": "#9be368" }}>
               <IonIcon icon={person} />
             </IonButton>
-            <IonButton onClick={handleLogout}>
+            <IonButton onClick={handleLogout} style={{ "--color": "#9be368" }}>
               <IonIcon icon={logOut} />
             </IonButton>
           </IonButtons>
@@ -187,24 +232,22 @@ const AdminApp: React.FC = () => {
         <Route exact path="/admin/home" component={AHome} />
         <Route exact path="/admin/complain" component={AComplain} />
         <Route exact path="/admin/inbox" component={AInbox} />
-        {/* <Route exact path="/admin/record" component={ARecord} /> */}
         <Route exact path="/admin/statistics" component={AStatistics} />
         <Route exact path="/admin/news" component={News} />
         <Route exact path="/admin/message" component={AMessage} />
-        {/* <Route exact path="/admin/message" component={Message} /> */}
-        {/* <Route exact path="/admin/record" component={ARecord} /> */}
-        {/* <Route exact path="/admin/ticket" component={TicketContainer} /> */}
-        {/* <Route exact path="/admin/ticket" component={ATicket} /> */}
-        {/* <Route
-          path="/admin/ticket"
-          render={(props) => <TicketContainer name="Admin" {...props} />}
-        /> */}
         <Route>
           <Redirect to="/admin/home" />
         </Route>
       </IonRouterOutlet>
 
-      <IonTabBar slot="bottom" color="primary">
+      <IonTabBar
+        slot="bottom"
+        style={{
+          "--background": "#002fa7",
+          "--color": "rgba(255,255,255,0.7)",
+          "--color-selected": "#9be368",
+        }}
+      >
         <IonTabButton tab="admin-complain" href="/admin/complain">
           <IonIcon icon={newspaper} />
           <IonLabel>Complaints</IonLabel>
@@ -213,22 +256,14 @@ const AdminApp: React.FC = () => {
           <IonIcon icon={megaphone} />
           <IonLabel>News</IonLabel>
         </IonTabButton>
-        {/* <IonTabButton tab="admin-ticket" href="/admin/ticket">
-          <IonIcon icon={ticket} />
-          <IonLabel>Tickets</IonLabel>
-        </IonTabButton> */}
         <IonTabButton tab="admin-home" href="/admin/home">
           <IonIcon icon={home} />
           <IonLabel>Home</IonLabel>
         </IonTabButton>
         <IonTabButton tab="admin-statistics" href="/admin/statistics">
           <IonIcon icon={statsChart} />
-          <IonLabel>Repports</IonLabel>
+          <IonLabel>Reports</IonLabel>
         </IonTabButton>
-        {/* <IonTabButton tab="admin-record" href="/admin/record">
-          <IonIcon icon={documentText} />
-          <IonLabel>Records</IonLabel>
-        </IonTabButton> */}
         <IonTabButton tab="admin-message" href="/admin/message">
           <IonIcon icon={mail} />
           <IonLabel>Message</IonLabel>
@@ -245,13 +280,13 @@ const UserApp: React.FC = () => {
   return (
     <IonTabs>
       <IonHeader>
-        <IonToolbar>
+        <IonToolbar style={{ "--background": "#002fa7", "--color": "white" }}>
           <IonTitle className="centered-title">JustiFy</IonTitle>
           <IonButtons slot="end">
-            <IonButton href="/dashboard">
+            <IonButton href="/dashboard" style={{ "--color": "#9be368" }}>
               <IonIcon icon={person} />
             </IonButton>
-            <IonButton onClick={handleLogout}>
+            <IonButton onClick={handleLogout} style={{ "--color": "#9be368" }}>
               <IonIcon icon={logOut} />
             </IonButton>
           </IonButtons>
@@ -266,7 +301,6 @@ const UserApp: React.FC = () => {
         <Route exact path="/home" component={Home} />
         <Route exact path="/complain" component={Complain} />
         <Route exact path="/inbox" component={Inbox} />
-        {/* <Route exact path="/record" component={Record} /> */}
         <Route exact path="/ticket" component={Ticket} />
         <Route exact path="/message" component={Message} />
         <Route>
@@ -274,7 +308,14 @@ const UserApp: React.FC = () => {
         </Route>
       </IonRouterOutlet>
 
-      <IonTabBar slot="bottom">
+      <IonTabBar
+        slot="bottom"
+        style={{
+          "--background": "#002fa7",
+          "--color": "rgba(255,255,255,0.7)",
+          "--color-selected": "#9be368",
+        }}
+      >
         <IonTabButton tab="complain" href="/complain">
           <IonIcon icon={newspaper} />
           <IonLabel>Complain</IonLabel>
@@ -291,7 +332,6 @@ const UserApp: React.FC = () => {
           <IonIcon icon={mail} />
           <IonLabel>Inbox</IonLabel>
         </IonTabButton>
-        {/* <IonTabButton tab="record" href="/record"> */}
         <IonTabButton tab="message" href="/message">
           <IonIcon icon={helpCircle} />
           <IonLabel>Ask</IonLabel>

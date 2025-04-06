@@ -94,3 +94,247 @@ ion-title {
   --background: var(--ion-color-primary);
   --color: var(--ion-color-light);
 }
+
+/* Main container styling */
+.register-container {
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #f0f4ff;
+  max-width: 500px;
+  margin: 0 auto;
+  box-shadow: 0 4px 12px rgba(0, 47, 167, 0.1);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  color: #333333; /* Darker text for better contrast */
+  font-size: 16px; /* Larger base font size */
+  line-height: 1.5; /* Better line height for readability */
+}
+
+/* Header styling */
+.register-container h2 {
+  color: #001d73; /* Darker blue for better contrast */
+  font-weight: 700; /* Bolder text */
+  margin-bottom: 24px;
+  text-align: center;
+  font-size: 26px; /* Larger header */
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5); /* Subtle text shadow for clarity */
+}
+
+/* Form items styling */
+.register-form-item {
+  --background: white;
+  --border-color: rgba(0, 47, 167, 0.15);
+  --border-radius: 8px;
+  --border-width: 1px;
+  --highlight-color-focused: #002fa7;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Make IonLabel text more readable */
+.register-form-item ion-label {
+  --color: #002fa7 !important; /* Force blue color */
+  font-weight: 600 !important; /* Make labels bold */
+  opacity: 1 !important; /* Ensure full opacity */
+}
+
+/* Make sure floating label stays visible */
+.register-form-item.item-has-focus ion-label {
+  --color: #002fa7 !important; /* Keep blue when focused */
+  opacity: 1 !important;
+}
+
+.register-form-item ion-input {
+  --color: #000000; /* Black text for maximum contrast */
+  --placeholder-color: #555555 !important;
+  --padding-start: 16px;
+  font-size: 16px; /* Larger input text */
+}
+
+/* Button container */
+.register-button-container {
+  margin-top: 24px;
+  padding-bottom: 16px;
+}
+
+/* Primary button styling */
+.register-primary-button {
+  --background: #002fa7;
+  --color: white;
+  --border-radius: 8px;
+  --ripple-color: rgba(255, 255, 255, 0.2);
+  margin-bottom: 12px;
+  --box-shadow: 0 4px 8px rgba(0, 47, 167, 0.2);
+  font-weight: 700; /* Bold button text */
+  font-size: 16px; /* Larger button text */
+  text-transform: none; /* Prevent all caps which can be harder to read */
+  height: 44px;
+}
+
+/* Secondary button styling */
+.register-secondary-button {
+  --background: transparent;
+  --color: #001d73; /* Darker blue */
+  --border-color: #002fa7;
+  --border-radius: 8px;
+  --border-width: 1px;
+  --box-shadow: none;
+  height: 44px;
+  font-weight: 600;
+  font-size: 16px;
+  text-transform: none;
+}
+
+/* Accent button (green) */
+.register-accent-button {
+  --background: #9be368;
+  --color: #001d73; /* Darker blue on green background */
+  --border-radius: 8px;
+  --ripple-color: rgba(0, 47, 167, 0.1);
+  margin-top: 12px;
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: none;
+  --box-shadow: 0 4px 8px rgba(155, 227, 104, 0.3);
+  height: 44px;
+}
+
+/* Modal styling */
+.datetime-modal ion-content {
+  --background: #f0f4ff;
+}
+
+.datetime-modal h2 {
+  color: #002fa7;
+  margin-bottom: 16px;
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.custom-datetime {
+  --background: white;
+  --calendar-background: white;
+  --title-color: #002fa7;
+  --calendar-day-color: #333;
+  --calendar-today-color: #002fa7;
+  --calendar-day-selected: #002fa7;
+  --calendar-day-selected-color: white;
+  color: #002fa7;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 47, 167, 0.1);
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Verification modal styling */
+.verification-modal ion-header ion-toolbar {
+  --background: #002fa7;
+  --color: white;
+}
+
+.verification-content {
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  margin: 16px;
+  box-shadow: 0 4px 12px rgba(0, 47, 167, 0.08);
+  border-top: 4px solid #9be368;
+}
+
+.verification-content h2 {
+  color: #001d73; /* Darker blue */
+  margin-bottom: 16px;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.verification-content p {
+  color: #333333; /* Darker text */
+  margin-bottom: 20px;
+  line-height: 1.6;
+  font-size: 16px;
+  text-align: center;
+}
+
+/* Error text styling */
+.error-text {
+  color: #cc0000; /* Bright red for better visibility */
+  font-size: 1rem; /* Larger error text */
+  font-weight: 600; /* Bolder error text */
+  margin-top: 8px;
+  padding: 8px 16px;
+  background-color: rgba(204, 0, 0, 0.08); /* Light red background */
+  border-radius: 4px;
+}
+
+/* Image preview styling */
+.image-preview-container {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.image-preview {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid #9be368;
+  box-shadow: 0 4px 8px rgba(0, 47, 167, 0.2);
+}
+
+/* File input styling */
+.file-input-container {
+  margin-top: 16px;
+  margin-bottom: 8px;
+  padding-left: 16px;
+}
+
+.file-input-container input {
+  color: #002fa7;
+}
+
+/* Fix for IonModal styling */
+.verification-modal .ion-page {
+  background-color: #f0f4ff;
+}
+
+/* Spinner color adjustment */
+ion-spinner {
+  color: white;
+}
+
+/* Improve modal text */
+.verification-modal ion-title {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+/* Fix dark text against dark backgrounds */
+.verification-modal ion-toolbar {
+  --color: white;
+  --background: #002fa7;
+}
+
+/* Verification modal label fix */
+.verification-modal ion-label {
+  --color: #002fa7 !important;
+  font-weight: 600 !important;
+  opacity: 1 !important;
+}
+
+/* Additional overrides for Ionic default behavior */
+:host(.label-floating).sc-ion-label-md-h,
+:host(.label-stacked).sc-ion-label-md-h {
+  color: #002fa7 !important;
+}
+
+/* Fix for IonItem with floating label */
+.item-label-floating .label-md,
+.item-label-stacked .label-md {
+  color: #002fa7 !important;
+  font-weight: 600 !important;
+}

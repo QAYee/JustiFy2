@@ -32,3 +32,126 @@
   --border-radius: 8px;
 }
 
+/* LoginContainer.css */
+
+/* Main container */
+.login-container {
+  background: linear-gradient(135deg, #f0f4ff 0%, #e8f4ff 100%);
+  min-height: 100%;
+}
+
+/* Card styling */
+.login-card {
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 47, 167, 0.15);
+  overflow: hidden;
+  margin: 20px;
+  background-color: #ffffff;
+  border-top: 4px solid #9be368;
+}
+
+/* Card header */
+.login-card-header {
+  text-align: center;
+  padding: 24px 16px 0;
+}
+
+.login-logo {
+  color: #002fa7;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+  text-shadow: 1px 1px 0 rgba(0, 47, 167, 0.1);
+}
+
+.login-subtitle {
+  color: #002fa7;
+  font-size: 20px;
+  font-weight: 600;
+  margin-top: 16px;
+  margin-bottom: 24px;
+}
+
+/* Form fields */
+.login-form-item {
+  --background: white;
+  --border-color: rgba(0, 47, 167, 0.15);
+  --border-width: 1px;
+  --border-radius: 8px;
+  --padding-start: 16px;
+  --highlight-color-focused: #002fa7;
+  margin-bottom: 16px !important;
+}
+
+.login-form-item ion-label {
+  --color: #002fa7;
+  font-weight: 500;
+}
+
+.login-form-item ion-input {
+  --color: #000000;
+  --placeholder-color: #666666;
+}
+
+/* Form buttons */
+.login-button {
+  --background: #002fa7;
+  --background-activated: #001d73;
+  --background-hover: #0027a0;
+  --color: white;
+  --border-radius: 8px;
+  font-weight: 600;
+  margin: 16px 0;
+  height: 48px;
+  --box-shadow: 0 4px 10px rgba(0, 47, 167, 0.3);
+}
+
+.register-link-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.register-link {
+  color: #002fa7;
+  font-weight: 500;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Error message styling */
+.error-container {
+  background-color: rgba(255, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 16px;
+}
+
+.error-message {
+  color: #cc0000;
+  text-align: center;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .login-card {
+    max-width: 440px;
+    margin: 0 auto;
+  }
+}
+
+/* Loading spinner customization */
+ion-loading.custom-loading {
+  --background: rgba(0, 47, 167, 0.8);
+  --spinner-color: #9be368;
+}
+
+/* Footer styling */
+.login-footer {
+  text-align: center;
+  padding: 16px;
+  color: #555;
+  font-size: 0.8rem;
+}

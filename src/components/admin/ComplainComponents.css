@@ -5,6 +5,7 @@
   gap: 1rem;
   max-height: 50vh;
   overflow-y: auto;
+  background-color: #f0f4ff; /* Light blue-tinted background */
 }
 
 .message {
@@ -16,13 +17,17 @@
 
 .user-message {
   align-self: flex-start;
-  background-color: var(--ion-color-light);
+  background-color: #444444; /* Dark gray for user messages */
+  color: #e4e4e4; /* Light text for readability */
+  border-bottom-left-radius: 4px;
 }
 
 .admin-message {
   align-self: flex-end;
-  background-color: var(--ion-color-primary);
+  background-color: #002fa7; /* Primary dark blue */
   color: white;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 47, 167, 0.2);
 }
 
 .message p {
@@ -41,7 +46,8 @@
   max-width: 100%;
   border-radius: 8px;
   margin-top: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 47, 167, 0.15);
+  border: 2px solid #f0f4ff;
 }
 
 .image-container {
@@ -51,9 +57,89 @@
 
 .image-container img {
   cursor: pointer;
-  transition: transform 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
 .image-container img:hover {
   transform: scale(1.02);
+  border-color: #9be368; /* Accent color on hover */
+  box-shadow: 0 4px 8px rgba(0, 47, 167, 0.2);
+}
+
+/* Additional styling for complaint components */
+.status-update-container {
+  background-color: #f0f4ff;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 16px;
+  border-left: 3px solid #002fa7;
+}
+
+.status-update-title {
+  color: #002fa7;
+  margin-top: 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.status-buttons-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.status-button {
+  --background: #002fa7;
+}
+
+.status-button[color="success"] {
+  --background: #9be368;
+  --color: #002fa7;
+}
+
+.complaint-details {
+  background-color: #f8faff;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+  border-left: 3px solid #002fa7;
+}
+
+.attachment-container {
+  background-color: #f0f4ff;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 16px;
+}
+
+/* Style for empty state */
+.empty-state {
+  text-align: center;
+  padding: 24px;
+  color: #777;
+  background-color: #f0f4ff;
+  border-radius: 8px;
+  border: 1px dashed #002fa7;
+  margin: 16px 0;
+}
+
+/* Message input styling */
+.message-input-container {
+  border-top: 1px solid rgba(0, 47, 167, 0.1);
+  background-color: #002fa7;
+  padding: 8px;
+}
+
+.send-button {
+  --background: #9be368;
+  --color: #002fa7;
+}
+
+/* Status chip styling */
+.status-chip {
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 12px;
 }

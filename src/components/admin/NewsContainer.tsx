@@ -234,7 +234,7 @@ const NewsContainer: React.FC = () => {
         }
 
         // Map each news item to ensure it has contentType
-        extractedNews = extractedNews.map((item: { contentType: any; }) => ({
+        extractedNews = extractedNews.map((item: { contentType: any }) => ({
           ...item,
           contentType: item.contentType || "news",
         }));
@@ -265,10 +265,12 @@ const NewsContainer: React.FC = () => {
         }
 
         // Map each announcement to ensure it has contentType
-        extractedAnnouncements = extractedAnnouncements.map((item: { contentType: any; }) => ({
-          ...item,
-          contentType: item.contentType || "announcement",
-        }));
+        extractedAnnouncements = extractedAnnouncements.map(
+          (item: { contentType: any }) => ({
+            ...item,
+            contentType: item.contentType || "announcement",
+          })
+        );
 
         allContent = [...allContent, ...extractedAnnouncements];
       }
@@ -480,49 +482,85 @@ const NewsContainer: React.FC = () => {
   };
 
   return (
-    <IonContent className="ion-padding" color="light">
+    <IonContent
+      className="ion-padding"
+      style={{
+        "--background": "#f0f4ff", // Light blue background that complements the dark blue
+        "--color": "#333333",
+      }}
+    >
       <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
         <IonRefresherContent></IonRefresherContent>
       </IonRefresher>
 
       <IonGrid>
-        {/* Remove the debug panel that was here */}
-
-        {/* Rest of your existing code */}
         <IonRow>
           <IonCol sizeMd="6" offsetMd="3">
-            <IonCardHeader>
-              <IonCardTitle>
+            <div
+              style={{
+                background: "#002fa7",
+                color: "white",
+                padding: "16px",
+                borderRadius: "10px 10px 0 0",
+                marginBottom: "0",
+                boxShadow: "0 4px 12px rgba(0, 47, 167, 0.12)",
+              }}
+            >
+              <h1
+                style={{ margin: "0", fontSize: "1.2rem", fontWeight: "bold" }}
+              >
                 {editMode ? "Update Content" : "Create Content"}
-              </IonCardTitle>
-              <IonCardSubtitle>
+              </h1>
+              <p
+                style={{
+                  margin: "4px 0 0 0",
+                  fontSize: "0.9rem",
+                  opacity: 0.8,
+                }}
+              >
                 {editMode
                   ? "Edit existing content"
                   : "Add new content to the system"}
-              </IonCardSubtitle>
-            </IonCardHeader>
-
-            <div className="content-type-tabs">
-              <IonSegment
-                value={contentType}
-                onIonChange={handleContentTypeChange}
-              >
-                <IonSegmentButton value="news">
-                  <IonIcon icon={newspaperOutline} />
-                  <IonLabel>News</IonLabel>
-                </IonSegmentButton>
-                <IonSegmentButton value="announcement">
-                  <IonIcon icon={megaphone} />
-                  <IonLabel>Announcement</IonLabel>
-                </IonSegmentButton>
-              </IonSegment>
+              </p>
             </div>
 
-            <IonCardContent>
-              <form onSubmit={handleSubmit}>
-                <IonList>
-                  <IonItem>
-                    <IonLabel position="floating">
+            <div
+              style={{
+                background: "#ffffff",
+                padding: "16px",
+                borderRadius: "0 0 10px 10px",
+                marginBottom: "16px",
+                boxShadow: "0 4px 12px rgba(0, 47, 167, 0.12)",
+              }}
+            >
+              <div className="content-type-tabs" style={{ overflow: "auto" }}>
+                <IonSegment
+                  value={contentType}
+                  onIonChange={handleContentTypeChange}
+                  style={{
+                    "--background": "#f0f4ff",
+                    "--color": "#002fa7",
+                    "--color-checked": "#ffffff",
+                    "--background-checked": "#002fa7",
+                    width: "100%", // Use full width instead of fixed width
+                  }}
+                  scrollable={true}
+                >
+                  <IonSegmentButton value="news" layout="icon-start" style={{ minWidth: "120px" }}>
+                    <IonIcon icon={newspaperOutline} />
+                    <IonLabel>News</IonLabel>
+                  </IonSegmentButton>
+                  <IonSegmentButton value="announcement" layout="icon-start" style={{ minWidth: "180px" }}>
+                    <IonIcon icon={megaphone} />
+                    <IonLabel>Announcement</IonLabel>
+                  </IonSegmentButton>
+                </IonSegment>
+              </div>
+
+              <form onSubmit={handleSubmit} className="news-form">
+                <IonList style={{ background: "transparent" }}>
+                  <IonItem style={{ "--background": "#f8faff" }}>
+                    <IonLabel position="floating" style={{ color: "#002fa7" }}>
                       {contentType === "news"
                         ? "News Title"
                         : "Announcement Title"}
@@ -536,11 +574,14 @@ const NewsContainer: React.FC = () => {
                         })
                       }
                       required
+                      style={{ "--color": "#333333" }}
                     />
                   </IonItem>
 
-                  <IonItem>
-                    <IonLabel position="floating">
+                  <IonItem
+                    style={{ "--background": "#f8faff", marginTop: "8px" }}
+                  >
+                    <IonLabel position="floating" style={{ color: "#002fa7" }}>
                       {contentType === "news"
                         ? "News Details"
                         : "Announcement Message"}
@@ -555,39 +596,66 @@ const NewsContainer: React.FC = () => {
                       }
                       rows={6}
                       required
+                      style={{ "--color": "#333333" }}
                     />
                   </IonItem>
 
-                  <IonItem>
-                    <IonLabel position="stacked">Upload Image</IonLabel>
+                  <IonItem
+                    style={{ "--background": "#f8faff", marginTop: "8px" }}
+                  >
+                    <IonLabel position="stacked" style={{ color: "#002fa7" }}>
+                      Upload Image
+                    </IonLabel>
                     <input
                       type="file"
                       accept="image/*"
                       onChange={handleImageChange}
+                      style={{ marginTop: "8px" }}
                     />
                   </IonItem>
 
                   {previewUrl && (
-                    <IonItem>
-                      <IonImg
-                        src={previewUrl}
-                        alt="Preview"
-                        style={{ maxHeight: "200px" }}
-                      />
+                    <IonItem style={{ "--background": "transparent" }}>
+                      <div
+                        style={{
+                          width: "100%",
+                          height: "200px",
+                          overflow: "hidden",
+                          borderRadius: "8px",
+                          border: "2px solid #f0f4ff",
+                          margin: "10px 0",
+                          boxShadow: "0 2px 6px rgba(0, 47, 167, 0.1)",
+                        }}
+                      >
+                        <IonImg
+                          src={previewUrl}
+                          alt="Preview"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </div>
                     </IonItem>
                   )}
 
                   {/* Only show recipient selection for announcements */}
                   {contentType === "announcement" && (
                     <>
-                      <IonItem>
-                        <IonLabel>Target Recipients</IonLabel>
+                      <IonItem
+                        style={{ "--background": "#f8faff", marginTop: "8px" }}
+                      >
+                        <IonLabel style={{ color: "#002fa7" }}>
+                          Target Recipients
+                        </IonLabel>
                         <IonSelect
                           value={targetAll ? "all" : "specific"}
                           onIonChange={(e) =>
                             setTargetAll(e.detail.value === "all")
                           }
                           interface="popover"
+                          style={{ "--color": "#333333" }}
                         >
                           <IonSelectOption value="all">
                             All Users
@@ -599,12 +667,17 @@ const NewsContainer: React.FC = () => {
                       </IonItem>
 
                       {!targetAll && (
-                        <IonItem>
+                        <IonItem style={{ "--background": "transparent" }}>
                           <IonButton
                             expand="block"
                             fill="outline"
                             onClick={toggleRecipientSelector}
                             className="recipient-button"
+                            style={{
+                              "--color": "#002fa7",
+                              "--border-color": "#002fa7",
+                              margin: "8px 0",
+                            }}
                           >
                             {showRecipientSelector
                               ? "Hide Recipient Selection"
@@ -614,16 +687,32 @@ const NewsContainer: React.FC = () => {
                       )}
 
                       {!targetAll && showRecipientSelector && (
-                        <div className="recipient-selector">
-                          <IonList className="recipient-list">
-                            <IonListHeader>
+                        <div
+                          className="recipient-selector"
+                          style={{
+                            border: "1px solid rgba(0, 47, 167, 0.2)",
+                            borderRadius: "8px",
+                            margin: "8px 0",
+                            background: "#f8faff",
+                          }}
+                        >
+                          <IonList
+                            className="recipient-list"
+                            style={{ background: "transparent" }}
+                          >
+                            <IonListHeader style={{ color: "#002fa7" }}>
                               <IonLabel>Select Recipients</IonLabel>
                             </IonListHeader>
 
                             {users.length > 0 ? (
                               users.map((user) => (
-                                <IonItem key={user.id}>
-                                  <IonLabel>{user.name}</IonLabel>
+                                <IonItem
+                                  key={user.id}
+                                  style={{ "--background": "transparent" }}
+                                >
+                                  <IonLabel style={{ color: "#333333" }}>
+                                    {user.name}
+                                  </IonLabel>
                                   <IonCheckbox
                                     slot="end"
                                     checked={selectedRecipients.includes(
@@ -632,12 +721,20 @@ const NewsContainer: React.FC = () => {
                                     onIonChange={() =>
                                       handleRecipientSelection(user.id)
                                     }
+                                    style={{
+                                      "--checkbox-background-checked":
+                                        "#002fa7",
+                                    }}
                                   />
                                 </IonItem>
                               ))
                             ) : (
-                              <IonItem>
-                                <IonLabel>Loading users...</IonLabel>
+                              <IonItem
+                                style={{ "--background": "transparent" }}
+                              >
+                                <IonLabel style={{ color: "#666" }}>
+                                  Loading users...
+                                </IonLabel>
                               </IonItem>
                             )}
                           </IonList>
@@ -646,12 +743,15 @@ const NewsContainer: React.FC = () => {
                     </>
                   )}
 
-                  <div className="form-buttons">
+                  <div className="form-buttons" style={{ marginTop: "16px" }}>
                     <IonButton
                       className="ion-margin-top"
                       expand="block"
                       type="submit"
-                      color={editMode ? "warning" : "primary"}
+                      style={{
+                        "--background": editMode ? "#002fa7" : "#002fa7",
+                        "--color": "white",
+                      }}
                     >
                       {editMode
                         ? `Update ${
@@ -667,7 +767,10 @@ const NewsContainer: React.FC = () => {
                         className="ion-margin-top"
                         expand="block"
                         type="button"
-                        color="medium"
+                        style={{
+                          "--background": "#f0f4ff",
+                          "--color": "#002fa7",
+                        }}
                         onClick={cancelEdit}
                       >
                         Cancel
@@ -676,126 +779,288 @@ const NewsContainer: React.FC = () => {
                   </div>
                 </IonList>
               </form>
-            </IonCardContent>
+            </div>
 
-            {/* Add this after the content creation form and before the news list */}
-            <div className="content-filter-container">
-              <h4 className="filter-heading">Filter Content</h4>
-              <IonSegment
-                value={contentFilter}
-                onIonChange={(e) => setContentFilter(e.detail.value as any)}
-                className="content-filter-tabs"
-              >
-                <IonSegmentButton value="all">
-                  <IonLabel>All</IonLabel>
-                </IonSegmentButton>
-                <IonSegmentButton value="news">
-                  <IonIcon icon={newspaperOutline} />
-                  <IonLabel>News</IonLabel>
-                </IonSegmentButton>
-                <IonSegmentButton value="announcement">
-                  <IonIcon icon={megaphone} />
-                  <IonLabel>Announcements</IonLabel>
-                </IonSegmentButton>
-              </IonSegment>
+            {/* Content filter container */}
+            <div
+              style={{
+                background: "#002fa7",
+                color: "white",
+                padding: "16px",
+                borderRadius: "10px 10px 0 0",
+                marginBottom: "0",
+                marginTop: "24px",
+                boxShadow: "0 4px 12px rgba(0, 47, 167, 0.12)",
+              }}
+            >
+              <h4 style={{ margin: "0", fontSize: "1.1rem" }}>
+                Filter Content
+              </h4>
+            </div>
+
+            <div
+              style={{
+              background: "#ffffff",
+              padding: "16px",
+              borderRadius: "0 0 10px 10px",
+              marginBottom: "16px",
+              boxShadow: "0 4px 12px rgba(0, 47, 167, 0.12)"
+              }}
+            >
+                <IonSegment
+                  value={contentFilter}
+                  onIonChange={(e) => setContentFilter(e.detail.value as any)}
+                  style={{
+                    "--background": "#f0f4ff",
+                    "--color": "#002fa7",
+                    "--color-checked": "#ffffff",
+                    "--background-checked": "#002fa7",
+                    width: "100%"
+                  }}
+                  scrollable={true}
+                >
+                  <IonSegmentButton value="all" layout="icon-start" style={{ minWidth: "100px" }}>
+                    <IonLabel>All</IonLabel>
+                  </IonSegmentButton>
+                  <IonSegmentButton value="news" layout="icon-start" style={{ minWidth: "120px" }}>
+                    <IonIcon icon={newspaperOutline} />
+                    <IonLabel>News</IonLabel>
+                  </IonSegmentButton>
+                  <IonSegmentButton value="announcement" layout="icon-start" style={{ minWidth: "200px" }}>
+                    <IonIcon icon={megaphone} />
+                    <IonLabel>Announcements</IonLabel>
+                  </IonSegmentButton>
+                </IonSegment>
             </div>
 
             <div className="news-list">
               {getFilteredContent().length > 0 ? (
                 getFilteredContent().map((item, index) => (
-                  <IonCard
+                  <div
                     key={index}
-                    className={`news-card ${
-                      item.contentType === "announcement"
-                        ? "announcement-card"
-                        : ""
-                    }`}
+                    style={{
+                      marginBottom: "16px",
+                      borderRadius: "10px",
+                      overflow: "hidden",
+                      boxShadow: "0 4px 12px rgba(0, 47, 167, 0.12)",
+                      background: "#ffffff",
+                    }}
                   >
-                    <IonCardHeader>
-                      <div className="card-header-content">
+                    <div
+                      style={{
+                        background:
+                          item.contentType === "announcement"
+                            ? "#002fa7"
+                            : "#002fa7",
+                        padding: "12px 16px",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          color: "white",
+                        }}
+                      >
                         {item.contentType === "announcement" ? (
                           <IonIcon
                             icon={megaphone}
-                            className="content-type-icon announcement-icon"
+                            style={{
+                              fontSize: "1.4rem",
+                              marginRight: "10px",
+                              color: "#9be368",
+                            }}
                           />
                         ) : (
                           <IonIcon
                             icon={newspaperOutline}
-                            className="content-type-icon news-icon"
+                            style={{
+                              fontSize: "1.4rem",
+                              marginRight: "10px",
+                              color: "#9be368",
+                            }}
                           />
                         )}
-                        <IonCardTitle>{item.title || "Untitled"}</IonCardTitle>
+                        <h2
+                          style={{
+                            margin: "0",
+                            color: "white",
+                            fontSize: "1.1rem",
+                          }}
+                        >
+                          {item.title || "Untitled"}
+                        </h2>
                       </div>
-                      <IonCardSubtitle className="content-type-label">
+                      <div
+                        style={{
+                          background: "#9be368",
+                          padding: "4px 8px",
+                          borderRadius: "12px",
+                          fontSize: "0.8rem",
+                          fontWeight: "bold",
+                          color: "#002fa7",
+                        }}
+                      >
                         {item.contentType === "announcement"
                           ? "Announcement"
                           : "News"}
-                      </IonCardSubtitle>
-                    </IonCardHeader>
-                    <IonCardContent>
-                      <p>{item.description || "No description available"}</p>
+                      </div>
+                    </div>
+
+                    <div style={{ padding: "16px" }}>
+                      <p style={{ color: "#333333", margin: "0 0 16px 0" }}>
+                        {item.description || "No description available"}
+                      </p>
+
                       {item.image && (
-                        <IonImg
-                          src={item.image}
-                          alt="Content Image"
-                          onIonError={(e) => {
-                            const target = e.target as HTMLIonImgElement;
-                            target.style.display = "none";
+                        <div
+                          style={{
+                            width: "100%",
+                            height: "200px",
+                            marginTop: "12px",
+                            marginBottom: "16px",
+                            borderRadius: "8px",
+                            overflow: "hidden",
+                            border: "2px solid #f0f4ff",
+                            boxShadow: "0 2px 6px rgba(0, 47, 167, 0.1)",
                           }}
-                        />
+                        >
+                          <IonImg
+                            src={item.image}
+                            alt="Content Image"
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
+                            onIonError={(e) => {
+                              const target = e.target as HTMLIonImgElement;
+                              target.style.display = "none";
+                            }}
+                          />
+                        </div>
                       )}
-                      <div className="news-timestamp">
-                        <IonIcon icon={timeOutline} />
-                        <small>
+
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          color: "#666",
+                          fontSize: "0.85rem",
+                          marginBottom: "12px",
+                        }}
+                      >
+                        <IonIcon
+                          icon={timeOutline}
+                          style={{ marginRight: "4px", fontSize: "1rem" }}
+                        />
+                        <span>
                           {item.created_at
                             ? new Date(item.created_at).toLocaleString()
                             : "Date not available"}
-                        </small>
+                        </span>
                       </div>
 
-                      {/* Inside your news card, after the timestamp section */}
+                      {/* Recipients section for announcements */}
                       {item.contentType === "announcement" && (
-                        <div className="recipients-container">
-                          <div className="recipients-header">
+                        <div
+                          style={{
+                            background: "#f0f4ff",
+                            borderRadius: "8px",
+                            padding: "12px",
+                            marginTop: "12px",
+                            marginBottom: "12px",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              marginBottom: "8px",
+                              color: "#002fa7",
+                            }}
+                          >
                             <IonIcon
                               icon={people}
-                              className="recipients-icon"
+                              style={{ marginRight: "8px", fontSize: "1.1rem" }}
                             />
-                            <span className="recipients-title">Recipients</span>
+                            <span style={{ fontWeight: "500" }}>
+                              Recipients
+                            </span>
                           </div>
 
                           {item.target_all ? (
-                            <div className="target-all-badge">
+                            <div
+                              style={{
+                                background: "#9be368",
+                                color: "#002fa7",
+                                padding: "4px 12px",
+                                borderRadius: "16px",
+                                display: "inline-block",
+                                fontWeight: "500",
+                                fontSize: "0.9rem",
+                              }}
+                            >
                               <span>
                                 Users ({item.recipient_count || "All"})
                               </span>
                             </div>
                           ) : (
-                            <div className="recipients-list">
+                            <div>
                               {Array.isArray(item.recipient_preview) &&
                               item.recipient_preview.length > 0 ? (
                                 <>
-                                  <div className="recipient-count">
+                                  <div
+                                    style={{
+                                      marginBottom: "8px",
+                                      color: "#002fa7",
+                                      fontSize: "0.9rem",
+                                    }}
+                                  >
                                     Sent to {item.recipient_count}{" "}
                                     {item.recipient_count === 1
                                       ? "person"
                                       : "people"}
                                   </div>
-                                  <div className="recipient-chips">
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      flexWrap: "wrap",
+                                      gap: "6px",
+                                    }}
+                                  >
                                     {item.recipient_preview.map((name, idx) => {
                                       // Ensure name is a string before calling includes
-                                      const nameStr = typeof name === 'string' ? name : String(name || '');
+                                      const nameStr =
+                                        typeof name === "string"
+                                          ? name
+                                          : String(name || "");
                                       return !nameStr.includes("...and") ? (
                                         <div
                                           key={idx}
-                                          className="recipient-chip"
+                                          style={{
+                                            background: "#e6efff",
+                                            color: "#002fa7",
+                                            padding: "4px 10px",
+                                            borderRadius: "16px",
+                                            fontSize: "0.85rem",
+                                          }}
                                         >
                                           {nameStr}
                                         </div>
                                       ) : (
                                         <div
                                           key={idx}
-                                          className="recipient-more"
+                                          style={{
+                                            background: "#002fa7",
+                                            color: "white",
+                                            padding: "4px 10px",
+                                            borderRadius: "16px",
+                                            fontSize: "0.85rem",
+                                          }}
                                         >
                                           {nameStr}
                                         </div>
@@ -804,7 +1069,13 @@ const NewsContainer: React.FC = () => {
                                   </div>
                                 </>
                               ) : (
-                                <div className="no-recipients">
+                                <div
+                                  style={{
+                                    color: "#666",
+                                    fontStyle: "italic",
+                                    fontSize: "0.9rem",
+                                  }}
+                                >
                                   No specific recipients
                                 </div>
                               )}
@@ -813,10 +1084,18 @@ const NewsContainer: React.FC = () => {
                         </div>
                       )}
 
-                      <div className="news-actions">
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "flex-end",
+                          borderTop: "1px solid #f0f4ff",
+                          marginTop: "12px",
+                          paddingTop: "12px",
+                        }}
+                      >
                         <IonButton
                           fill="clear"
-                          color="primary"
+                          style={{ "--color": "#002fa7" }}
                           onClick={() => handleEdit(item)}
                         >
                           <IonIcon slot="icon-only" icon={pencil} />
@@ -829,11 +1108,20 @@ const NewsContainer: React.FC = () => {
                           <IonIcon slot="icon-only" icon={trash} />
                         </IonButton>
                       </div>
-                    </IonCardContent>
-                  </IonCard>
+                    </div>
+                  </div>
                 ))
               ) : (
-                <div className="no-content-message">
+                <div
+                  style={{
+                    textAlign: "center",
+                    padding: "24px",
+                    background: "#f0f4ff",
+                    borderRadius: "8px",
+                    color: "#666",
+                    border: "1px dashed #002fa7",
+                  }}
+                >
                   <p>
                     {contentFilter === "all"
                       ? "No news or announcements found. Create some using the form above."
@@ -846,7 +1134,10 @@ const NewsContainer: React.FC = () => {
                   <IonButton
                     size="small"
                     onClick={fetchAllContent}
-                    className="refresh-button"
+                    style={{
+                      "--background": "#9be368",
+                      "--color": "#002fa7",
+                    }}
                   >
                     Refresh
                   </IonButton>
@@ -862,6 +1153,10 @@ const NewsContainer: React.FC = () => {
         onDidDismiss={() => setShowToast(false)}
         message={toastMessage}
         duration={2000}
+        style={{
+          "--background": "#002fa7",
+          "--color": "white",
+        }}
       />
 
       <IonAlert
@@ -886,6 +1181,10 @@ const NewsContainer: React.FC = () => {
             handler: deleteNews,
           },
         ]}
+        style={{
+          "--background": "#ffffff",
+          "--color": "#333333",
+        }}
       />
     </IonContent>
   );

@@ -24,6 +24,9 @@ import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { Chart as ChartJS, ArcElement } from "chart.js";
 
+// Import the CSS file
+import "./StatisticsContainer.css";
+
 ChartJS.register(ChartDataLabels);
 
 interface ContainerProps {
@@ -208,6 +211,38 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
     });
   };
 
+  // Define chart colors
+  const chartColors = {
+    primary: "#002fa7",
+    primaryLight: "rgba(0, 47, 167, 0.2)",
+    accent: "#9be368",
+    accentLight: "rgba(155, 227, 104, 0.2)",
+
+    statusColors: [
+      "rgba(255, 206, 86, 0.6)", // New - yellow
+      "rgba(0, 47, 167, 0.6)", // Under review - blue (primary)
+      "rgba(153, 102, 255, 0.6)", // In progress - purple
+      "rgba(155, 227, 104, 0.6)", // Resolved - green (accent)
+      "rgba(201, 203, 207, 0.6)", // Closed - grey
+      "rgba(255, 99, 132, 0.6)", // Rejected - red
+    ],
+
+    typeColors: {
+      "Noise Complaint": "rgba(255, 99, 132, 0.6)",
+      "Property Dispute": "rgba(0, 47, 167, 0.6)", // primary blue
+      "Public Disturbance": "rgba(255, 206, 86, 0.6)",
+      "Utility Issue": "rgba(155, 227, 104, 0.6)", // accent green
+      "Environmental Concern": "rgba(153, 102, 255, 0.6)",
+      Vandalism: "rgba(255, 159, 64, 0.6)",
+      "Illegal Construction": "rgba(201, 203, 207, 0.6)",
+      "Parking Violation": "rgba(255, 99, 71, 0.6)",
+      "Animal Complaint": "rgba(46, 204, 113, 0.6)",
+      Others: "rgba(0, 47, 167, 0.4)", // lighter primary
+      Unknown: "rgba(100, 100, 100, 0.6)",
+      default: "rgba(0, 47, 167, 0.6)",
+    },
+  };
+
   useEffect(() => {
     if (!stats || loading) return;
 
@@ -268,8 +303,8 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
                   ? "Complaints per Day"
                   : "Complaints per Month",
                 data: dataPoints,
-                borderColor: "rgb(75, 192, 192)",
-                backgroundColor: "rgba(75, 192, 192, 0.2)",
+                borderColor: chartColors.primary,
+                backgroundColor: chartColors.primaryLight,
                 tension: 0.3,
                 fill: true,
               },
@@ -280,10 +315,21 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
             plugins: {
               legend: {
                 position: "top",
+                labels: {
+                  color: chartColors.primary,
+                  font: {
+                    weight: "bold",
+                  },
+                },
               },
               title: {
                 display: true,
                 text: chartTitle,
+                color: chartColors.primary,
+                font: {
+                  weight: "bold",
+                  size: 16,
+                },
               },
             },
           },
@@ -291,7 +337,7 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
       }
     }
 
-    // User chart - similar changes
+    // User chart - using accent colors
     if (usersChartRef.current) {
       const ctx = usersChartRef.current.getContext("2d");
       if (ctx) {
@@ -343,8 +389,8 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
                   ? "User Registrations per Day"
                   : "User Registrations per Month",
                 data: dataPoints,
-                borderColor: "rgb(153, 102, 255)",
-                backgroundColor: "rgba(153, 102, 255, 0.2)",
+                borderColor: chartColors.accent,
+                backgroundColor: chartColors.accentLight,
                 tension: 0.3,
                 fill: true,
               },
@@ -355,10 +401,21 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
             plugins: {
               legend: {
                 position: "top",
+                labels: {
+                  color: chartColors.primary,
+                  font: {
+                    weight: "bold",
+                  },
+                },
               },
               title: {
                 display: true,
                 text: chartTitle,
+                color: chartColors.primary,
+                font: {
+                  weight: "bold",
+                  size: 16,
+                },
               },
             },
           },
@@ -384,14 +441,7 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
               {
                 label: "Complaints by Status",
                 data: stats.complaints.byStatus.map((item) => item.count),
-                backgroundColor: [
-                  "rgba(255, 206, 86, 0.6)", // New - yellow
-                  "rgba(54, 162, 235, 0.6)", // Under review - blue
-                  "rgba(153, 102, 255, 0.6)", // In progress - purple
-                  "rgba(75, 192, 192, 0.6)", // Resolved - green
-                  "rgba(201, 203, 207, 0.6)", // Closed - grey
-                  "rgba(255, 99, 132, 0.6)", // Rejected - red
-                ],
+                backgroundColor: chartColors.statusColors,
               },
             ],
           },
@@ -400,10 +450,21 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
             plugins: {
               legend: {
                 position: "top",
+                labels: {
+                  color: chartColors.primary,
+                  font: {
+                    weight: "bold",
+                  },
+                },
               },
               title: {
                 display: true,
                 text: "Complaints by Status",
+                color: chartColors.primary,
+                font: {
+                  weight: "bold",
+                  size: 16,
+                },
               },
               tooltip: {
                 callbacks: {
@@ -439,21 +500,8 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
       const ctx = complaintsTypeChartRef.current.getContext("2d");
       if (ctx) {
         // Define consistent colors for complaint types
-        const complaintTypeColors: { [key: string]: string } = {
-          "Noise Complaint": "rgba(255, 99, 132, 0.6)",
-          "Property Dispute": "rgba(54, 162, 235, 0.6)",
-          "Public Disturbance": "rgba(255, 206, 86, 0.6)",
-          "Utility Issue": "rgba(75, 192, 192, 0.6)",
-          "Environmental Concern": "rgba(153, 102, 255, 0.6)",
-          Vandalism: "rgba(255, 159, 64, 0.6)",
-          "Illegal Construction": "rgba(201, 203, 207, 0.6)",
-          "Parking Violation": "rgba(255, 99, 71, 0.6)",
-          "Animal Complaint": "rgba(46, 204, 113, 0.6)",
-          Others: "rgba(142, 68, 173, 0.6)",
-          Unknown: "rgba(100, 100, 100, 0.6)",
-          // Default color for any other types or custom entries
-          default: "rgba(153, 102, 255, 0.6)",
-        };
+        const complaintTypeColors: { [key: string]: string } =
+          chartColors.typeColors;
 
         // Sort data by count (descending) for better visualization
         const sortedData = [...stats.complaints.byType].sort(
@@ -564,10 +612,21 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
             plugins: {
               legend: {
                 position: "top",
+                labels: {
+                  color: chartColors.primary,
+                  font: {
+                    weight: "bold",
+                  },
+                },
               },
               title: {
                 display: true,
                 text: "Users by Role",
+                color: chartColors.primary,
+                font: {
+                  weight: "bold",
+                  size: 16,
+                },
               },
               tooltip: {
                 callbacks: {
@@ -601,61 +660,71 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
 
   return (
     <>
-      <IonCardHeader>
-        <IonCardTitle>{name}</IonCardTitle>
+      <IonCardHeader className="stats-card-header">
+        <IonCardTitle className="stats-title">{name}</IonCardTitle>
       </IonCardHeader>
-      <IonCardContent>
+      <IonCardContent className="stats-card-content">
         {/* Date filtering controls */}
-        <IonGrid>
-          <IonRow>
-            <IonCol size="12" sizeMd="4">
-              <IonItem>
-                <IonLabel>Year</IonLabel>
-                <IonSelect
-                  value={filter.year}
-                  onIonChange={(e) => handleYearChange(e.detail.value)}
-                  interface="popover"
+        <div className="filter-container">
+          <IonGrid>
+            <IonRow>
+              <IonCol size="12" sizeMd="4">
+                <IonItem className="filter-item">
+                  <IonLabel className="filter-label">Year</IonLabel>
+                  <IonSelect
+                    value={filter.year}
+                    onIonChange={(e) => handleYearChange(e.detail.value)}
+                    interface="popover"
+                    className="filter-select"
+                  >
+                    {availableYears.map((year) => (
+                      <IonSelectOption key={year} value={year}>
+                        {year}
+                      </IonSelectOption>
+                    ))}
+                  </IonSelect>
+                </IonItem>
+              </IonCol>
+              <IonCol size="12" sizeMd="4">
+                <IonItem className="filter-item">
+                  <IonLabel className="filter-label">Month</IonLabel>
+                  <IonSelect
+                    value={filter.month}
+                    onIonChange={(e) => handleMonthChange(e.detail.value)}
+                    interface="popover"
+                    className="filter-select"
+                  >
+                    <IonSelectOption value={null}>All Months</IonSelectOption>
+                    {monthNames.map((month, index) => (
+                      <IonSelectOption key={month} value={month}>
+                        {month}
+                      </IonSelectOption>
+                    ))}
+                  </IonSelect>
+                </IonItem>
+              </IonCol>
+              <IonCol
+                size="12"
+                sizeMd="4"
+                className="ion-text-end ion-padding-top"
+              >
+                <IonButton
+                  fill="outline"
+                  className="stats-outline-button"
+                  onClick={handleResetFilters}
                 >
-                  {availableYears.map((year) => (
-                    <IonSelectOption key={year} value={year}>
-                      {year}
-                    </IonSelectOption>
-                  ))}
-                </IonSelect>
-              </IonItem>
-            </IonCol>
-            <IonCol size="12" sizeMd="4">
-              <IonItem>
-                <IonLabel>Month</IonLabel>
-                <IonSelect
-                  value={filter.month}
-                  onIonChange={(e) => handleMonthChange(e.detail.value)}
-                  interface="popover"
-                >
-                  <IonSelectOption value={null}>All Months</IonSelectOption>
-                  {monthNames.map((month, index) => (
-                    <IonSelectOption key={month} value={month}>
-                      {month}
-                    </IonSelectOption>
-                  ))}
-                </IonSelect>
-              </IonItem>
-            </IonCol>
-            <IonCol
-              size="12"
-              sizeMd="4"
-              className="ion-text-end ion-padding-top"
-            >
-              <IonButton fill="outline" onClick={handleResetFilters}>
-                Reset Filters
-              </IonButton>
-            </IonCol>
-          </IonRow>
-        </IonGrid>
+                  Reset Filters
+                </IonButton>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
+        </div>
 
         <IonSegment
           value={activeTab}
           onIonChange={(e) => setActiveTab(e.detail.value as string)}
+          className="stats-segment"
+          scrollable={true}
         >
           <IonSegmentButton value="complaints">
             <IonLabel>Complaints</IonLabel>
@@ -666,9 +735,9 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
         </IonSegment>
 
         {loading ? (
-          <div className="ion-text-center ion-padding">
-            <IonSpinner name="circular" />
-            <p>Loading statistics...</p>
+          <div className="loading-container">
+            <IonSpinner name="circular" className="loading-spinner" />
+            <p className="loading-text">Loading statistics...</p>
           </div>
         ) : (
           <>
@@ -676,9 +745,12 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
               <IonGrid>
                 <IonRow>
                   <IonCol size="12">
-                    <div className="stats-header ion-text-center">
+                    <div className="stats-header">
                       <h2>
-                        Total Complaints: {stats.complaints.total}
+                        Total Complaints:{" "}
+                        <span className="stats-total-value">
+                          {stats.complaints.total}
+                        </span>
                         {filter.month && (
                           <span className="filter-info">
                             {" "}
@@ -721,9 +793,12 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
               <IonGrid>
                 <IonRow>
                   <IonCol size="12">
-                    <div className="stats-header ion-text-center">
+                    <div className="stats-header">
                       <h2>
-                        Total Users: {stats.users.total}
+                        Total Users:{" "}
+                        <span className="stats-total-value">
+                          {stats.users.total}
+                        </span>
                         {filter.month && (
                           <span className="filter-info">
                             {" "}

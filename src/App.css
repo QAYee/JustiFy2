@@ -1,0 +1,330 @@
+/* App-wide styles */
+
+/* Card styling */
+ion-card {
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 47, 167, 0.1);
+  overflow: hidden;
+}
+
+ion-card-header {
+  background-color: #002fa7;
+  color: white;
+}
+
+ion-card-title {
+  color: white;
+}
+
+/* Button styling */
+ion-button {
+  --border-radius: 8px;
+}
+
+ion-button.primary {
+  --background: #002fa7;
+  --color: white;
+}
+
+ion-button.secondary {
+  --background: #9be368;
+  --color: #002fa7;
+}
+
+/* Item styling */
+ion-item {
+  --border-color: rgba(0, 47, 167, 0.1);
+}
+
+/* Custom header for pages */
+.page-header {
+  background-color: #002fa7;
+  color: white;
+  padding: 16px;
+  border-radius: 0 0 16px 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 8px rgba(0, 47, 167, 0.2);
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Forms */
+ion-input, ion-textarea, ion-select {
+  --background: #f8faff;
+  --color: #333;
+  --placeholder-color: #666;
+  --padding-start: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 4px rgba(0, 47, 167, 0.05);
+}
+
+ion-input:focus, ion-textarea:focus, ion-select:focus {
+  --background: #fff;
+  box-shadow: 0 0 0 2px rgba(0, 47, 167, 0.2);
+}
+
+/* Segment controls */
+ion-segment {
+  background-color: #f0f4ff;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+ion-segment-button {
+  --color: #002fa7;
+  --color-checked: white;
+  --background-checked: #002fa7;
+  min-height: 36px;
+  --border-radius: 6px;
+  font-weight: 500;
+}
+
+/* Toast styling */
+ion-toast {
+  --background: #002fa7;
+  --color: white;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 16px rgba(0, 47, 167, 0.15);
+}
+
+/* Centered title */
+.centered-title {
+  text-align: center;
+  padding-left: 48px; /* Offset for the buttons on the right */
+}
+
+/* Badges */
+ion-badge {
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+/* Lists */
+ion-list {
+  background: transparent;
+}
+
+/* Content */
+ion-content {
+  --background: #f0f4ff;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+}
+
+/* Refresher */
+ion-refresher {
+  --ion-color-primary: #002fa7;
+}
+
+/* Toolbar */
+ion-toolbar {
+  --background: #002fa7;
+  --color: white;
+}
+
+/* FAB button */
+ion-fab-button {
+  --background: #9be368;
+  --color: #002fa7;
+  --box-shadow: 0 4px 16px rgba(0, 47, 167, 0.25);
+}
+
+/* Login and Register pages */
+.auth-page {
+  --background: #f0f4ff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+}
+
+.auth-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.auth-logo img {
+  max-width: 120px;
+  height: auto;
+}
+
+.auth-card {
+  box-shadow: 0 8px 20px rgba(0, 47, 167, 0.15);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.auth-card ion-card-header {
+  text-align: center;
+  padding-top: 24px;
+  padding-bottom: 24px;
+}
+
+.auth-card ion-card-content {
+  padding: 24px;
+}
+
+/* Dashboard styling */
+.dashboard-header {
+  background: #002fa7;
+  color: white;
+  padding: 24px 16px;
+  border-radius: 0 0 24px 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 16px rgba(0, 47, 167, 0.2);
+}
+
+.dashboard-greeting {
+  font-size: 1.5rem;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+}
+
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 47, 167, 0.1);
+  text-align: center;
+}
+
+.stat-card .number {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #002fa7;
+  margin: 8px 0;
+}
+
+.stat-card .label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Activity list */
+.activity-card {
+  margin-bottom: 16px;
+}
+
+.activity-card ion-card-header {
+  padding-bottom: 8px;
+}
+
+.activity-item {
+  --background: transparent;
+  --background-hover: rgba(0, 47, 167, 0.05);
+  --border-color: rgba(0, 47, 167, 0.1);
+}
+
+.activity-item ion-icon {
+  color: #002fa7;
+}
+
+/* Chat/message styling */
+.message-container {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.message-bubble {
+  padding: 12px 16px;
+  border-radius: 18px;
+  max-width: 80%;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.message-sent {
+  background-color: #002fa7;
+  color: white;
+  margin-left: auto;
+  border-bottom-right-radius: 4px;
+}
+
+.message-received {
+  background-color: white;
+  color: #333;
+  margin-right: auto;
+  border-bottom-left-radius: 4px;
+}
+
+.message-time {
+  font-size: 0.7rem;
+  opacity: 0.7;
+  margin-top: 4px;
+  text-align: right;
+}
+
+/* News card styling */
+.news-card {
+  margin-bottom: 16px;
+}
+
+.news-card ion-img {
+  height: 180px;
+  object-fit: cover;
+}
+
+.news-card ion-card-header {
+  padding: 12px 16px;
+}
+
+.news-card ion-card-content {
+  padding: 0 16px 16px;
+}
+
+.news-date {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+/* Empty state styling */
+.empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  margin: 16px 0;
+  background-color: #f0f4ff;
+  border-radius: 12px;
+  border: 1px dashed #002fa7;
+}
+
+.empty-state ion-icon {
+  font-size: 48px;
+  color: #002fa7;
+  opacity: 0.5;
+  margin-bottom: 16px;
+}
+
+.empty-state h4 {
+  font-size: 1.2rem;
+  color: #002fa7;
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  color: #666;
+  max-width: 300px;
+  margin: 0 auto;
+}

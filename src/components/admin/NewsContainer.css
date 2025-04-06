@@ -1,7 +1,8 @@
 .form-card {
   margin-bottom: 2rem;
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 47, 167, 0.15);
+  border: 1px solid rgba(0, 47, 167, 0.1);
 }
 
 .custom-input,
@@ -11,12 +12,17 @@
   --padding-top: 16px;
   --padding-bottom: 16px;
   margin-top: 8px;
+  --background: #f8faff;
+  --color: #333333;
+  --placeholder-color: #666666;
 }
 
 .submit-button {
   margin: 24px 0 8px;
   --border-radius: 8px;
   font-weight: 600;
+  --background: #002fa7;
+  --color: white;
 }
 
 .news-list {
@@ -26,24 +32,30 @@
 .news-card {
   margin-bottom: 1rem;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 47, 167, 0.1);
   transition: transform 0.2s ease;
-  border-left: 3px solid var(--ion-color-primary);
+  border-left: 3px solid #002fa7;
+  background-color: white;
 }
 
 .news-card:hover {
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 47, 167, 0.2);
 }
 
 .news-title {
   font-size: 1.2rem;
   font-weight: 600;
-  color: var(--ion-color-light);
+  color: white;
+  background: #002fa7;
+  padding: 12px 16px;
+  border-radius: 8px 8px 0 0;
+  margin: 0;
 }
 
 .news-description {
   margin: 1rem 0;
-  color: var(--ion-color-light);
+  color: #333333;
   line-height: 1.5;
 }
 
@@ -51,20 +63,25 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: var(--ion-color-light);
+  color: #666666;
   font-size: 0.85rem;
 }
 
 .news-timestamp ion-icon {
   font-size: 16px;
+  color: #002fa7;
 }
 
 .news-actions {
   display: flex;
   justify-content: flex-end;
   margin-top: 10px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid rgba(0, 47, 167, 0.1);
   padding-top: 10px;
+}
+
+.news-actions ion-button {
+  --color: #002fa7;
 }
 
 .form-buttons {
@@ -75,8 +92,23 @@
   padding: 10px 0;
 }
 
+.form-buttons ion-button[type="submit"] {
+  --background: #002fa7;
+  --color: white;
+}
+
+.cancel-button {
+  --background: #f0f4ff;
+  --color: #002fa7;
+}
+
 .delete-alert .delete-button {
-  color: var(--ion-color-danger);
+  color: white;
+  background-color: #ff3b30;
+}
+
+.delete-alert .cancel-button {
+  color: #002fa7;
 }
 
 @media (max-width: 768px) {
@@ -93,23 +125,25 @@
   --width: 90%;
   --max-width: 500px;
   --border-radius: 10px;
+  --background: #f0f4ff;
 }
 
 /* Make sure inputs are visible */
 .update-modal ion-item {
   --background: white;
   margin-bottom: 8px;
+  --border-color: rgba(0, 47, 167, 0.1);
 }
 
 .update-modal ion-label {
-  --color: var(--ion-color-dark);
+  --color: #002fa7;
   font-weight: 500;
 }
 
 .update-modal ion-input,
 .update-modal ion-textarea {
-  --color: black;
-  --placeholder-color: #999;
+  --color: #333333;
+  --placeholder-color: #666666;
 }
 
 .file-input {
@@ -119,14 +153,19 @@
 
 .preview-container {
   width: 100%;
+  height: 200px;
   padding: 10px 0;
+  overflow: hidden;
+  border-radius: 8px;
 }
 
 .preview-image {
-  max-height: 200px;
-  object-fit: contain;
-  border: 1px solid #eee;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 2px solid #f0f4ff;
   border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 47, 167, 0.1);
 }
 
 @media (min-width: 768px) {
@@ -140,33 +179,37 @@
 }
 
 .content-filter ion-segment {
-  background: var(--ion-color-light-shade);
+  background: #f0f4ff;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 47, 167, 0.1);
 }
 
 .content-filter ion-segment-button {
-  --color: var(--ion-color-medium);
-  --color-checked: var(--ion-color-primary);
+  --color: #002fa7;
+  --color-checked: white;
+  --background-checked: #002fa7;
   min-height: 40px;
 }
 
 .no-content-message {
-  background: #f8f8f8;
+  background: #f0f4ff;
   padding: 25px;
   border-radius: 8px;
   text-align: center;
   margin: 20px 0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 6px rgba(0, 47, 167, 0.1);
+  border: 1px dashed #002fa7;
 }
 
 .no-content-message p {
   margin-bottom: 15px;
-  color: #555;
+  color: #002fa7;
 }
 
 .refresh-button {
   margin-top: 10px;
+  --background: #9be368;
+  --color: #002fa7;
 }
 
 .content-filter-container {
@@ -174,57 +217,60 @@
   padding: 15px;
   border-radius: 8px;
   margin: 20px 0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 6px rgba(0, 47, 167, 0.1);
 }
 
 .filter-heading {
   font-size: 1rem;
-  color: var(--ion-color-medium);
+  color: #002fa7;
   margin: 0 0 10px 0;
   font-weight: 500;
 }
 
 .content-filter-tabs {
-  background: var(--ion-color-light-shade);
+  background: #f0f4ff;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 47, 167, 0.1);
 }
 
 .content-filter-tabs ion-segment-button {
-  --color: var(--ion-color-medium);
-  --color-checked: var(--ion-color-primary);
+  --color: #002fa7;
+  --color-checked: white;
+  --background-checked: #002fa7;
   min-height: 40px;
 }
 
 /* Make announcement items more distinctly styled */
 .announcement-card {
-  border-left: 3px solid var(--ion-color-warning);
+  border-left: 3px solid #9be368;
 }
 
 .announcement-icon {
-  color: var(--ion-color-warning);
+  color: #9be368;
 }
 
 .news-icon {
-  color: var(--ion-color-primary);
+  color: #002fa7;
 }
 
 .recipient-selector {
   margin: 10px 0;
-  border: 1px solid #e0e0e0;
+  border: 1px solid rgba(0, 47, 167, 0.1);
   border-radius: 8px;
   max-height: 200px;
   overflow-y: auto;
-  background: white;
+  background: #f8faff;
 }
 
 .recipient-list {
-  background: white;
+  background: transparent;
 }
 
 .recipient-button {
   margin: 10px 0;
   width: 100%;
+  --color: #002fa7;
+  --border-color: #002fa7;
 }
 
 .recipients-info {
@@ -232,39 +278,40 @@
   align-items: center;
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px dashed #e0e0e0;
-  color: var(--ion-color-medium);
+  border-top: 1px dashed rgba(0, 47, 167, 0.2);
+  color: #002fa7;
 }
 
 .recipients-icon {
   margin-right: 6px;
   font-size: 16px;
-  color: var(--ion-color-secondary);
+  color: #9be368;
 }
 
 .recipient-names {
   font-size: 0.85rem;
   margin-top: 4px;
   font-style: italic;
+  color: #666666;
 }
 
 .recipients-container {
   margin-top: 16px;
   padding: 12px;
-  background-color: #f8f9fa;
+  background-color: #f0f4ff;
   border-radius: 8px;
-  border-left: 3px solid var(--ion-color-warning);
+  border-left: 3px solid #9be368;
 }
 
 .recipients-header {
   display: flex;
   align-items: center;
   margin-bottom: 8px;
-  color: var(--ion-color-dark);
+  color: #002fa7;
 }
 
 .recipients-icon {
-  color: var(--ion-color-warning);
+  color: #9be368;
   font-size: 18px;
   margin-right: 8px;
 }
@@ -274,11 +321,12 @@
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  color: #002fa7;
 }
 
 .target-all-badge {
-  background-color: var(--ion-color-warning-tint);
-  color: var(--ion-color-warning-shade);
+  background-color: #9be368;
+  color: #002fa7;
   padding: 4px 12px;
   border-radius: 16px;
   display: inline-block;
@@ -288,7 +336,7 @@
 
 .recipient-count {
   margin-bottom: 8px;
-  color: var(--ion-color-medium);
+  color: #002fa7;
   font-size: 13px;
 }
 
@@ -299,9 +347,9 @@
 }
 
 .recipient-chip {
-  background-color: var(--ion-color-light-shade);
-  border: 1px solid var(--ion-color-light-shade);
-  color: var(--ion-color-dark);
+  background-color: #e6efff;
+  border: 1px solid rgba(0, 47, 167, 0.1);
+  color: #002fa7;
   padding: 4px 10px;
   border-radius: 16px;
   font-size: 13px;
@@ -309,13 +357,108 @@
 }
 
 .recipient-more {
-  color: var(--ion-color-medium);
-  font-style: italic;
+  background-color: #002fa7;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 16px;
   font-size: 13px;
-  padding: 4px 0;
+  font-style: normal;
+  font-weight: 500;
 }
 
 .no-recipients {
-  color: var(--ion-color-danger);
+  color: #666666;
   font-style: italic;
+}
+
+/* Fixed image container styles */
+.news-image-container {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  border-radius: 8px;
+  margin: 12px 0;
+  border: 2px solid #f0f4ff;
+  box-shadow: 0 2px 6px rgba(0, 47, 167, 0.1);
+}
+
+.news-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Content type indicator */
+.content-type-badge {
+  background: #9be368;
+  color: #002fa7;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.content-type-badge ion-icon {
+  font-size: 14px;
+}
+
+/* Better header styling */
+.section-header {
+  background: #002fa7;
+  color: white;
+  padding: 16px;
+  border-radius: 10px 10px 0 0;
+  margin-bottom: 0;
+  box-shadow: 0 4px 12px rgba(0, 47, 167, 0.12);
+}
+
+.section-header h1,
+.section-header h4 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.section-header p {
+  margin: 4px 0 0 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.section-content {
+  background: white;
+  padding: 16px;
+  border-radius: 0 0 10px 10px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(0, 47, 167, 0.12);
+}
+
+/* Add this to your NewsContainer.css file */
+ion-segment[scrollable] {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* For smoother scrolling on iOS */
+  scroll-behavior: smooth; /* For smooth scrolling */
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+ion-segment[scrollable]::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome/Safari/Edge */
+}
+
+.content-type-tabs {
+  overflow-x: auto;
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+.content-type-tabs::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome/Safari/Edge */
+}
+
+ion-segment-button {
+  min-width: 120px; /* Ensure buttons don't get too small */
 }

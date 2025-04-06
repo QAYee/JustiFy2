@@ -1,0 +1,146 @@
+/* StatisticsContainer Styles */
+
+.stats-card-header {
+  background-color: #002fa7;
+  color: white;
+  padding: 16px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.stats-card-content {
+  padding: 16px;
+  background-color: white;
+}
+
+.stats-title {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.stats-segment {
+  --background: #f0f4ff;
+  --color: #002fa7;
+  --color-checked: white;
+  --background-checked: #002fa7;
+  margin-top: 16px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.stats-button {
+  --background: #9be368;
+  --color: #002fa7;
+  font-weight: bold;
+}
+
+.stats-outline-button {
+  --color: #002fa7;
+  --border-color: #002fa7;
+}
+
+.filter-container {
+  background-color: #f0f4ff;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(0, 47, 167, 0.1);
+}
+
+.filter-item {
+  --background: white;
+  --border-color: rgba(0, 47, 167, 0.1);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.filter-label {
+  color: #002fa7;
+  font-weight: 500;
+}
+
+.filter-select {
+  color: #002fa7;
+}
+
+.canvas-container {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  background-color: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0, 47, 167, 0.1);
+}
+
+.stats-header {
+  color: #002fa7;
+  text-align: center;
+  margin-top: 16px;
+  margin-bottom: 24px;
+}
+
+.stats-header h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #002fa7;
+}
+
+.stats-total-value {
+  color: #002fa7;
+  font-weight: bold;
+}
+
+.filter-info {
+  color: #9be368;
+  font-weight: normal;
+  font-size: 0.9rem;
+}
+
+.loading-container {
+  text-align: center;
+  padding: 32px 16px;
+}
+
+.loading-spinner {
+  color: #002fa7;
+  width: 40px;
+  height: 40px;
+}
+
+.loading-text {
+  color: #002fa7;
+  margin-top: 12px;
+  font-size: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .canvas-container {
+    padding: 12px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+  }
+
+  .stats-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .stats-segment {
+    overflow-x: auto;
+  }
+}
+
+/* Chart-specific custom styling that can be added through chart options */
+.chart-title {
+  color: #002fa7;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.chart-legend {
+  color: #002fa7;
+  font-weight: bold;
+}

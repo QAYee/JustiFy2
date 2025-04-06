@@ -17,6 +17,8 @@ import {
   IonSpinner,
 } from "@ionic/react";
 import { useHistory } from "react-router-dom";
+// Import the CSS file
+import "./RegisterContainer.css";
 
 const RegisterContainer: React.FC = () => {
   const history = useHistory();
@@ -247,19 +249,25 @@ const RegisterContainer: React.FC = () => {
   };
 
   return (
-    <div className="container">
-      <h2 className="ion-text-center">Create an Account</h2>
+    <div className="register-container">
+      <h2>Create an Account</h2>
 
-      <IonItem>
-        <IonLabel position="floating">Full Name</IonLabel>
+      <IonItem className="register-form-item">
+        <IonLabel
+          position="floating"
+          style={{ color: "#002fa7", fontWeight: "600" }}
+        >
+          Full Name
+        </IonLabel>
         <IonInput
           value={name}
           onIonChange={(e) => setName(e.detail.value || "")}
           required
+          style={{ color: "#000000" }}
         />
       </IonItem>
 
-      <IonItem>
+      <IonItem className="register-form-item">
         <IonLabel position="floating">Birthdate</IonLabel>
         <IonInput
           type="text"
@@ -294,12 +302,12 @@ const RegisterContainer: React.FC = () => {
         </IonContent>
       </IonModal>
 
-      <IonItem>
+      <IonItem className="register-form-item">
         <IonLabel position="floating">Age</IonLabel>
         <IonInput type="text" value={age} readonly />
       </IonItem>
 
-      <IonItem>
+      <IonItem className="register-form-item">
         <IonLabel position="floating">Email</IonLabel>
         <IonInput
           type="email"
@@ -309,7 +317,7 @@ const RegisterContainer: React.FC = () => {
         />
       </IonItem>
 
-      <IonItem>
+      <IonItem className="register-form-item">
         <IonLabel position="floating">Address</IonLabel>
         <IonInput
           value={address}
@@ -318,7 +326,7 @@ const RegisterContainer: React.FC = () => {
         />
       </IonItem>
 
-      <IonItem>
+      <IonItem className="register-form-item">
         <IonLabel position="floating">Phone</IonLabel>
         <IonInput
           type="tel"
@@ -328,7 +336,7 @@ const RegisterContainer: React.FC = () => {
         />
       </IonItem>
 
-      <IonItem>
+      <IonItem className="register-form-item">
         <IonLabel position="floating">Password</IonLabel>
         <IonInput
           type="password"
@@ -338,7 +346,7 @@ const RegisterContainer: React.FC = () => {
         />
       </IonItem>
 
-      <IonItem>
+      <IonItem className="register-form-item">
         <IonLabel position="floating">Confirm Password</IonLabel>
         <IonInput
           type="password"
@@ -348,35 +356,24 @@ const RegisterContainer: React.FC = () => {
         />
       </IonItem>
 
-      <IonItem>
+      <IonItem className="register-form-item">
         <IonLabel position="floating">Profile Image</IonLabel>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          style={{ marginTop: "16px" }}
-        />
+        <div className="file-input-container">
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+        </div>
         {imagePreview && (
-          <div style={{ marginTop: "10px" }}>
-            <img
-              src={imagePreview}
-              alt="Preview"
-              style={{
-                width: "100px",
-                height: "100px",
-                objectFit: "cover",
-                borderRadius: "50%",
-              }}
-            />
+          <div className="image-preview-container">
+            <img src={imagePreview} alt="Preview" className="image-preview" />
           </div>
         )}
       </IonItem>
 
-      <div className="ion-padding">
+      <div className="register-button-container">
         <IonButton
           expand="block"
           onClick={handleRegisterClick}
           disabled={loading}
+          className="register-primary-button"
         >
           {loading ? <IonSpinner name="dots" /> : "Register"}
         </IonButton>
@@ -386,6 +383,7 @@ const RegisterContainer: React.FC = () => {
           fill="outline"
           onClick={() => history.push("/login")}
           disabled={loading}
+          className="register-secondary-button"
         >
           Back to Login
         </IonButton>
@@ -403,14 +401,14 @@ const RegisterContainer: React.FC = () => {
           </IonToolbar>
         </IonHeader>
         <IonContent className="ion-padding">
-          <div className="ion-padding">
+          <div className="verification-content">
             <h2>Email Verification</h2>
             <p>
               A 6-digit verification code has been sent to {email}. Please enter
               the code below to complete your registration.
             </p>
 
-            <IonItem>
+            <IonItem className="register-form-item">
               <IonLabel position="floating">Verification Code</IonLabel>
               <IonInput
                 type="text"
@@ -421,9 +419,7 @@ const RegisterContainer: React.FC = () => {
             </IonItem>
 
             {verificationError && (
-              <p className="error-text" style={{ color: "red" }}>
-                {verificationError}
-              </p>
+              <p className="error-text">{verificationError}</p>
             )}
 
             <div className="ion-margin-top">
@@ -431,6 +427,7 @@ const RegisterContainer: React.FC = () => {
                 expand="block"
                 onClick={handleVerifyAndRegister}
                 disabled={loading}
+                className="register-primary-button"
               >
                 {loading ? (
                   <IonSpinner name="dots" />
@@ -441,10 +438,9 @@ const RegisterContainer: React.FC = () => {
 
               <IonButton
                 expand="block"
-                fill="outline"
                 onClick={() => sendVerificationCode()}
                 disabled={loading}
-                className="ion-margin-top"
+                className="register-accent-button"
               >
                 Resend Code
               </IonButton>
@@ -453,15 +449,7 @@ const RegisterContainer: React.FC = () => {
         </IonContent>
       </IonModal>
 
-      {/* Verification Alert (for demo purposes) */}
-      {/* <IonAlert
-        isOpen={showVerificationAlert}
-        onDidDismiss={() => setShowVerificationAlert(false)}
-        header={"Verification Code"}
-        subHeader={"For demonstration purposes"}
-        message={`Your verification code is: ${verificationCode}`}
-        buttons={["OK"]}
-      /> */}
+      {/* Verification Alert - commented out as in your original code */}
     </div>
   );
 };

@@ -12,11 +12,11 @@ import {
   IonRow,
   IonCol,
   IonRouterLink,
-  IonPage,
   IonContent,
   IonLoading,
 } from "@ionic/react";
 import { useHistory } from "react-router-dom";
+import "./LoginContainer.css";
 
 const LoginContainer: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -109,79 +109,78 @@ const LoginContainer: React.FC = () => {
   };
 
   return (
-    <>
-      <IonContent
-        className="ion-justify-content-center ion-align-items-center"
-        fullscreen={true}
-      >
-        <IonRow
-          className="ion-justify-content-center ion-align-items-center"
-          style={{ height: "100%" }}
+    <IonContent className="login-container">
+      <IonCard className="login-card">
+     
+        <IonCardTitle>
+        <h1 className="login-logo">JustiFy</h1>
+        </IonCardTitle>
+      
+      
+     
+        <h2 className="login-subtitle">Login</h2>
+
+        {error && (
+        <div className="error-container">
+          <p className="error-message">{error}</p>
+        </div>
+        )}
+
+        <IonItem className="login-form-item">
+        <IonLabel position="floating" color="primary">Username</IonLabel>
+        <IonInput
+          type="text"
+          value={email}
+          onIonChange={(e) => setEmail(e.detail.value!)}
+          onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+          required
+          className="input-text"
+        />
+        </IonItem>
+
+        <IonItem className="login-form-item">
+        <IonLabel position="floating" color="primary">Password</IonLabel>
+        <IonInput
+          type="password"
+          value={password}
+          onIonChange={(e) => setPassword(e.detail.value!)}
+          onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+          required
+          className="input-text"
+        />
+        </IonItem>
+
+        <IonButton
+        expand="block"
+        className="login-button"
+        onClick={handleLogin}
+        color="primary"
         >
-          <IonCol size="12" sizeMd="8" sizeLg="6" sizeXl="4">
-            <IonCard>
-              <IonCardHeader>
-                <IonCardTitle className="ion-text-center">
-                  <h1>JustiFy</h1>
-                </IonCardTitle>
-              </IonCardHeader>
+        Login
+        </IonButton>
 
-              <IonCardContent>
-                <h2 className="ion-text-center">Login</h2>
-
-                {error && (
-                  <IonText color="danger">
-                    <p className="ion-text-center">{error}</p>
-                  </IonText>
-                )}
-
-                <IonItem className="ion-margin-bottom">
-                  <IonLabel position="floating">Email</IonLabel>
-                  <IonInput
-                    type="email"
-                    value={email}
-                    onIonChange={(e) => setEmail(e.detail.value!)}
-                    onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-                    required
-                  />
-                </IonItem>
-
-                <IonItem className="ion-margin-bottom">
-                  <IonLabel position="floating">Password</IonLabel>
-                  <IonInput
-                    type="password"
-                    value={password}
-                    onIonChange={(e) => setPassword(e.detail.value!)}
-                    onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-                    required
-                  />
-                </IonItem>
-
-                <IonButton
-                  expand="block"
-                  className="ion-margin-top"
-                  onClick={handleLogin}
-                >
-                  Login
-                </IonButton>
-
-                <div className="ion-text-center ion-margin-top">
-                  <IonText>
-                    Don't have an account?{" "}
-                    <IonRouterLink onClick={() => history.push("/register")}>
-                      Register
-                    </IonRouterLink>
-                  </IonText>
-                </div>
-              </IonCardContent>
-            </IonCard>
-          </IonCol>
-        </IonRow>
-
-        {/* Loading Indicator */}
-        <IonLoading isOpen={isLoading} message="Logging in..." />
-      </IonContent>
-    </>
+        <div className="register-link-container">
+        <IonText color="dark">
+          Don't have an account?{" "}
+          <IonRouterLink
+          className="register-link"
+          onClick={() => history.push("/register")}
+          color="primary"
+          >
+          Register
+          </IonRouterLink>
+        </IonText>
+        </div>
+      
+      </IonCard>
+      
+      {/* Loading Indicator */}
+      <IonLoading
+      isOpen={isLoading}
+      message="Logging in..."
+      className="custom-loading"
+      />
+    </IonContent>
   );
 };
 
