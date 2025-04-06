@@ -540,6 +540,16 @@ const ComplainContainer: React.FC = () => {
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedComplaint) return;
 
+    // Don't allow sending messages if complaint is resolved, closed, or rejected
+    if (["Resolved", "Closed", "Rejected"].includes(selectedComplaint.status)) {
+      setToast({
+        message:
+          "Cannot send messages to resolved, closed, or rejected complaints",
+        color: "warning",
+      });
+      return;
+    }
+
     try {
       const response = await fetch(
         `http://127.0.0.1/justify/index.php/ChatController/sendMessage`,
@@ -935,18 +945,53 @@ const ComplainContainer: React.FC = () => {
                 No messages yet. Start the conversation!
               </div>
             )}
+
+            {selectedComplaint &&
+              ["Resolved", "Closed", "Rejected"].includes(
+                selectedComplaint.status
+              ) && (
+                <div
+                  style={{
+                    background: "#f4f4f4",
+                    padding: "10px",
+                    borderRadius: "8px",
+                    textAlign: "center",
+                    margin: "20px 0",
+                    color: "#666",
+                  }}
+                >
+                  This complaint is {selectedComplaint.status.toLowerCase()}.
+                  Chat functionality has been disabled.
+                </div>
+              )}
           </div>
         </IonContent>
 
         <IonFooter>
           <IonItem>
             <IonInput
-              placeholder="Type your message..."
+              placeholder={
+                ["Resolved", "Closed", "Rejected"].includes(
+                  selectedComplaint?.status || ""
+                )
+                  ? "Chat disabled for this complaint"
+                  : "Type your message..."
+              }
               value={newMessage}
               onIonChange={(e) => setNewMessage(e.detail.value!)}
               onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+              disabled={["Resolved", "Closed", "Rejected"].includes(
+                selectedComplaint?.status || ""
+              )}
             />
-            <IonButton onClick={handleSendMessage}>
+            <IonButton
+              onClick={handleSendMessage}
+              disabled={
+                ["Resolved", "Closed", "Rejected"].includes(
+                  selectedComplaint?.status || ""
+                ) || !newMessage.trim()
+              }
+            >
               <IonIcon icon={sendOutline} />
             </IonButton>
           </IonItem>
