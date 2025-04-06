@@ -37,6 +37,7 @@ import {
   chatbubbleOutline,
 } from "ionicons/icons";
 import "./MessageContainer.css"; // Import your CSS styles
+import { data } from "cypress/types/jquery";
 
 // Base URL for API calls
 const API_BASE_URL = "http://localhost/justify/index.php";
@@ -389,19 +390,20 @@ const MessageContainer: React.FC = () => {
     }
 
     // Add this to your fetchConversation function to retrieve messages from localStorage on failure
-    if (data.messages.length === 0) {
       try {
-        const cachedMessagesStr = localStorage.getItem(`messages_${userId}`);
-        if (cachedMessagesStr) {
-          const cachedMessages = JSON.parse(cachedMessagesStr);
-          console.log("Using cached messages:", cachedMessages);
-          setMessages(cachedMessages);
-          return; // Exit early since we're using cached messages
+        // Check if messages are empty or not available
+        if (!messages.length) {
+          const cachedMessagesStr = localStorage.getItem(`messages_${userId}`);
+          if (cachedMessagesStr) {
+            const cachedMessages = JSON.parse(cachedMessagesStr);
+            console.log("Using cached messages:", cachedMessages);
+            setMessages(cachedMessages);
+            return; // Exit early since we're using cached messages
+          }
         }
       } catch (error) {
         console.error("Could not load cached messages", error);
       }
-    }
   };
 
   // Add this function to mark messages as read
