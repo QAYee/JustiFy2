@@ -7,18 +7,9 @@ import { useIonAlert } from "@ionic/react"
 import { useEffect } from "react"
 import HomeContainer from "../../components/admin/HomeContainer"
 const Home: React.FC = () => {
-  const [presentAlert] = useIonAlert()
+  
 
-  useEffect(() => {
-    presentAlert({
-      header: "NEWS & ANNOUNCEMENTS",
-      message: "nagawa palang ako tangina mo",
-      buttons: ["Exit"],
-      htmlAttributes: {
-        "aria-label": "alert dialog",
-      },
-    })
-  }, [presentAlert])
+
 
   return (
     <IonPage>

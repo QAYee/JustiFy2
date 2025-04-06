@@ -28,7 +28,8 @@ import {
   newspaper,
   logOut,
   statsChart,
-  megaphone
+  megaphone,
+  helpCircle
 
 } from "ionicons/icons";
 import { useState, useEffect } from "react";
@@ -222,7 +223,7 @@ const AdminApp: React.FC = () => {
         </IonTabButton>
         <IonTabButton tab="admin-statistics" href="/admin/statistics">
           <IonIcon icon={statsChart} />
-          <IonLabel>statistics</IonLabel>
+          <IonLabel>Repports</IonLabel>
         </IonTabButton>
         {/* <IonTabButton tab="admin-record" href="/admin/record">
           <IonIcon icon={documentText} />
@@ -292,8 +293,8 @@ const UserApp: React.FC = () => {
         </IonTabButton>
         {/* <IonTabButton tab="record" href="/record"> */}
         <IonTabButton tab="message" href="/message">
-          <IonIcon icon={mail} />
-          <IonLabel>Message</IonLabel>
+          <IonIcon icon={helpCircle} />
+          <IonLabel>Ask</IonLabel>
         </IonTabButton>
       </IonTabBar>
     </IonTabs>
