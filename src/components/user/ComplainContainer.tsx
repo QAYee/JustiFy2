@@ -407,7 +407,7 @@ const ComplainContainer: React.FC = () => {
 
   return (
     <>
-      <IonContent className="ion-padding" color="light">
+    
         <div className="complaint-form-container">
           <h2 className="form-title">Barangay Complaint Form</h2>
           <p className="form-subtitle">
@@ -419,7 +419,7 @@ const ComplainContainer: React.FC = () => {
             <IonCardTitle>Complaint Information</IonCardTitle>
           </IonCardHeader>
 
-          <IonCardContent>
+          
             <div className="form-section">
               <h3 className="section-title">Complainant Details</h3>
 
@@ -540,6 +540,9 @@ const ComplainContainer: React.FC = () => {
                     id="image-upload"
                   />
                   <IonButton
+                    className="image-upload-button"
+                    expand="block"
+                    color="primary"
                     fill="outline"
                     onClick={() =>
                       document.getElementById("image-upload")?.click()
@@ -565,9 +568,7 @@ const ComplainContainer: React.FC = () => {
             </div>
 
             <div className="form-actions">
-              <IonButton expand="block" fill="outline" className="form-button">
-                Cancel
-              </IonButton>
+              
               <IonButton
                 expand="block"
                 color="primary"
@@ -585,7 +586,7 @@ const ComplainContainer: React.FC = () => {
                 )}
               </IonButton>
             </div>
-          </IonCardContent>
+         
 
           {/* Recent complaints preview */}
           {/* Recent complaints with chat functionality */}
@@ -599,7 +600,7 @@ const ComplainContainer: React.FC = () => {
             onDidDismiss={() => setShowToast(null)}
           />
         )}
-      </IonContent>
+      
     </>
   );
 };
