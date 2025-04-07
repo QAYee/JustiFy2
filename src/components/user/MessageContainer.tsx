@@ -175,6 +175,25 @@ const MessageContainer: React.FC<{ name: string }> = ({ name }) => {
 
   // Add this function before your return statement in MessageContainer
   const sendAutomaticAdminResponse = async (userMessageId: number) => {
+    // Check if auto-response was already sent recently
+    const lastAutoResponseTime = localStorage.getItem(
+      `lastAutoResponse_${currentUserId}`
+    );
+    const currentTime = new Date().getTime();
+
+    // If there was a previous auto-response, check the time difference
+    if (lastAutoResponseTime) {
+      const timeSinceLastResponse =
+        currentTime - parseInt(lastAutoResponseTime);
+      const sixHoursInMs = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
+
+      // If it's been less than 6 hours, don't send another auto-response
+      if (timeSinceLastResponse < sixHoursInMs) {
+        console.log("Auto-response skipped - already sent within last 6 hours");
+        return;
+      }
+    }
+
     // Wait 2 seconds to simulate admin response delay
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
@@ -192,6 +211,12 @@ const MessageContainer: React.FC<{ name: string }> = ({ name }) => {
       // Add the auto-response to the messages state
       setMessages((prevMessages) => [...prevMessages, autoResponse]);
 
+      // Save the time of this auto-response
+      localStorage.setItem(
+        `lastAutoResponse_${currentUserId}`,
+        currentTime.toString()
+      );
+
       // Optionally save this auto-response to the database
       const response = await fetch(
         `${API_BASE_URL}/MessageController/sendAutoResponse`,
@@ -205,6 +230,7 @@ const MessageContainer: React.FC<{ name: string }> = ({ name }) => {
             message: autoResponse.text,
             is_admin: 1, // 1 for admin
             in_response_to: userMessageId,
+            timestamp: currentTime, // Also send timestamp to server
           }),
         }
       );
@@ -313,6 +339,8 @@ const MessageContainer: React.FC<{ name: string }> = ({ name }) => {
     fetchMessages();
 
     // Set up polling for new messages every 10 seconds
+    // Commented out polling for future use
+    /*
     const intervalId = setInterval(() => {
       if (!loading && conversationId) {
         fetchMessages();
@@ -320,6 +348,7 @@ const MessageContainer: React.FC<{ name: string }> = ({ name }) => {
     }, 10000);
 
     return () => clearInterval(intervalId);
+    */
   }, []); // Empty dependency array means this runs once on mount
 
   // Scroll to bottom when messages change
