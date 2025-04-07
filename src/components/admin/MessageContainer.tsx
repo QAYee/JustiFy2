@@ -269,7 +269,7 @@ const MessageContainer: React.FC = () => {
     setShowChatModal(false);
   };
 
-  // Fix the fetchConversation function
+  // Fix for the isAdmin determination in fetchConversation function
   const fetchConversation = async (userId: number) => {
     if (!adminId) {
       setError("Admin not logged in");
@@ -309,33 +309,80 @@ const MessageContainer: React.FC = () => {
 
         // Format messages to match our interface
         if (Array.isArray(data.messages)) {
+          // First, let's log the structure of a message to understand what fields are available
+          if (data.messages.length > 0) {
+            console.log(
+              "Sample message structure:",
+              JSON.stringify(data.messages[0], null, 2)
+            );
+          }
+
           const formattedMessages: Message[] = data.messages.map(
             (msg: any, index: number) => {
-              // Log detailed information about each message
-              console.log(`Message ${index} details:`, {
-                id: msg.id,
-                sender: msg.sender,
-                sender_id: msg.sender_id,
-                adminId: adminId,
-                is_admin: msg.is_admin,
-              });
+              // Log detailed information about each message for debugging
+              console.log(`Message ${index} raw data:`, msg);
 
-              // More reliable way to determine if message is from admin
-              const isAdminMessage =
-                msg.sender === "admin" ||
+              // Try to determine if this is an admin message
+              // We need to check multiple potential fields since API responses can vary
+
+              // DEBUGGING THE ADMIN IDENTIFICATION LOGIC
+              const hasAdminField =
                 msg.is_admin === 1 ||
                 msg.is_admin === true ||
-                msg.sender_id === adminId ||
-                (typeof msg.sender === "string" &&
-                  msg.sender.toLowerCase().includes("admin"));
+                msg.isAdmin === true;
+              const senderMatches =
+                msg.sender_id === adminId || msg.senderId === adminId;
+              const senderIsAdmin =
+                msg.sender === "admin" || msg.role === "admin";
 
-              console.log(`Message ${index} isAdmin:`, isAdminMessage);
+              console.log(`Message ${index} debug:`, {
+                hasAdminField,
+                senderMatches,
+                senderIsAdmin,
+                msgSenderId: msg.sender_id,
+                adminId: adminId,
+              });
+
+              // If this is an API response where admin messages are correctly identified
+              // by the is_admin field, we should prioritize that.
+              // If is_admin is 0 or false, we still need to check if sender_id matches adminId
+
+              // Use a more comprehensive approach to identify admin messages
+              let isAdminMessage = false;
+
+              // Check if there's an explicit admin indicator
+              if (
+                msg.is_admin === 1 ||
+                msg.is_admin === true ||
+                msg.isAdmin === true
+              ) {
+                isAdminMessage = true;
+              }
+              // Check sender ID
+              else if (msg.sender_id && adminId && msg.sender_id == adminId) {
+                // Note: using == instead of === to handle string/number type differences
+                isAdminMessage = true;
+              }
+              // Check sender role
+              else if (msg.sender === "admin" || msg.role === "admin") {
+                isAdminMessage = true;
+              }
+              // If there's an explicit user indicator, it's definitely not an admin
+              else if (
+                msg.is_admin === 0 ||
+                msg.is_admin === false ||
+                msg.isAdmin === false
+              ) {
+                isAdminMessage = false;
+              }
+
+              console.log(`Message ${index} final isAdmin:`, isAdminMessage);
 
               return {
                 id: msg.id || index + 1,
                 text: msg.message || msg.text || msg.content || "",
                 senderId: msg.sender_id || (isAdminMessage ? adminId! : userId),
-                isAdmin: isAdminMessage, // Use our more reliable determination
+                isAdmin: isAdminMessage,
                 timestamp:
                   msg.timestamp ||
                   msg.created_at ||
@@ -345,33 +392,31 @@ const MessageContainer: React.FC = () => {
               };
             }
           );
-          console.log("Formatted messages:", formattedMessages);
+
+          console.log(
+            "Final formatted messages with isAdmin:",
+            formattedMessages.map((m) => ({
+              id: m.id,
+              isAdmin: m.isAdmin,
+              text: m.text.substring(0, 20),
+            }))
+          );
+
           setMessages(formattedMessages);
+
+          // Also save to localStorage with correct isAdmin values
+          try {
+            localStorage.setItem(
+              `messages_${userId}`,
+              JSON.stringify(formattedMessages)
+            );
+          } catch (error) {
+            console.error("Could not save messages to localStorage", error);
+          }
         } else {
           console.log("No messages in response or invalid format");
           setMessages([]);
         }
-
-        // Add this debug log in your fetchConversation function
-        console.log(
-          "Message isAdmin flags:",
-          data.messages.map(
-            (msg: {
-              id: any;
-              sender: string;
-              is_admin: number | boolean;
-              sender_id: number;
-            }) => ({
-              id: msg.id,
-              sender: msg.sender,
-              isAdmin:
-                msg.sender === "admin" ||
-                msg.is_admin === 1 ||
-                msg.is_admin === true ||
-                (msg.sender_id && msg.sender_id === adminId),
-            })
-          )
-        );
 
         // Mark messages as read if needed
         if (selectedUser?.hasUnreadMessages) {
@@ -384,26 +429,24 @@ const MessageContainer: React.FC = () => {
     } catch (error) {
       console.error("Error fetching conversation:", error);
       setError("Failed to load conversation. Please try again.");
-      setMessages([]);
-    } finally {
-      setLoadingMessages(false);
-    }
 
-    // Add this to your fetchConversation function to retrieve messages from localStorage on failure
+      // Try to load from localStorage as fallback
       try {
-        // Check if messages are empty or not available
-        if (!messages.length) {
-          const cachedMessagesStr = localStorage.getItem(`messages_${userId}`);
-          if (cachedMessagesStr) {
-            const cachedMessages = JSON.parse(cachedMessagesStr);
-            console.log("Using cached messages:", cachedMessages);
-            setMessages(cachedMessages);
-            return; // Exit early since we're using cached messages
-          }
+        const cachedMessagesStr = localStorage.getItem(`messages_${userId}`);
+        if (cachedMessagesStr) {
+          const cachedMessages = JSON.parse(cachedMessagesStr);
+          console.log("Using cached messages:", cachedMessages);
+          setMessages(cachedMessages);
+        } else {
+          setMessages([]);
         }
       } catch (error) {
         console.error("Could not load cached messages", error);
+        setMessages([]);
       }
+    } finally {
+      setLoadingMessages(false);
+    }
   };
 
   // Add this function to mark messages as read
@@ -453,7 +496,7 @@ const MessageContainer: React.FC = () => {
       id: tempId,
       text: newMessage,
       senderId: adminId,
-      isAdmin: true,
+      isAdmin: true, // Always true for messages sent by admin
       timestamp: new Date().toISOString(),
       status: "sent",
     };
@@ -461,11 +504,23 @@ const MessageContainer: React.FC = () => {
     try {
       setSending(true);
 
-      // Optimistically update UI
+      // Optimistically update UI with admin message (on the right)
       setMessages((prev) => [...prev, tempMessage]);
       const messageText = newMessage; // Store before clearing
       setNewMessage("");
 
+      // Also update localStorage immediately with the optimistic message
+      try {
+        const updatedMessages = [...messages, tempMessage];
+        localStorage.setItem(
+          `messages_${selectedUser.id}`,
+          JSON.stringify(updatedMessages)
+        );
+      } catch (error) {
+        console.error("Could not save messages to localStorage", error);
+      }
+
+      // Rest of your function stays the same...
       // Scroll to bottom immediately
       setTimeout(() => {
         messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -617,13 +672,6 @@ const MessageContainer: React.FC = () => {
                   <IonLabel>
                     <h2>{user.name}</h2>
                     <p>{user.email}</p>
-                    <p className="last-activity">
-                      {user.lastMessageTime
-                        ? `Last active: ${formatLastActivity(
-                            user.lastMessageTime
-                          )}`
-                        : "No activity yet"}
-                    </p>
                   </IonLabel>
                   {user.hasUnreadMessages && (
                     <IonBadge className="new-badge" slot="end">
@@ -702,11 +750,31 @@ const MessageContainer: React.FC = () => {
                       className={`message-wrapper ${
                         message.isAdmin ? "admin" : "user"
                       }`}
+                      style={{
+                        display: "flex",
+                        justifyContent: message.isAdmin
+                          ? "flex-end"
+                          : "flex-start",
+                        width: "100%",
+                      }}
                     >
                       <div
                         className={`message-bubble ${
                           message.isAdmin ? "admin" : "user"
                         }`}
+                        style={{
+                          backgroundColor: message.isAdmin
+                            ? "#9be368"
+                            : "#f0f0f0",
+                          color: message.isAdmin ? "#002fa7" : "#333",
+                          borderRadius: "12px",
+                          padding: "10px 14px",
+                          maxWidth: "70%",
+                          wordBreak: "break-word",
+                          alignSelf: message.isAdmin
+                            ? "flex-end"
+                            : "flex-start",
+                        }}
                       >
                         <p className="message-text">
                           {message.text || "No message content"}
@@ -715,6 +783,11 @@ const MessageContainer: React.FC = () => {
                           className={`message-meta ${
                             message.isAdmin ? "admin" : "user"
                           }`}
+                          style={{
+                            fontSize: "12px",
+                            marginTop: "6px",
+                            textAlign: message.isAdmin ? "right" : "left",
+                          }}
                         >
                           {formatMessageTime(message.timestamp)}
                           {message.isAdmin &&
