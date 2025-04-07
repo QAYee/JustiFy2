@@ -506,6 +506,22 @@ const TicketContainer: React.FC = () => {
                   key={complaint.id}
                   button
                   onClick={() => handleComplaintClick(complaint)}
+                  style={{
+                    "--background": "white",
+                    "--background-hover": "rgba(0, 47, 167, 0.05)",
+                    "--background-activated": "rgba(0, 47, 167, 0.08)",
+                    "--background-focused": "white",
+                    "--border-color": "rgba(0, 47, 167, 0.1)",
+                    "--padding-start": "16px",
+                    "--padding-end": "16px",
+                    "--padding-top": "12px",
+                    "--padding-bottom": "12px",
+                    "--inner-padding-end": "8px",
+                    "marginBottom": "4px",
+                    "borderRadius": "8px",
+                    "boxShadow": "0 1px 3px rgba(0,0,0,0.06)",
+                    "overflow": "hidden"
+                  }}
                 >
                   <IonLabel>
                     <h2>{getComplaintTypeName(complaint)}</h2>
@@ -534,11 +550,28 @@ const TicketContainer: React.FC = () => {
                 </IonItem>
               ))
             ) : (
-              <IonItem>
-                <IonLabel className="ion-text-center">
-                  No active tickets found
+              <IonItem
+                style={{
+                  "--background": "white",
+                  "--background-hover": "rgba(0, 47, 167, 0.05)",
+                  "--background-activated": "rgba(0, 47, 167, 0.08)",
+                  "--background-focused": "white",
+                  "--border-color": "rgba(0, 47, 167, 0.1)",
+                  "--padding-start": "16px",
+                  "--padding-end": "16px",
+                  "--padding-top": "12px",
+                  "--padding-bottom": "12px",
+                  "--inner-padding-end": "8px",
+                  "marginBottom": "4px",
+                  "borderRadius": "8px",
+                  "boxShadow": "0 1px 3px rgba(0,0,0,0.06)",
+                  "overflow": "hidden"
+                }}
+                >
+                <IonLabel className="ion-text-center" style={{ color: "#000" }}>
+                  No records found
                 </IonLabel>
-              </IonItem>
+                </IonItem>
             )}
           </>
         </>
@@ -586,39 +619,72 @@ const TicketContainer: React.FC = () => {
                   key={complaint.id}
                   button
                   onClick={() => handleComplaintClick(complaint)}
+                  style={{
+                  "--background": "white",
+                  "--background-hover": "rgba(0, 47, 167, 0.05)",
+                  "--background-activated": "rgba(0, 47, 167, 0.08)",
+                  "--background-focused": "white",
+                  "--border-color": "rgba(0, 47, 167, 0.1)",
+                  "--padding-start": "16px",
+                  "--padding-end": "16px",
+                  "--padding-top": "12px",
+                  "--padding-bottom": "12px",
+                  "--inner-padding-end": "8px",
+                  "marginBottom": "4px",
+                  "borderRadius": "8px",
+                  "boxShadow": "0 1px 3px rgba(0,0,0,0.06)",
+                  "overflow": "hidden"
+                  }}
                 >
                   <IonLabel>
-                    <h2>{getComplaintTypeName(complaint)}</h2>
-                    <p className="respondent-text">
-                      Respondent: {complaint.respondent || "Not specified"}
-                    </p>
-                    <p>
-                      <IonChip
-                        color={
-                          complaint.status === "Resolved"
-                            ? "success"
-                            : complaint.status === "Closed"
-                            ? "medium"
-                            : "danger"
-                        }
-                        outline={true}
-                      >
-                        {complaint.status}
-                      </IonChip>
-                    </p>
-                    <p>
-                      Date:{" "}
-                      {new Date(complaint.incident_date).toLocaleDateString()}
-                    </p>
+                  <h2>{getComplaintTypeName(complaint)}</h2>
+                  <p className="respondent-text">
+                    Respondent: {complaint.respondent || "Not specified"}
+                  </p>
+                  <p>
+                    <IonChip
+                    color={
+                      complaint.status === "Resolved"
+                      ? "success"
+                      : complaint.status === "Closed"
+                      ? "medium"
+                      : "danger"
+                    }
+                    outline={true}
+                    >
+                    {complaint.status}
+                    </IonChip>
+                  </p>
+                  <p>
+                    Date:{" "}
+                    {new Date(complaint.incident_date).toLocaleDateString()}
+                  </p>
                   </IonLabel>
                 </IonItem>
               ))
             ) : (
-              <IonItem>
-                <IonLabel className="ion-text-center">
+                <IonItem
+                style={{
+                  "--background": "white",
+                  "--background-hover": "rgba(0, 47, 167, 0.05)",
+                  "--background-activated": "rgba(0, 47, 167, 0.08)",
+                  "--background-focused": "white",
+                  "--border-color": "rgba(0, 47, 167, 0.1)",
+                  "--padding-start": "16px",
+                  "--padding-end": "16px",
+                  "--padding-top": "12px",
+                  "--padding-bottom": "12px",
+                  "--inner-padding-end": "8px",
+                  "marginBottom": "4px",
+                  "borderRadius": "8px",
+                  "boxShadow": "0 1px 3px rgba(0,0,0,0.06)",
+                  "overflow": "hidden"
+                }}
+                >
+                <IonLabel className="ion-text-center" style={{ color: "#000" }}>
                   No records found
                 </IonLabel>
-              </IonItem>
+                </IonItem>
             )}
           </>
         </>
