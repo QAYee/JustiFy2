@@ -160,7 +160,7 @@ const LoginContainer: React.FC = () => {
         </IonButton>
 
         <div className="register-link-container">
-        <IonText color="dark">
+        <IonText color="primary">
           Don't have an account?{" "}
           <IonRouterLink
           className="register-link"
