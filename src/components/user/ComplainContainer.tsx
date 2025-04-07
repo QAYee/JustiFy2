@@ -456,18 +456,25 @@ const ComplainContainer: React.FC = () => {
             <IonLabel position="stacked" className="required-field">
               Complaint Type
             </IonLabel>
-            <IonSelect
-              value={complaintType}
-              onIonChange={(e) => setComplaintType(e.detail.value)}
-              interface="popover"
-              placeholder="Select complaint type"
-            >
-              {complaintTypes.map((type) => (
-                <IonSelectOption key={type.id} value={type.id}>
-                  {type.name}
-                </IonSelectOption>
-              ))}
-            </IonSelect>
+            <div className="select-wrapper">
+              <IonIcon icon={documentTextOutline} className="select-icon" />
+              <IonSelect
+                value={complaintType}
+                onIonChange={(e) => setComplaintType(e.detail.value)}
+                interface="action-sheet"
+                placeholder="Select complaint type"
+                className="custom-select"
+              >
+                {complaintTypes.map((type) => (
+                  <IonSelectOption key={type.id} value={type.id}>
+                    {type.name}
+                    <div className="select-option-description">
+                      {type.description}
+                    </div>
+                  </IonSelectOption>
+                ))}
+              </IonSelect>
+            </div>
           </IonItem>
 
           {/* Show additional input field when "Others" is selected */}

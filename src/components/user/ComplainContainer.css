@@ -343,3 +343,85 @@ ion-button {
   --color: white;
   font-weight: bold !important;
 }
+
+/* Custom Select Styling */
+.select-wrapper {
+  position: relative;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.select-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ion-color-primary);
+  z-index: 2;
+  font-size: 18px;
+  pointer-events: none;
+}
+
+.custom-select {
+  --padding-start: 40px;
+  --padding-end: 16px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  --placeholder-color: #666;
+  --placeholder-opacity: 0.8;
+  --background: rgba(0, 47, 167, 0.05);
+  --border-radius: 8px;
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+/* Make the select option text more readable in the action sheet */
+ion-action-sheet {
+  --button-color: var(--ion-color-dark);
+  --button-background: white;
+}
+
+/* Style for the option description */
+.select-option-description {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+  white-space: normal;
+  text-overflow: initial;
+}
+
+/* Adding hover effect */
+.custom-select:hover {
+  --background: rgba(0, 47, 167, 0.08);
+}
+
+/* Required field indicator */
+.required-field::after {
+  content: " *";
+  color: #ff4961;
+  font-weight: bold;
+}
+
+/* Focus state */
+.custom-select:focus {
+  --background: rgba(0, 47, 167, 0.1);
+  border-color: var(--ion-color-primary);
+}
+
+/* Style for selected option text */
+.custom-select .select-text {
+  color: var(--ion-color-dark);
+  font-weight: 500;
+}
+
+/* Style for placeholder */
+.custom-select .select-placeholder {
+  color: #666;
+  opacity: 0.8;
+}
+
+/* Style for the selected value */
+.custom-select[aria-expanded="false"] {
+  color: var(--ion-color-dark);
+}
