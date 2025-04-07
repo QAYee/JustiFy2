@@ -173,7 +173,61 @@ const MessageContainer: React.FC<{ name: string }> = ({ name }) => {
     }
   };
 
-  // Send a message
+  // Add this function before your return statement in MessageContainer
+  const sendAutomaticAdminResponse = async (userMessageId: number) => {
+    // Wait 2 seconds to simulate admin response delay
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // Create the automatic response message
+    const autoResponse = {
+      id: Date.now(), // Temporary ID until server responds
+      text: "Thank you for your message. An admin will respond to you shortly. Your inquiry is important to us.",
+      senderId: 0, // Admin's ID (or a special system ID)
+      isAdmin: true,
+      timestamp: new Date().toISOString(),
+      status: "sent" as const,
+    };
+
+    try {
+      // Add the auto-response to the messages state
+      setMessages((prevMessages) => [...prevMessages, autoResponse]);
+
+      // Optionally save this auto-response to the database
+      const response = await fetch(
+        `${API_BASE_URL}/MessageController/sendAutoResponse`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_id: currentUserId,
+            message: autoResponse.text,
+            is_admin: 1, // 1 for admin
+            in_response_to: userMessageId,
+          }),
+        }
+      );
+
+      // If you want to handle the server response
+      if (response.ok) {
+        const data = await response.json();
+        if (data.status) {
+          // Update the auto-response with the correct ID from server
+          setMessages((prevMessages) =>
+            prevMessages.map((msg) =>
+              msg.id === autoResponse.id ? { ...msg, id: data.data.id } : msg
+            )
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Error sending automatic response:", error);
+      // Even if server storage fails, keep the auto-response in UI
+    }
+  };
+
+  // Modify the sendMessage function to trigger the auto-response
   const sendMessage = async () => {
     if (!newMessage.trim() || !currentUserId || sending) {
       return;
@@ -212,6 +266,9 @@ const MessageContainer: React.FC<{ name: string }> = ({ name }) => {
 
         // Scroll to bottom
         setTimeout(() => scrollToBottom(), 100);
+
+        // Send automatic admin response
+        sendAutomaticAdminResponse(data.data.id);
       } else {
         throw new Error(data.message || "Failed to send message");
       }
