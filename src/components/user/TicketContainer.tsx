@@ -579,7 +579,7 @@ const TicketContainer: React.FC = () => {
             </IonSegmentButton>
           </IonSegment>
 
-          <IonList>
+          <>
             {filteredRecords.length > 0 ? (
               filteredRecords.map((complaint: Complaint) => (
                 <IonItem
@@ -620,7 +620,7 @@ const TicketContainer: React.FC = () => {
                 </IonLabel>
               </IonItem>
             )}
-          </IonList>
+          </>
         </>
       )}
 
