@@ -669,37 +669,85 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
           <IonGrid>
             <IonRow>
               <IonCol size="12" sizeMd="4">
-                <IonItem className="filter-item">
-                  <IonLabel className="filter-label">Year</IonLabel>
-                  <IonSelect
-                    value={filter.year}
-                    onIonChange={(e) => handleYearChange(e.detail.value)}
-                    interface="popover"
-                    className="filter-select"
+                <IonItem 
+                  className="filter-item" 
+                  style={{ 
+                  borderRadius: '8px', 
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                  border: '1px solid #e0e0e0',
+                  margin: '8px 0'
+                  }}
+                >
+                  <IonLabel 
+                  className="filter-label" 
+                  style={{ 
+                    color: '#002fa7', 
+                    fontWeight: 600,
+                    fontSize: '0.95rem'
+                  }}
                   >
-                    {availableYears.map((year) => (
-                      <IonSelectOption key={year} value={year}>
-                        {year}
-                      </IonSelectOption>
-                    ))}
+                  Year
+                  </IonLabel>
+                  <IonSelect
+                  value={filter.year}
+                  onIonChange={(e) => handleYearChange(e.detail.value)}
+                  interface="popover"
+                  className="filter-select"
+                  style={{ 
+                    color: '#002fa7',
+                    fontWeight: 500,
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    background: 'rgba(0, 47, 167, 0.05)'
+                  }}
+                  >
+                  {availableYears.map((year) => (
+                    <IonSelectOption key={year} value={year}>
+                    {year}
+                    </IonSelectOption>
+                  ))}
                   </IonSelect>
                 </IonItem>
               </IonCol>
               <IonCol size="12" sizeMd="4">
-                <IonItem className="filter-item">
-                  <IonLabel className="filter-label">Month</IonLabel>
-                  <IonSelect
-                    value={filter.month}
-                    onIonChange={(e) => handleMonthChange(e.detail.value)}
-                    interface="popover"
-                    className="filter-select"
+                <IonItem 
+                  className="filter-item" 
+                  style={{ 
+                  borderRadius: '8px', 
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                  border: '1px solid #e0e0e0',
+                  margin: '8px 0'
+                  }}
+                >
+                  <IonLabel 
+                  className="filter-label" 
+                  style={{ 
+                    color: '#002fa7', 
+                    fontWeight: 600,
+                    fontSize: '0.95rem'
+                  }}
                   >
-                    <IonSelectOption value={null}>All Months</IonSelectOption>
-                    {monthNames.map((month, index) => (
-                      <IonSelectOption key={month} value={month}>
-                        {month}
-                      </IonSelectOption>
-                    ))}
+                  Month
+                  </IonLabel>
+                  <IonSelect
+                  value={filter.month}
+                  onIonChange={(e) => handleMonthChange(e.detail.value)}
+                  interface="popover"
+                  className="filter-select"
+                  style={{ 
+                    color: '#002fa7',
+                    fontWeight: 500,
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    background: 'rgba(0, 47, 167, 0.05)'
+                  }}
+                  >
+                  <IonSelectOption value={null}>All Months</IonSelectOption>
+                  {monthNames.map((month, index) => (
+                    <IonSelectOption key={month} value={month}>
+                    {month}
+                    </IonSelectOption>
+                  ))}
                   </IonSelect>
                 </IonItem>
               </IonCol>

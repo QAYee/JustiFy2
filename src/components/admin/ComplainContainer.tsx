@@ -726,9 +726,12 @@ const ComplainContainer: React.FC = () => {
             value={sortBy}
             onIonChange={(e) => setSortBy(e.detail.value)}
             placeholder="Sort by"
-            style={{
-              "--placeholder-color": "#002fa7",
-              "--color": "#002fa7",
+            style={{ 
+              color: '#002fa7',
+              fontWeight: 500,
+              padding: '4px 8px',
+              borderRadius: '4px',
+              background: 'rgba(0, 47, 167, 0.05)'
             }}
           >
             <IonSelectOption value="date">Date (Newest)</IonSelectOption>
