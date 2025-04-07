@@ -468,9 +468,6 @@ const ComplainContainer: React.FC = () => {
                 {complaintTypes.map((type) => (
                   <IonSelectOption key={type.id} value={type.id}>
                     {type.name}
-                    <div className="select-option-description">
-                      {type.description}
-                    </div>
                   </IonSelectOption>
                 ))}
               </IonSelect>
