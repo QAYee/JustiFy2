@@ -42,28 +42,62 @@
   --border-color: #002fa7;
 }
 
+/* Filter styling */
 .filter-container {
-  background-color: #f0f4ff;
+  margin-bottom: 20px;
+  background: #f5f7fa;
   border-radius: 8px;
   padding: 12px;
-  margin-bottom: 16px;
-  border: 1px solid rgba(0, 47, 167, 0.1);
 }
 
 .filter-item {
-  --background: white;
-  --border-color: rgba(0, 47, 167, 0.1);
-  border-radius: 8px;
-  margin-bottom: 8px;
+  --background: transparent;
+  --border-color: rgba(0, 47, 167, 0.2);
+  --border-radius: 8px;
+  --border-style: solid;
+  --border-width: 1px;
+  --padding-start: 12px;
+  --inner-padding-end: 12px;
+  margin-bottom: 0;
 }
 
 .filter-label {
-  color: #002fa7;
   font-weight: 500;
+  color: #333;
+  margin-right: 16px;
+  min-width: 60px;
 }
 
 .filter-select {
-  color: #002fa7;
+  max-width: 100%;
+  width: 100%;
+  --placeholder-color: #666;
+  --placeholder-opacity: 1;
+}
+
+/* Override the default IonSelect styling */
+ion-select.filter-select {
+  background: white;
+  border-radius: 8px;
+  padding: 8px 12px;
+  border: 1px solid rgba(0, 47, 167, 0.2);
+}
+
+/* Style for the popover interface */
+.select-interface-option {
+  --color: #333;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+}
+
+/* Reset button styling */
+.stats-outline-button {
+  --border-radius: 8px;
+  --border-color: #002fa7;
+  --color: #002fa7;
+  --background-hover: rgba(0, 47, 167, 0.05);
+  font-weight: 500;
+  margin-top: 8px;
 }
 
 .canvas-container {
@@ -130,6 +164,18 @@
 
   .stats-segment {
     overflow-x: auto;
+  }
+
+  .filter-container {
+    padding: 8px;
+  }
+
+  .filter-item {
+    margin-bottom: 12px;
+  }
+
+  ion-col.ion-text-end {
+    text-align: center !important;
   }
 }
 

@@ -462,6 +462,22 @@ const InboxContainer: React.FC<ContainerProps> = ({
                     markAsRead(announcement.id);
                   }
                 }}
+                style={{
+                  "--background": "white",
+                  "--background-hover": "rgba(0, 47, 167, 0.05)",
+                  "--background-activated": "rgba(0, 47, 167, 0.08)",
+                  "--background-focused": "white",
+                  "--border-color": "rgba(0, 47, 167, 0.1)",
+                  "--padding-start": "16px",
+                  "--padding-end": "16px",
+                  "--padding-top": "12px",
+                  "--padding-bottom": "12px",
+                  "--inner-padding-end": "8px",
+                  marginBottom: "4px",
+                  borderRadius: "8px",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+                  overflow: "hidden",
+                }}
               >
                 {/* Add an avatar based on content type */}
                 <IonAvatar slot="start">
@@ -476,14 +492,24 @@ const InboxContainer: React.FC<ContainerProps> = ({
                     style={{
                       fontWeight:
                         announcement.is_read === 1 ? "normal" : "bold",
+                      marginBottom: "6px",
+                      color: "#222",
                     }}
                   >
                     {announcement.title}
                   </h2>
-                  <p className="announcement-preview">
+                  <p
+                    className="announcement-preview"
+                    style={{
+                      margin: "4px 0",
+                      color: "#666",
+                    }}
+                  >
                     {announcement.description.substring(0, 60)}...
                   </p>
-                  <p style={{ fontSize: "12px", color: "#666" }}>
+                  <p
+                    style={{ fontSize: "12px", color: "#666", margin: "4px 0" }}
+                  >
                     <IonIcon
                       icon={timeOutline}
                       style={{ verticalAlign: "middle", marginRight: "4px" }}
@@ -492,7 +518,14 @@ const InboxContainer: React.FC<ContainerProps> = ({
                   </p>
                 </IonLabel>
                 {announcement.is_read === 0 && (
-                  <IonBadge color="primary" slot="end">
+                  <IonBadge
+                    color="primary"
+                    slot="end"
+                    style={{
+                      borderRadius: "12px",
+                      padding: "4px 8px",
+                    }}
+                  >
                     New
                   </IonBadge>
                 )}

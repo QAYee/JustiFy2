@@ -25,25 +25,9 @@ ion-badge {
 }
 
 /* List Styling */
-ion-list {
-  background: transparent;
-  padding: 0;
-  margin: 8px 0 16px 0;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
 
 /* Item Styling */
-ion-item {
-  --padding-start: 16px;
-  --padding-end: 16px;
-  --padding-top: 12px;
-  --padding-bottom: 12px;
-  --background: white;
-  --border-color: rgba(0, 47, 167, 0.1);
-  margin-bottom: 1px;
-}
+
 
 .inbox-container ion-item {
   --padding-start: 16px;
