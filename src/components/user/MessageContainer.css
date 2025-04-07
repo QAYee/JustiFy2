@@ -13,10 +13,19 @@
   display: flex;
   flex-direction: column;
   height: 100%;
- 
+
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Chat container layout */
+.chat-content-wrapper {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* Content area that holds the messages */
@@ -282,4 +291,51 @@ ion-toast.toast-primary {
   .message-input {
     --color: #333;
   }
+}
+
+/* Make content area take all available space */
+ion-content.ion-padding {
+  --padding-bottom: 70px; /* Add padding to account for fixed footer */
+}
+
+/* Fixed height footer */
+ion-footer {
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  z-index: 10;
+}
+
+/* Prevent input from growing */
+ion-footer ion-item {
+  --min-height: 56px;
+  height: 56px;
+}
+
+/* Fix input field height */
+ion-footer ion-input {
+  --min-height: 40px;
+  --max-height: 40px;
+  min-height: 40px;
+  max-height: 40px;
+}
+
+/* Fix send button */
+ion-footer ion-button {
+  height: 40px;
+  margin: 0;
+  --padding-start: 12px;
+  --padding-end: 12px;
+}
+
+/* Ensure chat messages don't go behind input */
+.chat-container {
+  min-height: 100%;
+  padding-bottom: 70px;
+}
+
+/* Fix scrolling */
+.message-end-marker {
+  height: 20px;
+  width: 100%;
 }

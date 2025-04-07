@@ -12,6 +12,12 @@ import {
   IonTextarea,
   IonSpinner,
   IonToast,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonFooter,
+  IonItem,
+  IonInput,
 } from "@ionic/react";
 import {
   sendOutline,
@@ -307,103 +313,179 @@ const MessageContainer: React.FC<{ name: string }> = ({ name }) => {
         color="primary"
       />
 
-      <div className="chat-content-area">
-        <IonCardHeader className="chat-header">
-          <IonCardTitle>
-            <IonIcon icon={chatbubblesOutline} className="chat-title-icon" />
-            Chat with Admin
-          </IonCardTitle>
-        </IonCardHeader>
+      <div
+        className="chat-content-wrapper"
+        style={{
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
+        <IonHeader style={{ flex: "0 0 auto" }}>
+          <IonToolbar style={{ "--background": "#002fa7", "--color": "white" }}>
+            <IonTitle>
+              <IonIcon icon={chatbubblesOutline} className="chat-title-icon" />
+              Chat with Admin
+            </IonTitle>
+          </IonToolbar>
+        </IonHeader>
 
-    
-          {loading ? (
-            <div className="loading-container">
-              <IonSpinner color="secondary" />
-              <p>Loading conversation...</p>
-            </div>
-          ) : error ? (
-            <div className="error-container">
-              <p>{error}</p>
-              <IonButton color="secondary" onClick={fetchMessages}>
-                Try Again
-              </IonButton>
-            </div>
-          ) : messages.length === 0 ? (
-            <div className="empty-container">
-              <IonIcon
-                icon={chatbubblesOutline}
-                color="light"
-                size="large"
-                className="empty-icon"
-              />
-              <p>No messages yet. Start a conversation!</p>
-            </div>
-          ) : (
-            <div className="message-container">
-              {messages.map((message) => (
+        <IonContent
+          className="ion-padding"
+          style={{
+            "--background": "#f0f4ff",
+            flex: "1 1 auto",
+            overflow: "auto",
+            position: "relative", // Add this
+          }}
+          scrollEvents={true}
+          onIonScrollEnd={() => {
+            messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+          }}
+          scrollY={true} // Ensure vertical scrolling is enabled
+        >
+          <div
+            className="chat-container"
+            style={{ padding: "16px", minHeight: "100%" }}
+          >
+            {loading ? (
+              <div style={{ textAlign: "center", padding: "20px" }}>
+                <IonSpinner />
+                <p style={{ color: "#666" }}>Loading conversation...</p>
+              </div>
+            ) : error ? (
+              <div style={{ textAlign: "center", padding: "20px" }}>
+                <p style={{ color: "#d33" }}>{error}</p>
+                <IonButton
+                  onClick={fetchMessages}
+                  style={{ "--background": "#002fa7", "--color": "white" }}
+                >
+                  Try Again
+                </IonButton>
+              </div>
+            ) : messages.length > 0 ? (
+              messages.map((message) => (
                 <div
                   key={message.id}
                   className={`message-wrapper ${
-                    message.isAdmin ?  "user" :"admin"
+                    message.isAdmin ? "user" : "admin"
                   }`}
+                  style={{
+                    display: "flex",
+                    justifyContent: message.isAdmin ? "flex-start" : "flex-end",
+                    width: "100%",
+                  }}
                 >
-                  <div className="message-content">
-                 
-                    <div className="message-bubble">
-                      {message.isAdmin && (
-                        <strong className="admin-name">Admin</strong>
-                      )}
-                      <div className="message-text">{message.text}</div>
+                  <div
+                    className={`message-bubble ${
+                      message.isAdmin ? "user" : "admin"
+                    }`}
+                    style={{
+                      backgroundColor: message.isAdmin ? "#f0f0f0" : "#9be368",
+                      color: message.isAdmin ? "#333" : "#002fa7",
+                      borderRadius: "12px",
+                      padding: "10px 14px",
+                      maxWidth: "70%",
+                      wordBreak: "break-word",
+                      alignSelf: message.isAdmin ? "flex-end" : "flex-start",
+                    }}
+                  >
+                    {message.isAdmin && (
+                      <strong className="admin-name">Admin</strong>
+                    )}
+                    <p className="message-text">
+                      {message.text || "No message content"}
+                    </p>
+                    <div
+                      className={`message-meta ${
+                        message.isAdmin ? "user" : "admin"
+                      }`}
+                      style={{
+                        fontSize: "12px",
+                        marginTop: "6px",
+                        textAlign: message.isAdmin ? "left" : "right",
+                      }}
+                    >
+                      {formatMessageTime(message.timestamp)}
+                      {!message.isAdmin && getMessageStatusIcon(message.status)}
                     </div>
                   </div>
-                  <div className="message-meta">
-                    <span className="message-time">
-                      {formatMessageTime(message.timestamp)}
-                    </span>
-                    
-                  </div>
                 </div>
-              ))}
-              <div ref={messageEndRef} />
-            </div>
-          )}
-        
-      </div>
-
-      <div className="fixed-input-container">
-        <div className="message-input-container">
-          <IonTextarea
-            className="message-input"
-            placeholder="Type a message..."
-            value={newMessage}
-            onIonChange={(e) => setNewMessage(e.detail.value!)}
-            autoGrow={true}
-            rows={1}
-            maxlength={500}
-            disabled={loading || !currentUserId || sending}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSendMessage();
-              }
-            }}
-          />
-          <IonButton
-            className="send-button"
-            color="secondary"
-            fill="solid"
-            onClick={handleSendMessage}
-            disabled={
-              !newMessage.trim() || loading || !currentUserId || sending
-            }
-          >
-            {sending ? (
-              <IonSpinner name="dots" />
+              ))
             ) : (
-              <IonIcon slot="icon-only" icon={sendOutline} />
+              <div
+                style={{
+                  textAlign: "center",
+                  padding: "20px",
+                  color: "#666",
+                }}
+              >
+                <IonIcon
+                  icon={chatbubblesOutline}
+                  style={{
+                    fontSize: "48px",
+                    color: "#002fa7",
+                    opacity: 0.5,
+                    marginBottom: "16px",
+                    display: "block",
+                    margin: "0 auto",
+                  }}
+                />
+                <p>No messages yet.</p>
+                <p>Start a conversation!</p>
+              </div>
             )}
-          </IonButton>
-        </div>
+            <div ref={messageEndRef} className="message-end-marker" />
+          </div>
+        </IonContent>
+
+        <IonFooter
+          style={{
+            flex: "0 0 auto",
+            position: "sticky", // Make it stick to bottom
+            bottom: 0,
+            zIndex: 10,
+            width: "100%",
+          }}
+        >
+          <IonItem
+            style={{
+              "--background": "#002fa7",
+              "--color": "white",
+              "--min-height": "56px", // Consistent height
+            }}
+          >
+            <IonInput
+              placeholder="Type your message..."
+              value={newMessage}
+              onIonChange={(e) => setNewMessage(e.detail.value!)}
+              onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+              disabled={loading || !currentUserId || sending}
+              style={{
+                "--placeholder-color": "rgba(255,255,255,0.7)",
+                "--color": "white",
+                "--padding-start": "12px",
+                minHeight: "40px", // Fixed height for input
+                maxHeight: "40px", // Prevent expanding
+              }}
+            />
+            <IonButton
+              onClick={handleSendMessage}
+              disabled={
+                !newMessage.trim() || loading || !currentUserId || sending
+              }
+              style={{
+                "--background": "#9be368",
+                "--color": "#002fa7",
+                height: "40px", // Fixed height for button
+                margin: "0",
+              }}
+            >
+              <IonIcon icon={sendOutline} />
+            </IonButton>
+          </IonItem>
+        </IonFooter>
       </div>
     </>
   );
