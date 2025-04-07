@@ -1,0 +1,218 @@
+/* InboxContainer.css */
+
+/* Card Header Styling */
+ion-card-header {
+  padding: 16px;
+  background-color: #002fa7;
+  color: white;
+  border-radius: 12px 12px 0 0;
+}
+
+ion-card-title {
+  font-size: 20px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+/* Badge Styling */
+ion-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  background-color: #9be368;
+  color: #002fa7;
+  font-weight: 600;
+}
+
+/* List Styling */
+ion-list {
+  background: transparent;
+  padding: 0;
+  margin: 8px 0 16px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Item Styling */
+ion-item {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  --background: white;
+  --border-color: rgba(0, 47, 167, 0.1);
+  margin-bottom: 1px;
+}
+
+ion-item:last-child {
+  margin-bottom: 0;
+}
+
+ion-item h2 {
+  font-size: 16px;
+  margin-bottom: 6px;
+  color: #222;
+}
+
+ion-item p {
+  font-size: 14px;
+  color: #666;
+  margin: 4px 0;
+}
+
+/* Unread item highlighting */
+ion-item.unread {
+  --background: rgba(0, 47, 167, 0.05);
+  border-left: 3px solid #002fa7;
+}
+
+/* Item Sliding Options */
+ion-item-option {
+  --padding-start: 16px;
+  --padding-end: 16px;
+}
+
+/* Avatar Styling */
+ion-avatar {
+  --border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  margin-right: 12px;
+  background-color: rgba(0, 47, 167, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Search Bar Styling */
+ion-searchbar {
+  --background: white;
+  --color: #333;
+  --placeholder-color: #888;
+  --icon-color: #002fa7;
+  --clear-button-color: #666;
+  --border-radius: 8px;
+  padding: 0 8px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Chip Styling */
+ion-chip {
+  --background: transparent;
+  --color: #002fa7;
+  font-weight: 500;
+  border: 1px solid #002fa7;
+  height: 36px;
+}
+
+ion-chip.active {
+  --background: rgba(0, 47, 167, 0.1);
+  --color: #002fa7;
+  font-weight: 600;
+}
+
+/* Skeleton Text Styling */
+ion-skeleton-text {
+  --border-radius: 4px;
+  --background: rgba(0, 47, 167, 0.1);
+}
+
+/* Modal Styling */
+ion-modal {
+  --background: transparent;
+}
+
+ion-modal ion-header {
+  --background: #002fa7;
+  --color: white;
+}
+
+ion-modal ion-content {
+  --background: white;
+}
+
+ion-modal ion-header ion-toolbar {
+  --background: #002fa7;
+  --color: white;
+}
+
+/* Toast Styling */
+ion-toast {
+  --background: #002fa7;
+  --color: white;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Empty State and Error Styling */
+.empty-state,
+.error-state {
+  text-align: center;
+  padding: 32px 16px;
+  color: #666;
+}
+
+.empty-state ion-icon,
+.error-state ion-icon {
+  font-size: 48px;
+  color: #002fa7;
+  opacity: 0.5;
+  margin-bottom: 16px;
+}
+
+.error-state {
+  color: #d33;
+}
+
+/* Announcement Item Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+ion-item-sliding {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Apply staggered animations to items */
+ion-item-sliding:nth-child(1) {
+  animation-delay: 0.05s;
+}
+ion-item-sliding:nth-child(2) {
+  animation-delay: 0.1s;
+}
+ion-item-sliding:nth-child(3) {
+  animation-delay: 0.15s;
+}
+ion-item-sliding:nth-child(4) {
+  animation-delay: 0.2s;
+}
+ion-item-sliding:nth-child(5) {
+  animation-delay: 0.25s;
+}
+
+/* Refresh Icon Animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+ion-button ion-icon[name="refresh-outline"] {
+  transition: transform 0.3s ease;
+}
+
+ion-button:active ion-icon[name="refresh-outline"] {
+  animation: spin 1s linear;
+}

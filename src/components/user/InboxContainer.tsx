@@ -41,6 +41,8 @@ import {
   refreshOutline,
 } from "ionicons/icons";
 
+import "./InboxContainer.css";
+
 interface Announcement {
   target_all: any;
   recipient_ids: boolean;
@@ -361,55 +363,52 @@ const InboxContainer: React.FC<ContainerProps> = ({
         <IonRefresherContent></IonRefresherContent>
       </IonRefresher>
 
-      
-        <IonCardHeader>
-          <IonCardTitle className="ion-text-wrap">
-            Announcements
-            <IonBadge color="primary" style={{ marginLeft: "8px" }}>
-              {getUnreadCount()}
-            </IonBadge>
-            <IonButton
-              fill="clear"
-              size="small"
-              onClick={fetchAnnouncements}
-              style={{ float: "right" }}
-            >
-              <IonIcon icon={refreshOutline} />
-            </IonButton>
-          </IonCardTitle>
-        </IonCardHeader>
-        
-          <IonSearchbar
-            value={searchText}
-            onIonChange={(e) => setSearchText(e.detail.value!)}
-            placeholder="Search announcements"
-            animated
-            color={"primary"}
-            style={{ borderRadius: "8px" }}
-          />
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginTop: "16px",
-              marginBottom: "16px",
-            }}
+      <IonCardHeader>
+        <IonCardTitle className="ion-text-wrap">
+          Announcements
+          <IonBadge color="primary" style={{ marginLeft: "8px" }}>
+            {getUnreadCount()}
+          </IonBadge>
+          <IonButton
+            fill="clear"
+            size="small"
+            onClick={fetchAnnouncements}
+            style={{ float: "right" }}
           >
-            <IonChip outline={true} color="primary">
-              All Announcements
-            </IonChip>
-            <IonChip outline={true}>
-              Unread
-              <IonBadge color="primary" style={{ marginLeft: "8px" }}>
-                {announcements.filter((a) => a.is_read === 0).length}
-              </IonBadge>
-            </IonChip>
-          </div>
-        
-      
+            <IonIcon icon={refreshOutline} />
+          </IonButton>
+        </IonCardTitle>
+      </IonCardHeader>
 
-      <IonList>
+      <IonSearchbar
+        value={searchText}
+        onIonChange={(e) => setSearchText(e.detail.value!)}
+        placeholder="Search announcements"
+        animated
+        color={"primary"}
+        style={{ borderRadius: "8px" }}
+      />
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginTop: "16px",
+          marginBottom: "16px",
+        }}
+      >
+        <IonChip outline={true} color="primary">
+          All Announcements
+        </IonChip>
+        <IonChip outline={true}>
+          Unread
+          <IonBadge color="primary" style={{ marginLeft: "8px" }}>
+            {announcements.filter((a) => a.is_read === 0).length}
+          </IonBadge>
+        </IonChip>
+      </div>
+
+      <>
         {loading ? (
           // Show skeletons when loading
           Array(3)
@@ -454,19 +453,24 @@ const InboxContainer: React.FC<ContainerProps> = ({
             <IonItemSliding key={announcement.id}>
               <IonItem
                 button
+                className={announcement.is_read === 0 ? "unread" : ""}
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevent event bubbling
-
-                  // Set the selected announcement and show modal
+                  e.stopPropagation();
                   setSelectedAnnouncement(announcement);
                   setShowModal(true);
-
-                  // Only mark as read if it's not already read
                   if (announcement.is_read === 0) {
                     markAsRead(announcement.id);
                   }
                 }}
               >
+                {/* Add an avatar based on content type */}
+                <IonAvatar slot="start">
+                  <IonIcon
+                    icon={megaphone}
+                    style={{ fontSize: "24px", color: "#002fa7" }}
+                  />
+                </IonAvatar>
+
                 <IonLabel>
                   <h2
                     style={{
@@ -476,6 +480,9 @@ const InboxContainer: React.FC<ContainerProps> = ({
                   >
                     {announcement.title}
                   </h2>
+                  <p className="announcement-preview">
+                    {announcement.description.substring(0, 60)}...
+                  </p>
                   <p style={{ fontSize: "12px", color: "#666" }}>
                     <IonIcon
                       icon={timeOutline}
@@ -526,22 +533,24 @@ const InboxContainer: React.FC<ContainerProps> = ({
             )}
           </IonItem>
         )}
-      </IonList>
+      </>
 
-      <IonModal isOpen={showModal} onDidDismiss={() => setShowModal(false)}>
+      <IonModal
+        isOpen={showModal}
+        onDidDismiss={() => setShowModal(false)}
+        style={{ "--background": "transparent" }}
+      >
         {selectedAnnouncement && (
           <>
             <IonHeader>
               <IonToolbar color="primary">
-                <IonButtons slot="start">
-                  <IonButton onClick={() => setShowModal(false)}>
-                    Close
-                  </IonButton>
-                </IonButtons>
                 <IonTitle>{selectedAnnouncement.title}</IonTitle>
               </IonToolbar>
             </IonHeader>
-            <IonContent className="ion-padding">
+            <IonContent
+              className="ion-padding"
+              style={{ "--background": "white" }}
+            >
               <div style={{ padding: "16px" }}>
                 {selectedAnnouncement.image && (
                   <div style={{ textAlign: "center", margin: "16px 0" }}>
@@ -596,14 +605,17 @@ const InboxContainer: React.FC<ContainerProps> = ({
                       whiteSpace: "pre-wrap",
                       lineHeight: "1.6",
                       fontSize: "16px",
+                      margin: "16px 0",
+                      color: "#333", // Added for better readability
                     }}
                   >
-                    {selectedAnnouncement.description}
+                    {selectedAnnouncement.description ||
+                      "No description available"}
                   </p>
                 </IonText>
               </div>
             </IonContent>
-            <div style={{ padding: "16px", background: "#f4f5f8" }}>
+            <div style={{ padding: "16px", background: "white" }}>
               {/* Removed the "Mark as Read" button */}
               <IonButton
                 expand="block"
