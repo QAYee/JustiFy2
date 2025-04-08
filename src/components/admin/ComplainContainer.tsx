@@ -823,7 +823,22 @@ const ComplainContainer: React.FC = () => {
                       </IonChip>
                     </p>
                     <p style={{ whiteSpace: "normal", overflow: "visible" }}>
-                      <strong>Status:</strong> {getStatusChip(complaint.status)}
+                      <strong>Status:</strong>{" "}
+                      {(() => {
+                      const statusOption = STATUS_OPTIONS.find(
+                        (option) => option.value.toLowerCase() === complaint.status?.toLowerCase()
+                      );
+                      return statusOption ? (
+                        <IonChip color={statusOption.color} style={{ margin: "2px 0" }}>
+                        <IonIcon icon={statusOption.icon} />
+                        <IonLabel>{statusOption.label}</IonLabel>
+                        </IonChip>
+                      ) : (
+                        <IonChip color="medium">
+                        <IonLabel>{complaint.status || "Unknown"}</IonLabel>
+                        </IonChip>
+                      );
+                      })()}
                     </p>
                   </IonLabel>
                 </IonItem>
