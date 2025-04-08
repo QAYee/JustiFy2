@@ -33,7 +33,12 @@ import {
   IonBadge,
   IonPage,
 } from "@ionic/react";
-import { sendOutline, documentsOutline, ticketOutline } from "ionicons/icons";
+import {
+  sendOutline,
+  documentsOutline,
+  ticketOutline,
+  timeOutline,
+} from "ionicons/icons";
 import "./TicketContainer.css";
 
 interface UserData {
@@ -517,10 +522,10 @@ const TicketContainer: React.FC = () => {
                     "--padding-top": "12px",
                     "--padding-bottom": "12px",
                     "--inner-padding-end": "8px",
-                    "marginBottom": "4px",
-                    "borderRadius": "8px",
-                    "boxShadow": "0 1px 3px rgba(0,0,0,0.06)",
-                    "overflow": "hidden"
+                    marginBottom: "4px",
+                    borderRadius: "8px",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+                    overflow: "hidden",
                   }}
                 >
                   <IonLabel>
@@ -562,16 +567,16 @@ const TicketContainer: React.FC = () => {
                   "--padding-top": "12px",
                   "--padding-bottom": "12px",
                   "--inner-padding-end": "8px",
-                  "marginBottom": "4px",
-                  "borderRadius": "8px",
-                  "boxShadow": "0 1px 3px rgba(0,0,0,0.06)",
-                  "overflow": "hidden"
+                  marginBottom: "4px",
+                  borderRadius: "8px",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+                  overflow: "hidden",
                 }}
-                >
+              >
                 <IonLabel className="ion-text-center" style={{ color: "#000" }}>
                   No records found
                 </IonLabel>
-                </IonItem>
+              </IonItem>
             )}
           </>
         </>
@@ -620,50 +625,50 @@ const TicketContainer: React.FC = () => {
                   button
                   onClick={() => handleComplaintClick(complaint)}
                   style={{
-                  "--background": "white",
-                  "--background-hover": "rgba(0, 47, 167, 0.05)",
-                  "--background-activated": "rgba(0, 47, 167, 0.08)",
-                  "--background-focused": "white",
-                  "--border-color": "rgba(0, 47, 167, 0.1)",
-                  "--padding-start": "16px",
-                  "--padding-end": "16px",
-                  "--padding-top": "12px",
-                  "--padding-bottom": "12px",
-                  "--inner-padding-end": "8px",
-                  "marginBottom": "4px",
-                  "borderRadius": "8px",
-                  "boxShadow": "0 1px 3px rgba(0,0,0,0.06)",
-                  "overflow": "hidden"
+                    "--background": "white",
+                    "--background-hover": "rgba(0, 47, 167, 0.05)",
+                    "--background-activated": "rgba(0, 47, 167, 0.08)",
+                    "--background-focused": "white",
+                    "--border-color": "rgba(0, 47, 167, 0.1)",
+                    "--padding-start": "16px",
+                    "--padding-end": "16px",
+                    "--padding-top": "12px",
+                    "--padding-bottom": "12px",
+                    "--inner-padding-end": "8px",
+                    marginBottom: "4px",
+                    borderRadius: "8px",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+                    overflow: "hidden",
                   }}
                 >
                   <IonLabel>
-                  <h2>{getComplaintTypeName(complaint)}</h2>
-                  <p className="respondent-text">
-                    Respondent: {complaint.respondent || "Not specified"}
-                  </p>
-                  <p>
-                    <IonChip
-                    color={
-                      complaint.status === "Resolved"
-                      ? "success"
-                      : complaint.status === "Closed"
-                      ? "medium"
-                      : "danger"
-                    }
-                    outline={true}
-                    >
-                    {complaint.status}
-                    </IonChip>
-                  </p>
-                  <p>
-                    Date:{" "}
-                    {new Date(complaint.incident_date).toLocaleDateString()}
-                  </p>
+                    <h2>{getComplaintTypeName(complaint)}</h2>
+                    <p className="respondent-text">
+                      Respondent: {complaint.respondent || "Not specified"}
+                    </p>
+                    <p>
+                      <IonChip
+                        color={
+                          complaint.status === "Resolved"
+                            ? "success"
+                            : complaint.status === "Closed"
+                            ? "medium"
+                            : "danger"
+                        }
+                        outline={true}
+                      >
+                        {complaint.status}
+                      </IonChip>
+                    </p>
+                    <p>
+                      Date:{" "}
+                      {new Date(complaint.incident_date).toLocaleDateString()}
+                    </p>
                   </IonLabel>
                 </IonItem>
               ))
             ) : (
-                <IonItem
+              <IonItem
                 style={{
                   "--background": "white",
                   "--background-hover": "rgba(0, 47, 167, 0.05)",
@@ -675,16 +680,16 @@ const TicketContainer: React.FC = () => {
                   "--padding-top": "12px",
                   "--padding-bottom": "12px",
                   "--inner-padding-end": "8px",
-                  "marginBottom": "4px",
-                  "borderRadius": "8px",
-                  "boxShadow": "0 1px 3px rgba(0,0,0,0.06)",
-                  "overflow": "hidden"
+                  marginBottom: "4px",
+                  borderRadius: "8px",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+                  overflow: "hidden",
                 }}
-                >
+              >
                 <IonLabel className="ion-text-center" style={{ color: "#000" }}>
                   No records found
                 </IonLabel>
-                </IonItem>
+              </IonItem>
             )}
           </>
         </>
@@ -708,6 +713,246 @@ const TicketContainer: React.FC = () => {
           </IonToolbar>
         </IonHeader>
         <IonContent>
+          {selectedComplaint && (
+            <div className="complaint-details-section">
+              <IonCard>
+                <IonCardHeader>
+                  <IonCardTitle
+                    style={{ color: "#0066cc", fontWeight: "bold" }}
+                  >
+                    {getComplaintTypeName(selectedComplaint)}
+                  </IonCardTitle>
+                </IonCardHeader>
+                <IonCardContent>
+                  <div
+                    className="complaint-header-info"
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: "16px",
+                    }}
+                  >
+                    <IonChip
+                      color={
+                        selectedComplaint.status === "New"
+                          ? "primary"
+                          : selectedComplaint.status === "Under review"
+                          ? "warning"
+                          : selectedComplaint.status === "In progress"
+                          ? "tertiary"
+                          : selectedComplaint.status === "Resolved"
+                          ? "success"
+                          : selectedComplaint.status === "Closed"
+                          ? "medium"
+                          : "danger"
+                      }
+                      outline={true}
+                    >
+                      {selectedComplaint.status}
+                    </IonChip>
+                    <span
+                      className="complaint-id"
+                      style={{
+                        fontSize: "0.9em",
+                        color: "#666",
+                        fontStyle: "italic",
+                      }}
+                    >
+                      Ref #: {selectedComplaint.id}
+                    </span>
+                  </div>
+
+                  <div
+                    className="complaint-timeline"
+                    style={{
+                      background: "#f9f9f9",
+                      padding: "12px",
+                      borderRadius: "8px",
+                      marginBottom: "16px",
+                    }}
+                  >
+                    <h3
+                      style={{
+                        margin: "0 0 8px 0",
+                        fontSize: "16px",
+                        color: "#444",
+                      }}
+                    >
+                      Complaint Timeline
+                    </h3>
+                    <div
+                      className="timeline-item"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      <IonIcon
+                        icon={timeOutline}
+                        style={{ color: "#0066cc", marginRight: "8px" }}
+                      />
+                      <div>
+                        <div style={{ fontWeight: "bold" }}>Filed on</div>
+                        <div>
+                          {new Date(
+                            selectedComplaint.incident_date
+                          ).toLocaleDateString()}{" "}
+                          at{" "}
+                          {new Date(
+                            selectedComplaint.incident_date
+                          ).toLocaleTimeString()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="complaint-detail-item">
+                    <strong>Status:</strong>
+                    <div style={{ margin: "8px 0" }}>
+                      <IonChip
+                        color={
+                          selectedComplaint.status === "New"
+                            ? "primary"
+                            : selectedComplaint.status === "Under review"
+                            ? "warning"
+                            : selectedComplaint.status === "In progress"
+                            ? "tertiary"
+                            : selectedComplaint.status === "Resolved"
+                            ? "success"
+                            : selectedComplaint.status === "Closed"
+                            ? "medium"
+                            : "danger"
+                        }
+                        outline={true}
+                      >
+                        {selectedComplaint.status}
+                      </IonChip>
+                      {selectedComplaint.status === "Under review" && (
+                        <small
+                          style={{
+                            display: "block",
+                            color: "#666",
+                            marginTop: "4px",
+                          }}
+                        >
+                          Your complaint is being reviewed by our staff
+                        </small>
+                      )}
+                      {selectedComplaint.status === "In progress" && (
+                        <small
+                          style={{
+                            display: "block",
+                            color: "#666",
+                            marginTop: "4px",
+                          }}
+                        >
+                          We're actively working to address your complaint
+                        </small>
+                      )}
+                      {selectedComplaint.status === "Resolved" && (
+                        <small
+                          style={{
+                            display: "block",
+                            color: "#666",
+                            marginTop: "4px",
+                          }}
+                        >
+                          Your complaint has been successfully addressed
+                        </small>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="complaint-detail-item">
+                    <strong>Complainant:</strong>
+                    <span>{user?.name || "You"}</span>
+                  </div>
+
+                  <div className="complaint-detail-item">
+                    <strong>Respondent:</strong>
+                    <span>
+                      {selectedComplaint.respondent || "Not specified"}
+                    </span>
+                  </div>
+
+                  <div className="complaint-detail-item">
+                    <strong>Complaint Type:</strong>
+                    <span>{getComplaintTypeName(selectedComplaint)}</span>
+                  </div>
+
+                  {selectedComplaint.description && (
+                    <div className="complaint-detail-item">
+                      <strong>Description:</strong>
+                      <p
+                        style={{
+                          background: "#f5f5f5",
+                          padding: "10px",
+                          borderRadius: "8px",
+                          whiteSpace: "pre-wrap",
+                          margin: "8px 0",
+                        }}
+                      >
+                        {selectedComplaint.description}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Add the details field here */}
+                  {selectedComplaint.details && (
+                    <div className="complaint-detail-item">
+                      <strong>Additional Details:</strong>
+                      <p
+                        style={{
+                          background: "#f5f5f5",
+                          padding: "10px",
+                          borderRadius: "8px",
+                          whiteSpace: "pre-wrap",
+                          margin: "8px 0",
+                        }}
+                      >
+                        {selectedComplaint.details}
+                      </p>
+                    </div>
+                  )}
+
+                 
+
+                  {selectedComplaint.resolution && (
+                    <div
+                      className="complaint-detail-item resolution-info"
+                      style={{
+                        background: "#e6f3ff",
+                        padding: "12px",
+                        borderRadius: "8px",
+                        marginTop: "16px",
+                      }}
+                    >
+                      
+                    </div>
+                  )}
+
+                  {selectedComplaint.admin_notes &&
+                    ["Resolved", "Closed", "Rejected"].includes(
+                      selectedComplaint.status
+                    ) && (
+                      <div className="complaint-detail-item">
+                        <strong>Admin Notes:</strong>
+                        <p style={{ fontStyle: "italic" }}>
+                          {selectedComplaint.admin_notes}
+                        </p>
+                      </div>
+                    )}
+                </IonCardContent>
+              </IonCard>
+
+              <div className="chat-header">
+                <h2 style={{ color: " #ffffff" }}>Conversation </h2>
+                <small style={{ color: " #ffffff" }}> Messages related to this complaint</small>
+              </div>
+            </div>
+          )}
+
           <div className="chat-container">
             {messages.length > 0 ? (
               messages.map((msg, index) => (
