@@ -1,4 +1,4 @@
-import type React from "react";
+import { useState, useEffect } from "react";
 import {
   IonCard,
   IonCardContent,
@@ -16,6 +16,7 @@ import {
   IonRow,
   IonCol,
   IonProgressBar,
+  IonSpinner,
 } from "@ionic/react";
 import {
   notificationsOutline,
@@ -25,13 +26,39 @@ import {
   peopleOutline,
   documentTextOutline,
   locationOutline,
+  alertCircleOutline,
 } from "ionicons/icons";
 
 interface ContainerProps {
   name: string;
 }
 
+interface Complaint {
+  name: string;
+  complaint_type: string;
+  id: number;
+  complainant: string;
+  respondent: string;
+  details: string;
+  incident_date: string;
+  status:
+    | "New"
+    | "Under review"
+    | "In progress"
+    | "Resolved"
+    | "Closed"
+    | "Rejected";
+  type: string;
+  user_id: number;
+  created_at: string;
+  image?: string;
+}
+
 const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
+  const [complaints, setComplaints] = useState<Complaint[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
   // Dummy statistics data
   const stats = {
     totalComplaints: 24,
@@ -42,31 +69,6 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
     activeUsers: 35,
     pendingRegistrations: 3,
   };
-
-  // Dummy recent complaints
-  const recentComplaints = [
-    {
-      id: 1001,
-      complainant: "Juan Dela Cruz",
-      type: "Noise Complaint",
-      date: "October 16, 2023",
-      status: "pending",
-    },
-    {
-      id: 1002,
-      complainant: "Maria Garcia",
-      type: "Utility Issue",
-      date: "October 12, 2023",
-      status: "processing",
-    },
-    {
-      id: 1003,
-      complainant: "Roberto Reyes",
-      type: "Environmental Concern",
-      date: "October 8, 2023",
-      status: "resolved",
-    },
-  ];
 
   // Dummy upcoming events
   const upcomingEvents = [
@@ -102,258 +104,135 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
     color: "#3880ff",
   };
 
+  const fetchComplaints = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `https://ivory-swallow-404351.hostingersite.com/Justify/index.php/ComplaintController/getAllComplaints`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.status && Array.isArray(data.complaints)) {
+        setComplaints(data.complaints);
+      } else {
+        setComplaints([]);
+        setError(data.message || "No complaints found");
+      }
+    } catch (err) {
+      console.error("Error fetching complaints:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch complaints"
+      );
+      setComplaints([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchComplaints();
+  }, []);
+
+  // Get only the most recent 3 complaints
+  const recentComplaints = complaints.slice(0, 3);
+
+  // Helper function to determine chip color based on status
+  const getStatusColor = (status: string): string => {
+    switch (status) {
+      case "New":
+        return "warning";
+      case "Under review":
+      case "In progress":
+        return "primary";
+      case "Resolved":
+        return "success";
+      case "Closed":
+        return "medium";
+      case "Rejected":
+        return "danger";
+      default:
+        return "medium";
+    }
+  };
+
   return (
     <div className="ion-padding">
       {/* Admin Dashboard Header */}
-      <IonCard
-        className="ion-no-margin"
-        color="primary"
-        style={{ borderRadius: "12px", marginBottom: "24px" }}
-      >
-        <IonCardHeader>
-          <IonCardTitle style={{ fontSize: "24px", fontWeight: "700" }}>
-            Admin Dashboard
-          </IonCardTitle>
-          <IonCardSubtitle style={{ fontSize: "16px", marginTop: "4px" }}>
-            Welcome to the JustiFy Admin Portal
-          </IonCardSubtitle>
-        </IonCardHeader>
-        <IonCardContent>
-          <p style={{ marginBottom: "20px", fontSize: "15px" }}>
-            Manage complaints, users, and community announcements from this
-            central dashboard.
-          </p>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: "12px",
-            }}
+      <div className="ion-text-center" style={{ margin: "0 auto", maxWidth: "800px" }}>
+        <IonCard
+          className="ion-no-margin"
+          color="primary"
+          style={{ borderRadius: "12px", marginBottom: "24px", width: "100%" }}
+        >
+          <IonCardHeader>
+        <IonCardTitle style={{ fontSize: "24px", fontWeight: "700" }}>
+          Admin Dashboard
+        </IonCardTitle>
+        <IonCardSubtitle style={{ fontSize: "16px", marginTop: "4px" }}>
+          Welcome to the JustiFy Admin Portal
+        </IonCardSubtitle>
+          </IonCardHeader>
+          <IonCardContent>
+        <p style={{ marginBottom: "20px", fontSize: "15px" }}>
+          Manage complaints, users, and community announcements from this
+          central dashboard.
+        </p>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "12px",
+            flexWrap: "wrap"
+          }}
+        >
+          <IonButton
+            fill="solid"
+            color="light"
+            href="/admin/complain"
+            style={{ fontWeight: "500" }}
           >
-            <IonButton
-              fill="solid"
-              color="light"
-              href="/admin/complain"
-              style={{ fontWeight: "500" }}
-              expand="block"
+            View Complaints
+            <IonIcon slot="end" icon={arrowForwardOutline} />
+          </IonButton>
+          <IonButton
+            fill="solid"
+            color="light"
+            href="/admin/inbox"
+            style={{ fontWeight: "500" }}
+          >
+            <IonIcon slot="start" icon={notificationsOutline} />
+            Notifications
+            <IonBadge
+          color="danger"
+          style={{
+            marginLeft: "8px",
+            borderRadius: "10px",
+            padding: "4px 8px",
+          }}
             >
-              View Complaints
-              <IonIcon slot="end" icon={arrowForwardOutline} />
-            </IonButton>
-            <IonButton
-              fill="solid"
-              color="light"
-              href="/admin/inbox"
-              style={{ fontWeight: "500" }}
-              expand="block"
-            >
-              <IonIcon slot="start" icon={notificationsOutline} />
-              Notifications
-              <IonBadge
-                color="danger"
-                style={{
-                  marginLeft: "8px",
-                  borderRadius: "10px",
-                  padding: "4px 8px",
-                }}
-              >
-                5
-              </IonBadge>
-            </IonButton>
-          </div>
-        </IonCardContent>
-      </IonCard>
+          5
+            </IonBadge>
+          </IonButton>
+        </div>
+          </IonCardContent>
+        </IonCard>
+      </div>
 
-      {/* Statistics Cards */}
-      <h2 style={sectionHeaderStyle}>
-        <IonIcon icon={statsChartOutline} style={iconStyle} />
-        System Statistics
-      </h2>
-
-      <IonGrid className="ion-no-padding">
-        <IonRow>
-          <IonCol size="12" sizeMd="6">
-            <IonCard
-              style={{
-                borderRadius: "12px",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-              }}
-            >
-              <IonCardHeader>
-                <IonCardTitle style={{ fontSize: "18px", color: "#333" }}>
-                  Complaint Statistics
-                </IonCardTitle>
-              </IonCardHeader>
-              <IonCardContent>
-                <div style={{ marginBottom: "20px" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginBottom: "8px",
-                      alignItems: "center",
-                    }}
-                  >
-                    <span style={{ fontSize: "15px" }}>Total Complaints</span>
-                    <strong style={{ fontSize: "18px" }}>
-                      {stats.totalComplaints}
-                    </strong>
-                  </div>
-                  <IonProgressBar
-                    value={1}
-                    color="primary"
-                    style={{ height: "8px", borderRadius: "4px" }}
-                  ></IonProgressBar>
-                </div>
-
-                <div style={{ marginBottom: "20px" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginBottom: "8px",
-                      alignItems: "center",
-                    }}
-                  >
-                    <span style={{ fontSize: "15px" }}>Pending</span>
-                    <strong style={{ fontSize: "18px" }}>
-                      {stats.pendingComplaints}
-                    </strong>
-                  </div>
-                  <IonProgressBar
-                    value={stats.pendingComplaints / stats.totalComplaints}
-                    color="warning"
-                    style={{ height: "8px", borderRadius: "4px" }}
-                  ></IonProgressBar>
-                </div>
-
-                <div style={{ marginBottom: "20px" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginBottom: "8px",
-                      alignItems: "center",
-                    }}
-                  >
-                    <span style={{ fontSize: "15px" }}>Processing</span>
-                    <strong style={{ fontSize: "18px" }}>
-                      {stats.processingComplaints}
-                    </strong>
-                  </div>
-                  <IonProgressBar
-                    value={stats.processingComplaints / stats.totalComplaints}
-                    color="tertiary"
-                    style={{ height: "8px", borderRadius: "4px" }}
-                  ></IonProgressBar>
-                </div>
-
-                <div>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginBottom: "8px",
-                      alignItems: "center",
-                    }}
-                  >
-                    <span style={{ fontSize: "15px" }}>Resolved</span>
-                    <strong style={{ fontSize: "18px" }}>
-                      {stats.resolvedComplaints}
-                    </strong>
-                  </div>
-                  <IonProgressBar
-                    value={stats.resolvedComplaints / stats.totalComplaints}
-                    color="success"
-                    style={{ height: "8px", borderRadius: "4px" }}
-                  ></IonProgressBar>
-                </div>
-              </IonCardContent>
-            </IonCard>
-          </IonCol>
-
-          <IonCol size="12" sizeMd="6">
-            <IonCard
-              style={{
-                borderRadius: "12px",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-              }}
-            >
-              <IonCardHeader>
-                <IonCardTitle style={{ fontSize: "18px", color: "#333" }}>
-                  User Statistics
-                </IonCardTitle>
-              </IonCardHeader>
-              <IonCardContent>
-                <div style={{ marginBottom: "20px" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginBottom: "8px",
-                      alignItems: "center",
-                    }}
-                  >
-                    <span style={{ fontSize: "15px" }}>Total Users</span>
-                    <strong style={{ fontSize: "18px" }}>
-                      {stats.totalUsers}
-                    </strong>
-                  </div>
-                  <IonProgressBar
-                    value={1}
-                    color="primary"
-                    style={{ height: "8px", borderRadius: "4px" }}
-                  ></IonProgressBar>
-                </div>
-
-                <div style={{ marginBottom: "20px" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginBottom: "8px",
-                      alignItems: "center",
-                    }}
-                  >
-                    <span style={{ fontSize: "15px" }}>Active Users</span>
-                    <strong style={{ fontSize: "18px" }}>
-                      {stats.activeUsers}
-                    </strong>
-                  </div>
-                  <IonProgressBar
-                    value={stats.activeUsers / stats.totalUsers}
-                    color="success"
-                    style={{ height: "8px", borderRadius: "4px" }}
-                  ></IonProgressBar>
-                </div>
-
-                <div>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginBottom: "8px",
-                      alignItems: "center",
-                    }}
-                  >
-                    <span style={{ fontSize: "15px" }}>
-                      Pending Registrations
-                    </span>
-                    <strong style={{ fontSize: "18px" }}>
-                      {stats.pendingRegistrations}
-                    </strong>
-                  </div>
-                  <IonProgressBar
-                    value={stats.pendingRegistrations / stats.totalUsers}
-                    color="warning"
-                    style={{ height: "8px", borderRadius: "4px" }}
-                  ></IonProgressBar>
-                </div>
-              </IonCardContent>
-            </IonCard>
-          </IonCol>
-        </IonRow>
-      </IonGrid>
+  
 
       {/* Recent Complaints */}
       <h2 style={sectionHeaderStyle}>
@@ -372,75 +251,82 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
             Latest Submissions
           </IonCardTitle>
         </IonCardHeader>
-        <IonList style={{ margin: "0 -16px" }}>
-          {recentComplaints.map((complaint) => (
-            <IonItem
-              key={complaint.id}
-              detail={true}
-              button
-              style={{ "--padding-start": "16px", "--padding-end": "16px" }}
-            >
-              <IonLabel>
-                <h2
-                  style={{
-                    fontWeight: "600",
-                    fontSize: "16px",
-                    marginBottom: "4px",
-                  }}
-                >
-                  {complaint.type}
-                  <IonBadge
-                    color="medium"
-                    style={{ marginLeft: "8px", fontSize: "12px" }}
+
+        {loading ? (
+          <div style={{ padding: "20px", textAlign: "center" }}>
+            <IonSpinner name="crescent" />
+            <p style={{ marginTop: "10px", color: "#666" }}>
+              Loading complaints...
+            </p>
+          </div>
+        ) : error ? (
+          <div
+            style={{ padding: "20px", textAlign: "center", color: "#eb445a" }}
+          >
+            <IonIcon icon={alertCircleOutline} style={{ fontSize: "32px" }} />
+            <p style={{ marginTop: "10px" }}>{error}</p>
+          </div>
+        ) : recentComplaints.length === 0 ? (
+          <div style={{ padding: "20px", textAlign: "center", color: "#666" }}>
+            <p>No complaints found</p>
+          </div>
+        ) : (
+          <IonList style={{ margin: "0 -16px" }}>
+            {recentComplaints.map((complaint) => (
+              <IonItem
+                key={complaint.id}
+                detail={true}
+                button
+                style={{ "--padding-start": "16px", "--padding-end": "16px" }}
+              >
+                <IonLabel>
+                  <h2
+                    style={{
+                      fontWeight: "600",
+                      fontSize: "16px",
+                      marginBottom: "4px",
+                    }}
                   >
-                    #{complaint.id}
-                  </IonBadge>
-                </h2>
-                <p style={{ fontSize: "14px", marginBottom: "2px" }}>
-                  From: {complaint.complainant}
-                </p>
-                <p
-                  style={{ fontSize: "12px", color: "#fffff", marginTop: "4px" }}
-                >
-                  {complaint.date}
-                </p>
-              </IonLabel>
-              {complaint.status === "pending" && (
+                    {complaint.complaint_type}
+                    <IonBadge
+                      color="medium"
+                      style={{ marginLeft: "8px", fontSize: "12px" }}
+                    >
+                      #{complaint.id}
+                    </IonBadge>
+                  </h2>
+                  <p style={{ fontSize: "14px", marginBottom: "2px" }}>
+                    From: {complaint.complainant}
+                  </p>
+                  <p
+                    style={{
+                      fontSize: "12px",
+                      color: "#666",
+                      marginTop: "4px",
+                    }}
+                  >
+                    {new Date(complaint.created_at).toLocaleDateString()} -{" "}
+                    {complaint.incident_date}
+                  </p>
+                </IonLabel>
                 <IonChip
-                  color="warning"
+                  color={getStatusColor(complaint.status)}
                   outline={true}
                   style={{ fontWeight: "500" }}
                 >
-                  Pending
+                  {complaint.status}
                 </IonChip>
-              )}
-              {complaint.status === "processing" && (
-                <IonChip
-                  color="primary"
-                  outline={true}
-                  style={{ fontWeight: "500" }}
-                >
-                  Processing
-                </IonChip>
-              )}
-              {complaint.status === "resolved" && (
-                <IonChip
-                  color="success"
-                  outline={true}
-                  style={{ fontWeight: "500" }}
-                >
-                  Resolved
-                </IonChip>
-              )}
-            </IonItem>
-          ))}
-        </IonList>
+              </IonItem>
+            ))}
+          </IonList>
+        )}
+
         <IonCardContent>
           <IonButton
             expand="block"
             fill="outline"
             href="/admin/complain"
-            style={{ marginTop: "8px", fontWeight: "500" , color: "blue" }}
+            style={{ marginTop: "8px", fontWeight: "500", color: "#3880ff" }}
           >
             View All Complaints
             <IonIcon slot="end" icon={arrowForwardOutline} />
@@ -528,7 +414,7 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
                 fill="outline"
                 slot="end"
                 size="small"
-                style={{ fontWeight: "500", color: "blue" }}
+                style={{ fontWeight: "500" , color: "#3880ff"}}
               >
                 Manage
               </IonButton>
@@ -539,7 +425,7 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
           <IonButton
             expand="block"
             fill="outline"
-            style={{ marginTop: "8px", fontWeight: "500", color: "blue" }}
+            style={{ marginTop: "8px", fontWeight: "500" , color: "#3880ff" }}
           >
             Manage Events
             <IonIcon slot="end" icon={arrowForwardOutline} />
