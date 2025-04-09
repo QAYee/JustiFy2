@@ -173,7 +173,7 @@ const TicketContainer: React.FC = () => {
   const fetchUserComplaints = async (userId: number) => {
     try {
       const response = await fetch(
-        `http://127.0.0.1/justify/index.php/ComplaintController/getAllComplaints?user_id=${userId}`,
+        `https://ivory-swallow-404351.hostingersite.com/Justify/index.php/ComplaintController/getAllComplaints?user_id=${userId}`,
         {
           method: "GET",
           headers: {
@@ -211,7 +211,7 @@ const TicketContainer: React.FC = () => {
       }
 
       const response = await fetch(
-        `http://127.0.0.1/justify/index.php/ChatController/getMessages/${complaintId}`
+        `https://ivory-swallow-404351.hostingersite.com/Justify/index.php/ChatController/getMessages/${complaintId}`
       );
 
       const data = await response.json();
@@ -261,7 +261,7 @@ const TicketContainer: React.FC = () => {
 
     try {
       const response = await fetch(
-        "http://127.0.0.1/justify/index.php/ChatController/sendMessage",
+        "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/ChatController/sendMessage",
         {
           method: "POST",
           headers: {
@@ -374,7 +374,7 @@ const TicketContainer: React.FC = () => {
   const fetchComplaintTypes = async () => {
     try {
       const response = await fetch(
-        "http://127.0.0.1/justify/index.php/ComplaintController/getComplaintTypes",
+        "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/ComplaintController/getComplaintTypes",
         {
           method: "GET",
           headers: {
@@ -916,8 +916,6 @@ const TicketContainer: React.FC = () => {
                     </div>
                   )}
 
-                 
-
                   {selectedComplaint.resolution && (
                     <div
                       className="complaint-detail-item resolution-info"
@@ -927,9 +925,7 @@ const TicketContainer: React.FC = () => {
                         borderRadius: "8px",
                         marginTop: "16px",
                       }}
-                    >
-                      
-                    </div>
+                    ></div>
                   )}
 
                   {selectedComplaint.admin_notes &&
@@ -948,7 +944,10 @@ const TicketContainer: React.FC = () => {
 
               <div className="chat-header">
                 <h2 style={{ color: " #ffffff" }}>Conversation </h2>
-                <small style={{ color: " #ffffff" }}> Messages related to this complaint</small>
+                <small style={{ color: " #ffffff" }}>
+                  {" "}
+                  Messages related to this complaint
+                </small>
               </div>
             </div>
           )}

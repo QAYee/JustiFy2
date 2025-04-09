@@ -71,7 +71,7 @@ const Home: React.FC = () => {
   const fetchNewsData = async () => {
     try {
       const response = await fetch(
-        "http://127.0.0.1/justify/index.php/NewsController/getNews",
+        "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/NewsController/getNews",
         {
           headers: { "Content-Type": "application/json" },
         }

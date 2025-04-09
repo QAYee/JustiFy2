@@ -221,7 +221,7 @@ const RegisterContainer: React.FC = () => {
     try {
       // Send registration request
       const response = await fetch(
-        "http://localhost/justify/index.php/RegisterController/register",
+        "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/RegisterController/register",
         {
           method: "POST",
           body: userData,

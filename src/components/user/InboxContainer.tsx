@@ -156,7 +156,7 @@ const InboxContainer: React.FC<ContainerProps> = ({
         // Try to fetch the current user from your auth API endpoint
         try {
           const response = await fetch(
-            "http://127.0.0.1/justify/index.php/UserController/getCurrentUser",
+            "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/UserController/getCurrentUser",
             {
               credentials: "include", // Include cookies if using cookie-based auth
               headers: {
@@ -206,7 +206,7 @@ const InboxContainer: React.FC<ContainerProps> = ({
 
     try {
       // Make sure the endpoint includes user_id parameter
-      const endpoint = `http://127.0.0.1/justify/index.php/AnnouncementController/getUserAnnouncements?user_id=${userId}`;
+      const endpoint = `https://ivory-swallow-404351.hostingersite.com/Justify/index.php/AnnouncementController/getUserAnnouncements?user_id=${userId}`;
 
       const response = await fetch(endpoint, {
         headers: {
@@ -291,7 +291,7 @@ const InboxContainer: React.FC<ContainerProps> = ({
       );
 
       const response = await fetch(
-        "http://127.0.0.1/justify/index.php/AnnouncementController/markAsRead",
+        "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/AnnouncementController/markAsRead",
         {
           method: "POST",
           headers: {

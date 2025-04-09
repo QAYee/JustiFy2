@@ -19,6 +19,9 @@ import {
 import { useHistory } from "react-router-dom";
 import "./LoginContainer.css";
 
+// Define base URL for API requests
+const BASE_URL = "https://ivory-swallow-404351.hostingersite.com/Justify";
+
 const LoginContainer: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -71,8 +74,7 @@ const LoginContainer: React.FC = () => {
 
       // If not a static user, proceed with API login
       const response = await fetch(
-        // "http://justifi.free.nf/index.php/LoginController/login",
-        "http://127.0.0.1/justify/index.php/LoginController/login",
+        `${BASE_URL}/index.php/LoginController/login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -112,13 +114,13 @@ const LoginContainer: React.FC = () => {
 
   return (
     <IonContent className="login-container">
-      <IonCard className="login-card">  
-          <IonImg 
-            src="src\styles\2-removebg-preview.png" 
-            alt="JustiFy Logo" 
-            className="login-logo-image" 
-            style={{ width: '120px', maxWidth: '70%', margin: '0 auto' }} 
-          />
+      <IonCard className="login-card">
+        <IonImg
+          src="src\styles\2-removebg-preview.png"
+          alt="JustiFy Logo"
+          className="login-logo-image"
+          style={{ width: "120px", maxWidth: "70%", margin: "0 auto" }}
+        />
         <IonCardTitle className="ion-text-center">
           <h1 className="login-logo">JustiFy</h1>
         </IonCardTitle>

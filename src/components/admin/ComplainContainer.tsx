@@ -224,7 +224,7 @@ const ComplaintDetails: React.FC<{
               </p>
               <div className="image-container">
                 <img
-                  src={`http://127.0.0.1/justify/uploads/complaints/${selectedComplaint.image}`}
+                  src={`https://ivory-swallow-404351.hostingersite.com/Justify/uploads/complaints/${selectedComplaint.image}`}
                   alt="Complaint attachment"
                   className="complaint-image"
                 />
@@ -261,7 +261,7 @@ const ComplainContainer: React.FC = () => {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1/justify/index.php/ComplaintController/getAllComplaints`,
+        `https://ivory-swallow-404351.hostingersite.com/Justify/index.php/ComplaintController/getAllComplaints`,
         {
           method: "GET",
           headers: {
@@ -322,7 +322,7 @@ const ComplainContainer: React.FC = () => {
   ) => {
     try {
       const response = await fetch(
-        `http://127.0.0.1/justify/index.php/ComplaintController/updateStatus`,
+        `https://ivory-swallow-404351.hostingersite.com/Justify/index.php/ComplaintController/updateStatus`,
         {
           method: "POST",
           headers: {
@@ -512,7 +512,7 @@ const ComplainContainer: React.FC = () => {
   const fetchMessages = async (complaintId: number) => {
     try {
       const response = await fetch(
-        `http://127.0.0.1/justify/index.php/ChatController/getMessages/${complaintId}`,
+        `https://ivory-swallow-404351.hostingersite.com/Justify/index.php/ChatController/getMessages/${complaintId}`,
         {
           method: "GET",
           headers: {
@@ -552,7 +552,7 @@ const ComplainContainer: React.FC = () => {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1/justify/index.php/ChatController/sendMessage`,
+        `https://ivory-swallow-404351.hostingersite.com/Justify/index.php/ChatController/sendMessage`,
         {
           method: "POST",
           headers: {
@@ -726,12 +726,12 @@ const ComplainContainer: React.FC = () => {
             value={sortBy}
             onIonChange={(e) => setSortBy(e.detail.value)}
             placeholder="Sort by"
-            style={{ 
-              color: '#002fa7',
+            style={{
+              color: "#002fa7",
               fontWeight: 500,
-              padding: '4px 8px',
-              borderRadius: '4px',
-              background: 'rgba(0, 47, 167, 0.05)'
+              padding: "4px 8px",
+              borderRadius: "4px",
+              background: "rgba(0, 47, 167, 0.05)",
             }}
           >
             <IonSelectOption value="date">Date (Newest)</IonSelectOption>
@@ -825,19 +825,24 @@ const ComplainContainer: React.FC = () => {
                     <p style={{ whiteSpace: "normal", overflow: "visible" }}>
                       <strong>Status:</strong>{" "}
                       {(() => {
-                      const statusOption = STATUS_OPTIONS.find(
-                        (option) => option.value.toLowerCase() === complaint.status?.toLowerCase()
-                      );
-                      return statusOption ? (
-                        <IonChip color={statusOption.color} style={{ margin: "2px 0" }}>
-                        <IonIcon icon={statusOption.icon} />
-                        <IonLabel>{statusOption.label}</IonLabel>
-                        </IonChip>
-                      ) : (
-                        <IonChip color="medium">
-                        <IonLabel>{complaint.status || "Unknown"}</IonLabel>
-                        </IonChip>
-                      );
+                        const statusOption = STATUS_OPTIONS.find(
+                          (option) =>
+                            option.value.toLowerCase() ===
+                            complaint.status?.toLowerCase()
+                        );
+                        return statusOption ? (
+                          <IonChip
+                            color={statusOption.color}
+                            style={{ margin: "2px 0" }}
+                          >
+                            <IonIcon icon={statusOption.icon} />
+                            <IonLabel>{statusOption.label}</IonLabel>
+                          </IonChip>
+                        ) : (
+                          <IonChip color="medium">
+                            <IonLabel>{complaint.status || "Unknown"}</IonLabel>
+                          </IonChip>
+                        );
                       })()}
                     </p>
                   </IonLabel>
@@ -975,7 +980,6 @@ const ComplainContainer: React.FC = () => {
               boxShadow: "0 4px 12px rgba(0, 47, 167, 0.12)",
             }}
           >
-           
             <ComplaintDetails
               selectedComplaint={selectedComplaint}
               handleStatusUpdate={handleStatusUpdate}

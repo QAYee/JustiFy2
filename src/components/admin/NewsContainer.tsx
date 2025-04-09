@@ -137,8 +137,8 @@ const NewsContainer: React.FC = () => {
     // Determine which endpoint to use based on content type
     const endpoint =
       formData.contentType === "news"
-        ? "http://127.0.0.1/justify/index.php/NewsController/addNews"
-        : "http://127.0.0.1/justify/index.php/AnnouncementController/addAnnouncement";
+        ? "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/NewsController/addNews"
+        : "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/AnnouncementController/addAnnouncement";
 
     try {
       const response = await fetch(endpoint, {
@@ -181,7 +181,7 @@ const NewsContainer: React.FC = () => {
     try {
       // Fetch news
       const newsResponse = await fetch(
-        "http://127.0.0.1/justify/index.php/NewsController/getNews",
+        "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/NewsController/getNews",
         {
           headers: { "Content-Type": "application/json" },
         }
@@ -197,7 +197,7 @@ const NewsContainer: React.FC = () => {
 
       // Fetch announcements
       const announcementResponse = await fetch(
-        "http://127.0.0.1/justify/index.php/AnnouncementController/getAnnouncements",
+        "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/AnnouncementController/getAnnouncements",
         {
           headers: { "Content-Type": "application/json" },
         }
@@ -302,7 +302,7 @@ const NewsContainer: React.FC = () => {
   const fetchUsers = async () => {
     try {
       const response = await fetch(
-        "http://127.0.0.1/justify/index.php/AnnouncementController/getUsers",
+        "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/AnnouncementController/getUsers",
         {
           headers: { "Content-Type": "application/json" },
         }
@@ -367,8 +367,8 @@ const NewsContainer: React.FC = () => {
     // Determine which endpoint to use based on content type
     const endpoint =
       formData.contentType === "news"
-        ? "http://127.0.0.1/justify/index.php/NewsController/updateNews"
-        : "http://127.0.0.1/justify/index.php/AnnouncementController/updateAnnouncement";
+        ? "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/NewsController/updateNews"
+        : "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/AnnouncementController/updateAnnouncement";
 
     try {
       const response = await fetch(endpoint, {
@@ -418,8 +418,8 @@ const NewsContainer: React.FC = () => {
     const isAnnouncement = contentToDelete?.contentType === "announcement";
 
     const endpoint = isAnnouncement
-      ? "http://127.0.0.1/justify/index.php/AnnouncementController/deleteAnnouncement"
-      : "http://127.0.0.1/justify/index.php/NewsController/deleteNews";
+      ? "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/AnnouncementController/deleteAnnouncement"
+      : "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/NewsController/deleteNews";
 
     try {
       const response = await fetch(endpoint, {
@@ -546,11 +546,19 @@ const NewsContainer: React.FC = () => {
                   }}
                   scrollable={true}
                 >
-                  <IonSegmentButton value="news" layout="icon-start" style={{ minWidth: "120px" }}>
+                  <IonSegmentButton
+                    value="news"
+                    layout="icon-start"
+                    style={{ minWidth: "120px" }}
+                  >
                     <IonIcon icon={newspaperOutline} />
                     <IonLabel>News</IonLabel>
                   </IonSegmentButton>
-                  <IonSegmentButton value="announcement" layout="icon-start" style={{ minWidth: "180px" }}>
+                  <IonSegmentButton
+                    value="announcement"
+                    layout="icon-start"
+                    style={{ minWidth: "180px" }}
+                  >
                     <IonIcon icon={megaphone} />
                     <IonLabel>Announcement</IonLabel>
                   </IonSegmentButton>
@@ -800,37 +808,49 @@ const NewsContainer: React.FC = () => {
 
             <div
               style={{
-              background: "#ffffff",
-              padding: "16px",
-              borderRadius: "0 0 10px 10px",
-              marginBottom: "16px",
-              boxShadow: "0 4px 12px rgba(0, 47, 167, 0.12)"
+                background: "#ffffff",
+                padding: "16px",
+                borderRadius: "0 0 10px 10px",
+                marginBottom: "16px",
+                boxShadow: "0 4px 12px rgba(0, 47, 167, 0.12)",
               }}
             >
-                <IonSegment
-                  value={contentFilter}
-                  onIonChange={(e) => setContentFilter(e.detail.value as any)}
-                  style={{
-                    "--background": "#f0f4ff",
-                    "--color": "#002fa7",
-                    "--color-checked": "#ffffff",
-                    "--background-checked": "#002fa7",
-                    width: "100%"
-                  }}
-                  scrollable={true}
+              <IonSegment
+                value={contentFilter}
+                onIonChange={(e) => setContentFilter(e.detail.value as any)}
+                style={{
+                  "--background": "#f0f4ff",
+                  "--color": "#002fa7",
+                  "--color-checked": "#ffffff",
+                  "--background-checked": "#002fa7",
+                  width: "100%",
+                }}
+                scrollable={true}
+              >
+                <IonSegmentButton
+                  value="all"
+                  layout="icon-start"
+                  style={{ minWidth: "100px" }}
                 >
-                  <IonSegmentButton value="all" layout="icon-start" style={{ minWidth: "100px" }}>
-                    <IonLabel>All</IonLabel>
-                  </IonSegmentButton>
-                  <IonSegmentButton value="news" layout="icon-start" style={{ minWidth: "120px" }}>
-                    <IonIcon icon={newspaperOutline} />
-                    <IonLabel>News</IonLabel>
-                  </IonSegmentButton>
-                  <IonSegmentButton value="announcement" layout="icon-start" style={{ minWidth: "200px" }}>
-                    <IonIcon icon={megaphone} />
-                    <IonLabel>Announcements</IonLabel>
-                  </IonSegmentButton>
-                </IonSegment>
+                  <IonLabel>All</IonLabel>
+                </IonSegmentButton>
+                <IonSegmentButton
+                  value="news"
+                  layout="icon-start"
+                  style={{ minWidth: "120px" }}
+                >
+                  <IonIcon icon={newspaperOutline} />
+                  <IonLabel>News</IonLabel>
+                </IonSegmentButton>
+                <IonSegmentButton
+                  value="announcement"
+                  layout="icon-start"
+                  style={{ minWidth: "200px" }}
+                >
+                  <IonIcon icon={megaphone} />
+                  <IonLabel>Announcements</IonLabel>
+                </IonSegmentButton>
+              </IonSegment>
             </div>
 
             <div className="news-list">

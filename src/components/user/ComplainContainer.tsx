@@ -149,7 +149,7 @@ const ComplainContainer: React.FC = () => {
   const fetchUserComplaints = async (userId: number) => {
     try {
       const response = await fetch(
-        `http://127.0.0.1/justify/index.php/ComplaintController/getAllComplaints?user_id=${userId}`,
+        `https://ivory-swallow-404351.hostingersite.com/Justify/index.php/ComplaintController/getAllComplaints?user_id=${userId}`,
         {
           method: "GET",
           headers: {
@@ -275,7 +275,7 @@ const ComplainContainer: React.FC = () => {
 
     try {
       const response = await fetch(
-        "http://127.0.0.1/justify/index.php/ComplaintController/create",
+        "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/ComplaintController/create",
         {
           method: "POST",
           body: formData,
@@ -331,7 +331,7 @@ const ComplainContainer: React.FC = () => {
       }
 
       const response = await fetch(
-        `http://127.0.0.1/justify/index.php/ChatController/getMessages/${complaintId}`
+        `https://ivory-swallow-404351.hostingersite.com/Justify/index.php/ChatController/getMessages/${complaintId}`
       );
 
       const data = await response.json();
@@ -365,7 +365,7 @@ const ComplainContainer: React.FC = () => {
 
     try {
       const response = await fetch(
-        "http://127.0.0.1/justify/index.php/ChatController/sendMessage",
+        "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/ChatController/sendMessage",
         {
           method: "POST",
           headers: {
