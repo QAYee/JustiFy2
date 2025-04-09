@@ -29,12 +29,6 @@ const LoginContainer: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const history = useHistory();
 
-  // Static user credentials (for testing purposes)
-  const staticUsers = [
-    { username: "admin", password: "123", admin: 1, name: "Administrator" },
-    { username: "user", password: "123", admin: 0, name: "Regular User" },
-  ];
-
   const validateForm = (): boolean => {
     if (!email || !password) {
       setError("Both username and password are required.");
@@ -49,30 +43,7 @@ const LoginContainer: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Check static users first
-      const staticUser = staticUsers.find(
-        (user) => user.username === email && user.password === password
-      );
-
-      if (staticUser) {
-        // Create user data object
-        const userData = {
-          name: staticUser.name,
-          username: staticUser.username,
-          admin: staticUser.admin,
-          isAdmin: staticUser.admin === 1,
-        };
-
-        // Store user data in localStorage
-        localStorage.setItem("user", JSON.stringify(userData));
-        localStorage.setItem("userInfo", JSON.stringify(userData));
-
-        // Redirect based on role
-        history.push(staticUser.admin === 1 ? "/admin/home" : "/home");
-        return;
-      }
-
-      // If not a static user, proceed with API login
+      // Proceed with API login
       const response = await fetch(
         `${BASE_URL}/index.php/LoginController/login`,
         {
