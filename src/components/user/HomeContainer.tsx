@@ -94,41 +94,50 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
   return (
     <div className="home-container">
       {/* Welcome Card */}
-      <IonCard className="welcome-card">
-        <div className="banner-image">
+      <IonCard style={{ borderRadius: '15px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', overflow: 'hidden', margin: '16px auto', maxWidth: '800px' }}>
+        <div style={{ position: 'relative' }}>
           <img
-            alt="Barangay Hall"
-            src="https://ionicframework.com/docs/img/demos/card-media.png"
-            style={{ maxHeight: "200px", objectFit: "cover", width: "100%" }}
+        alt="Barangay Hall"
+        src="https://ionicframework.com/docs/img/demos/card-media.png"
+        style={{ maxHeight: "200px", objectFit: "cover", width: "100%" }}
           />
-          <div className="banner-overlay"></div>
+          <div style={{ 
+        position: 'absolute', 
+        top: 0, 
+        left: 0, 
+        width: '100%', 
+        height: '100%', 
+        background: 'linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.7))',
+        zIndex: 1 
+          }}></div>
         </div>
-        <IonCardHeader>
-          <IonCardSubtitle>Welcome to</IonCardSubtitle>
-          <IonCardTitle>JustiFy Community Portal</IonCardTitle>
+        <IonCardHeader style={{ paddingTop: '16px', background: '#ffffff', textAlign: 'center' }}>
+          <IonCardSubtitle style={{ color: '#666666', fontWeight: 500, fontSize: '14px' }}>Welcome to</IonCardSubtitle>
+          <IonCardTitle style={{ color: '#263238', fontWeight: 700, fontSize: '24px' }}>JustiFy Community Portal</IonCardTitle>
         </IonCardHeader>
-        <IonCardContent>
-          <p>
-            Your one-stop platform for community services, complaint management,
-            and local updates. Stay connected with your barangay officials and
-            fellow residents.
+        <IonCardContent style={{ background: '#ffffff', paddingTop: '0', textAlign: 'center' }}>
+          <p style={{ color: '#546e7a', lineHeight: '1.5', marginBottom: '20px' }}>
+        Your one-stop platform for community services, complaint management,
+        and local updates. Stay connected with your barangay officials and
+        fellow residents.
           </p>
           <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginTop: "16px",
-            }}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "16px",
+          flexWrap: "wrap",
+          gap: "16px"
+        }}
           >
-            <IonButton fill="clear" href="/complain">
-              File a Complaint
-              <IonIcon slot="end" icon={arrowForwardOutline} />
-            </IonButton>
-            <IonButton fill="clear" href="/inbox">
-              <IonIcon slot="start" icon={notificationsOutline} />
-              Notifications
-              <IonBadge style={{ marginLeft: "8px" }}>3</IonBadge>
-            </IonButton>
+        <IonButton fill="clear" href="/complain" style={{ color: '#1976d2' }}>
+          File a Complaint
+          <IonIcon slot="end" icon={arrowForwardOutline} />
+        </IonButton>
+        <IonButton fill="clear" href="/inbox" style={{ color: '#1976d2' }}>
+          <IonIcon slot="start" icon={notificationsOutline} />
+          Notifications
+        </IonButton>
           </div>
         </IonCardContent>
       </IonCard>
@@ -176,57 +185,9 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
         </IonCard>
       ))}
 
-      {/* Recent Activities Section */}
-      <h2 className="section-header">
-        <IonIcon icon={timeOutline} />
-        Recent Activities
-      </h2>
+    
 
-      <IonCard>
-        <IonCardHeader>
-          <IonCardTitle>Your Activity Feed</IonCardTitle>
-        </IonCardHeader>
-        <IonList>
-          {recentActivities.map((activity) => (
-            <IonItem key={activity.id}>
-              <IonAvatar slot="start">
-                <IonIcon
-                  icon={personOutline}
-                  style={{ fontSize: "24px", margin: "8px" }}
-                />
-              </IonAvatar>
-              <IonLabel>
-                <h2>{activity.type}</h2>
-                <p>{activity.description}</p>
-                <p style={{ fontSize: "12px", color: "#666" }}>
-                  {activity.date}
-                </p>
-              </IonLabel>
-              {activity.status === "pending" && (
-                <IonChip color="warning" outline={true}>
-                  Pending
-                </IonChip>
-              )}
-              {activity.status === "processing" && (
-                <IonChip color="primary" outline={true}>
-                  Processing
-                </IonChip>
-              )}
-              {activity.status === "resolved" && (
-                <IonChip color="success" outline={true}>
-                  Resolved
-                </IonChip>
-              )}
-            </IonItem>
-          ))}
-        </IonList>
-        <IonCardContent>
-          <IonButton expand="block" fill="clear">
-            View All Activities
-            <IonIcon slot="end" icon={arrowForwardOutline} />
-          </IonButton>
-        </IonCardContent>
-      </IonCard>
+     
 
       {/* News Section */}
       <h2 className="section-header">

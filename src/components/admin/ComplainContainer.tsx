@@ -69,6 +69,7 @@ interface Complaint {
 }
 
 interface SelectedComplaint extends Complaint {
+  complaint_type: ReactNode;
   messages?: Message[];
 }
 
@@ -201,7 +202,7 @@ const ComplaintDetails: React.FC<{
       <IonCardContent>
         <div className="complaint-details">
           <p>
-            <strong>Type:</strong> {selectedComplaint.type}
+            <strong>Type:</strong> {selectedComplaint.complaint_type}
           </p>
           <p>
             <strong>Complainant:</strong> {selectedComplaint.complainant}
@@ -216,21 +217,28 @@ const ComplaintDetails: React.FC<{
             <strong>Incident Date:</strong>{" "}
             {formatDate(selectedComplaint.incident_date)}
           </p>
-
-          {selectedComplaint.image && (
+            {selectedComplaint.image && (
             <div className="attachment-container">
               <p>
-                <strong>Attachment:</strong>
+              <strong>Attachment:</strong>
               </p>
               <div className="image-container">
-                <img
-                  src={`https://ivory-swallow-404351.hostingersite.com/Justify/uploads/complaints/${selectedComplaint.image}`}
-                  alt="Complaint attachment"
-                  className="complaint-image"
-                />
+              <img
+                src={`https://ivory-swallow-404351.hostingersite.com/Justify/uploads/complaints/${selectedComplaint.image}`}
+                alt="Complaint attachment"
+                className="complaint-image"
+                onClick={(e) => {
+                // Allow image to be viewed in full size when clicked
+                window.open(e.currentTarget.src, '_blank');
+                }}
+              />
               </div>
+              <p style={{ fontSize: "0.8em", color: "#666", marginTop: "5px" }}>
+              Tap image to view full size
+              </p>
             </div>
-          )}
+            )}
+          
         </div>
 
         {renderStatusActions()}
@@ -778,74 +786,74 @@ const ComplainContainer: React.FC = () => {
                     boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
                   }}
                 >
-                  <IonLabel className="ion-text-wrap">
+                    <IonLabel className="ion-text-wrap">
                     <h2
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        flexWrap: "wrap",
-                        gap: "4px",
-                        color: "#002fa7",
+                      display: "flex",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      gap: "4px",
+                      color: "#002fa7",
                       }}
                     >
+                      <span style={{ fontWeight: "bold", marginRight: "4px" }}>
+                      {complaint.complainant}
+                      </span>
                       <span style={{ wordBreak: "break-word" }}>
-                        {complaint.type}
+                      - {complaint.type}
                       </span>
                       <IonBadge color="medium">#{complaint.id}</IonBadge>
                       {complaint.image && (
-                        <IonIcon
-                          icon={imageOutline}
-                          style={{
-                            marginLeft: "8px",
-                            fontSize: "1.1em",
-                            verticalAlign: "middle",
-                          }}
-                        />
+                      <IonIcon
+                        icon={imageOutline}
+                        style={{
+                        marginLeft: "8px",
+                        fontSize: "1.1em",
+                        verticalAlign: "middle",
+                        }}
+                      />
                       )}
                     </h2>
-                    <h3 style={{ whiteSpace: "normal", overflow: "visible" }}>
-                      Complainant: {complaint.complainant}
-                    </h3>
                     <p style={{ whiteSpace: "normal", overflow: "visible" }}>
                       <strong>Respondent:</strong> {complaint.respondent}
                     </p>
                     <p style={{ whiteSpace: "normal", overflow: "visible" }}>
                       <strong>Date:</strong>
                       <IonChip
-                        color="medium"
-                        outline={true}
-                        style={{ margin: "2px 0" }}
+                      color="medium"
+                      outline={true}
+                      style={{ margin: "2px 0" }}
                       >
-                        <IonIcon icon={timeOutline} />
-                        <span style={{ padding: "0 4px" }}>
-                          {formatDate(complaint.incident_date)}
-                        </span>
+                      <IonIcon icon={timeOutline} />
+                      <span style={{ padding: "0 4px" }}>
+                        {formatDate(complaint.incident_date)}
+                      </span>
                       </IonChip>
                     </p>
                     <p style={{ whiteSpace: "normal", overflow: "visible" }}>
                       <strong>Status:</strong>{" "}
                       {(() => {
-                        const statusOption = STATUS_OPTIONS.find(
-                          (option) =>
-                            option.value.toLowerCase() ===
-                            complaint.status?.toLowerCase()
-                        );
-                        return statusOption ? (
-                          <IonChip
-                            color={statusOption.color}
-                            style={{ margin: "2px 0" }}
-                          >
-                            <IonIcon icon={statusOption.icon} />
-                            <IonLabel>{statusOption.label}</IonLabel>
-                          </IonChip>
-                        ) : (
-                          <IonChip color="medium">
-                            <IonLabel>{complaint.status || "Unknown"}</IonLabel>
-                          </IonChip>
-                        );
+                      const statusOption = STATUS_OPTIONS.find(
+                        (option) =>
+                        option.value.toLowerCase() ===
+                        complaint.status?.toLowerCase()
+                      );
+                      return statusOption ? (
+                        <IonChip
+                        color={statusOption.color}
+                        style={{ margin: "2px 0" }}
+                        >
+                        <IonIcon icon={statusOption.icon} />
+                        <IonLabel>{statusOption.label}</IonLabel>
+                        </IonChip>
+                      ) : (
+                        <IonChip color="medium">
+                        <IonLabel>{complaint.status || "Unknown"}</IonLabel>
+                        </IonChip>
+                      );
                       })()}
                     </p>
-                  </IonLabel>
+                    </IonLabel>
                 </IonItem>
                 <IonItemOptions side="end">
                   {!["Resolved", "Closed", "Rejected"].includes(

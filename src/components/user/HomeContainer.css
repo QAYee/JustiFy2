@@ -44,11 +44,11 @@ ion-card-header {
   color: var(--text-on-primary);
 }
 
-ion-card-title {
+/* ion-card-title {
   color: var(--text-on-primary) !important;
   font-size: 18px;
   font-weight: 600;
-}
+} */
 
 ion-card-subtitle {
   color: var(--secondary-color) !important;
