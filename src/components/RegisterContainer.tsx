@@ -104,7 +104,7 @@ const RegisterContainer: React.FC = () => {
 
       // Call backend API to send verification code
       const response = await fetch(
-        "http://localhost/justify/index.php/EmailController/sendVerificationCode",
+        "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/EmailController/sendVerificationCode",
         {
           method: "POST",
           headers: {

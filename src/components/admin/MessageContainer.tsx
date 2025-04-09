@@ -40,7 +40,7 @@ import "./MessageContainer.css"; // Import your CSS styles
 import { data } from "cypress/types/jquery";
 
 // Base URL for API calls
-const API_BASE_URL = "http://localhost/justify/index.php";
+const API_BASE_URL = "https://ivory-swallow-404351.hostingersite.com/Justify/index.php";
 
 interface User {
   id: number;
