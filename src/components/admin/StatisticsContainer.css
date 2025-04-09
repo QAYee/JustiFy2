@@ -107,6 +107,8 @@ ion-select.filter-select {
   border-radius: 8px;
   padding: 16px;
   box-shadow: 0 2px 6px rgba(0, 47, 167, 0.1);
+  position: relative;
+  width: 100%;
 }
 
 .stats-header {
@@ -164,18 +166,32 @@ ion-select.filter-select {
 
   .stats-segment {
     overflow-x: auto;
+    min-height: 40px;
+  }
+
+  .stats-title-mobile {
+    font-size: 1.1rem !important;
+  }
+
+  .stats-total-value {
+    font-size: 1.3rem !important;
   }
 
   .filter-container {
-    padding: 8px;
+    padding: 0 8px;
   }
 
   .filter-item {
-    margin-bottom: 12px;
+    margin: 4px 0 !important;
   }
 
   ion-col.ion-text-end {
     text-align: center !important;
+  }
+
+  /* Add spacing between charts on mobile */
+  .ion-col + .ion-col {
+    margin-top: 16px;
   }
 }
 

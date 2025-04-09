@@ -69,23 +69,6 @@ interface DateFilter {
   month: string | null;
 }
 
-// No need for complaint type mapping since we're using names directly now
-// Remove or comment out the old mapping
-/*
-const complaintTypeMap: { [key: number]: string } = {
-  1: "Noise Complaint",
-  2: "Property Dispute",
-  3: "Public Disturbance",
-  4: "Utility Issue",
-  5: "Environmental Concern",
-  6: "Vandalism",
-  7: "Illegal Construction",
-  8: "Parking Violation",
-  9: "Animal Complaint",
-  10: "Others",
-};
-*/
-
 const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
   const [activeTab, setActiveTab] = useState<string>("complaints");
   const [loading, setLoading] = useState<boolean>(true);
@@ -183,9 +166,6 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
     } catch (error) {
       console.error("Error fetching statistics:", error);
       setLoading(false);
-      // You might want to implement proper error handling here
-      // For example:
-      // setError("Failed to load statistics data. Please try again later.");
     }
   };
 
@@ -243,15 +223,84 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
     },
   };
 
+  // Add state to track window width
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  // Handle resize events
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Redraw charts when window size changes
+  useEffect(() => {
+    if (stats && !loading) {
+      // Force chart redraw by destroying and recreating them
+      Object.values(chartInstances.current).forEach((chart) => {
+        if (chart) chart.destroy();
+      });
+
+      // This will trigger the useEffect that creates charts
+      setStats({ ...stats });
+    }
+  }, [windowWidth]);
+
   useEffect(() => {
     if (!stats || loading) return;
+
+    // Get current screen width for responsive adjustments
+    const screenWidth = window.innerWidth;
+    const isMobile = screenWidth < 768;
+
+    // Common responsive chart options
+    const getResponsiveOptions = (title: string) => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: isMobile ? "bottom" : "top",
+          labels: {
+            boxWidth: isMobile ? 12 : 20,
+            padding: isMobile ? 10 : 20,
+            color: chartColors.primary,
+            font: {
+              size: isMobile ? 10 : 14,
+              weight: "bold",
+            },
+          },
+        },
+        title: {
+          display: true,
+          text: title,
+          color: chartColors.primary,
+          font: {
+            weight: "bold",
+            size: isMobile ? 14 : 16,
+          },
+          padding: {
+            top: 10,
+            bottom: isMobile ? 5 : 10,
+          },
+        },
+        datalabels: {
+          font: {
+            size: isMobile ? 9 : 11,
+            weight: "bold",
+          },
+        },
+      },
+    });
 
     // Destroy existing charts to prevent memory leaks
     Object.values(chartInstances.current).forEach((chart) => {
       if (chart) chart.destroy();
     });
 
-    // Create complaint trend chart
+    // Create complaint trend chart with responsive options
     if (complaintsChartRef.current) {
       const ctx = complaintsChartRef.current.getContext("2d");
       if (ctx) {
@@ -259,7 +308,6 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
         let dataPoints = [];
 
         if (filter.month) {
-          // Get number of days in the selected month
           const monthIndex = monthNames.indexOf(filter.month);
           const daysInMonth = new Date(
             filter.year,
@@ -267,16 +315,13 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
             0
           ).getDate();
 
-          // Create array of all days in month
           dataLabels = Array.from(
             { length: daysInMonth },
             (_, i) => `Day ${i + 1}`
           );
 
-          // Initialize data points with zeros
           dataPoints = Array(daysInMonth).fill(0);
 
-          // Fill in actual data where available
           stats.complaints.monthly.forEach((item) => {
             const day = item.day || parseInt(item.date?.split("-")[2] || "0");
             if (day > 0 && day <= daysInMonth) {
@@ -284,7 +329,6 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
             }
           });
         } else {
-          // Monthly view - use data as is
           dataLabels = stats.complaints.monthly.map((item) => item.month);
           dataPoints = stats.complaints.monthly.map((item) => item.count);
         }
@@ -311,25 +355,26 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
             ],
           },
           options: {
-            responsive: true,
-            plugins: {
-              legend: {
-                position: "top",
-                labels: {
-                  color: chartColors.primary,
+            ...getResponsiveOptions(chartTitle),
+            scales: {
+              x: {
+                ticks: {
+                  maxRotation: isMobile ? 45 : 0,
+                  minRotation: isMobile ? 45 : 0,
                   font: {
-                    weight: "bold",
+                    size: isMobile ? 8 : 12,
                   },
+                  autoSkip: true,
+                  maxTicksLimit: isMobile ? 8 : 12,
                 },
               },
-              title: {
-                display: true,
-                text: chartTitle,
-                color: chartColors.primary,
-                font: {
-                  weight: "bold",
-                  size: 16,
+              y: {
+                ticks: {
+                  font: {
+                    size: isMobile ? 10 : 12,
+                  },
                 },
+                beginAtZero: true,
               },
             },
           },
@@ -345,7 +390,6 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
         let dataPoints = [];
 
         if (filter.month) {
-          // Get number of days in the selected month
           const monthIndex = monthNames.indexOf(filter.month);
           const daysInMonth = new Date(
             filter.year,
@@ -353,16 +397,13 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
             0
           ).getDate();
 
-          // Create array of all days in month
           dataLabels = Array.from(
             { length: daysInMonth },
             (_, i) => `Day ${i + 1}`
           );
 
-          // Initialize data points with zeros
           dataPoints = Array(daysInMonth).fill(0);
 
-          // Fill in actual data where available
           stats.users.monthly.forEach((item) => {
             const day = item.day || parseInt(item.date?.split("-")[2] || "0");
             if (day > 0 && day <= daysInMonth) {
@@ -370,7 +411,6 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
             }
           });
         } else {
-          // Monthly view - use data as is
           dataLabels = stats.users.monthly.map((item) => item.month);
           dataPoints = stats.users.monthly.map((item) => item.count);
         }
@@ -397,25 +437,26 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
             ],
           },
           options: {
-            responsive: true,
-            plugins: {
-              legend: {
-                position: "top",
-                labels: {
-                  color: chartColors.primary,
+            ...getResponsiveOptions(chartTitle),
+            scales: {
+              x: {
+                ticks: {
+                  maxRotation: isMobile ? 45 : 0,
+                  minRotation: isMobile ? 45 : 0,
                   font: {
-                    weight: "bold",
+                    size: isMobile ? 8 : 12,
                   },
+                  autoSkip: true,
+                  maxTicksLimit: isMobile ? 8 : 12,
                 },
               },
-              title: {
-                display: true,
-                text: chartTitle,
-                color: chartColors.primary,
-                font: {
-                  weight: "bold",
-                  size: 16,
+              y: {
+                ticks: {
+                  font: {
+                    size: isMobile ? 10 : 12,
+                  },
                 },
+                beginAtZero: true,
               },
             },
           },
@@ -427,7 +468,6 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
     if (complaintsStatusChartRef.current) {
       const ctx = complaintsStatusChartRef.current.getContext("2d");
       if (ctx) {
-        // Calculate total for percentages
         const statusTotal = stats.complaints.byStatus.reduce(
           (sum, item) => sum + item.count,
           0
@@ -446,26 +486,8 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
             ],
           },
           options: {
-            responsive: true,
+            ...getResponsiveOptions("Complaints by Status"),
             plugins: {
-              legend: {
-                position: "top",
-                labels: {
-                  color: chartColors.primary,
-                  font: {
-                    weight: "bold",
-                  },
-                },
-              },
-              title: {
-                display: true,
-                text: "Complaints by Status",
-                color: chartColors.primary,
-                font: {
-                  weight: "bold",
-                  size: 16,
-                },
-              },
               tooltip: {
                 callbacks: {
                   label: function (context) {
@@ -499,25 +521,44 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
     if (complaintsTypeChartRef.current) {
       const ctx = complaintsTypeChartRef.current.getContext("2d");
       if (ctx) {
-        // Define consistent colors for complaint types
         const complaintTypeColors: { [key: string]: string } =
           chartColors.typeColors;
 
-        // Sort data by count (descending) for better visualization
         const sortedData = [...stats.complaints.byType].sort(
           (a, b) => b.count - a.count
         );
 
-        // Show only top 10 complaint types if there are more
         const displayData = sortedData.slice(0, 10);
 
-        // Get background colors based on type names
         const backgroundColors = displayData.map(
           (item) =>
             complaintTypeColors[item.type] || complaintTypeColors.default
         );
 
-        console.log("Complaint types data:", stats.complaints.byType);
+        const typeChartOptions = {
+          ...getResponsiveOptions("Complaints by Type"),
+          indexAxis: "y",
+          scales: {
+            x: {
+              beginAtZero: true,
+              ticks: {
+                precision: 0,
+                font: {
+                  size: isMobile ? 10 : 12,
+                },
+              },
+            },
+            y: {
+              ticks: {
+                font: {
+                  size: isMobile ? 9 : 11,
+                },
+                autoSkip: true,
+                maxTicksLimit: isMobile ? 7 : 10,
+              },
+            },
+          },
+        };
 
         chartInstances.current.complaintsType = new Chart(ctx, {
           type: "bar",
@@ -535,48 +576,6 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
               },
             ],
           },
-          options: {
-            responsive: true,
-            indexAxis: "y", // Makes horizontal bar chart for better readability
-            plugins: {
-              legend: {
-                display: false, // Hide legend as we're using colored bars
-              },
-              title: {
-                display: true,
-                text: "Complaints by Type",
-                font: {
-                  size: 16,
-                  weight: "bold",
-                },
-              },
-              tooltip: {
-                callbacks: {
-                  label: function (context) {
-                    return `${context.raw} complaints`;
-                  },
-                },
-              },
-            },
-            scales: {
-              x: {
-                beginAtZero: true,
-                ticks: {
-                  precision: 0, // Only show whole numbers
-                },
-                title: {
-                  display: true,
-                  text: "Number of Complaints",
-                },
-              },
-              y: {
-                title: {
-                  display: true,
-                  text: "Complaint Type",
-                },
-              },
-            },
-          },
         });
       }
     }
@@ -585,7 +584,6 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
     if (usersRoleChartRef.current) {
       const ctx = usersRoleChartRef.current.getContext("2d");
       if (ctx) {
-        // Calculate total for percentages
         const roleTotal = stats.users.byRole.reduce(
           (sum, item) => sum + item.count,
           0
@@ -608,26 +606,8 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
             ],
           },
           options: {
-            responsive: true,
+            ...getResponsiveOptions("Users by Role"),
             plugins: {
-              legend: {
-                position: "top",
-                labels: {
-                  color: chartColors.primary,
-                  font: {
-                    weight: "bold",
-                  },
-                },
-              },
-              title: {
-                display: true,
-                text: "Users by Role",
-                color: chartColors.primary,
-                font: {
-                  weight: "bold",
-                  size: 16,
-                },
-              },
               tooltip: {
                 callbacks: {
                   label: function (context) {
@@ -790,47 +770,152 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
         ) : (
           <>
             {activeTab === "complaints" && stats && (
-              <IonGrid>
+              <IonGrid className="stats-grid">
+                {/* Summary header - Mobile optimized */}
                 <IonRow>
                   <IonCol size="12">
-                    <div className="stats-header">
-                      <h2>
+                    <div
+                      className="stats-header"
+                      style={{
+                        padding: "12px",
+                        backgroundColor: "#f5f7ff",
+                        borderRadius: "10px",
+                        marginBottom: "16px",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                      }}
+                    >
+                      <h2
+                        className="stats-title-mobile"
+                        style={{
+                          fontSize: "1.2rem",
+                          margin: "0",
+                          textAlign: "center",
+                          fontWeight: "700",
+                          color: "#002fa7",
+                        }}
+                      >
                         Total Complaints:{" "}
-                        <span className="stats-total-value">
+                        <span
+                          className="stats-total-value"
+                          style={{
+                            fontSize: "1.5rem",
+                            color: "#002fa7",
+                            fontWeight: "800",
+                          }}
+                        >
                           {stats.complaints.total}
                         </span>
                         {filter.month && (
-                          <span className="filter-info">
-                            {" "}
-                            ({filter.month} {filter.year})
+                          <span
+                            className="filter-info"
+                            style={{
+                              fontSize: "0.95rem",
+                              fontWeight: "500",
+                              color: "#666",
+                              display: "block",
+                              marginTop: "4px",
+                            }}
+                          >
+                            {filter.month} {filter.year}
                           </span>
                         )}
                         {!filter.month && (
-                          <span className="filter-info"> ({filter.year})</span>
+                          <span
+                            className="filter-info"
+                            style={{
+                              fontSize: "0.95rem",
+                              fontWeight: "500",
+                              color: "#666",
+                              display: "block",
+                              marginTop: "4px",
+                            }}
+                          >
+                            {filter.year}
+                          </span>
                         )}
                       </h2>
                     </div>
                   </IonCol>
                 </IonRow>
+
+                {/* Charts - Mobile responsive layout */}
                 <IonRow>
+                  {/* Chart container with horizontal scrolling */}
                   <IonCol size="12" sizeMd="6">
-                    <div className="canvas-container">
-                      <canvas ref={complaintsChartRef}></canvas>
+                    <div
+                      className="chart-scroll-container"
+                      style={{
+                        marginBottom: "24px",
+                        backgroundColor: "white",
+                        borderRadius: "10px",
+                        padding: "16px",
+                        boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
+                        position: "relative",
+                        overflowX: "auto",
+                        WebkitOverflowScrolling: "touch",
+                      }}
+                    >
+                      <div
+                        style={{
+                          minHeight: "250px",
+                          height: window.innerWidth < 768 ? "280px" : "300px",
+                          minWidth: window.innerWidth < 768 ? "500px" : "100%",
+                        }}
+                      >
+                        <canvas ref={complaintsChartRef}></canvas>
+                      </div>
                     </div>
                   </IonCol>
                   <IonCol size="12" sizeMd="6">
-                    <div className="canvas-container">
-                      <canvas ref={complaintsStatusChartRef}></canvas>
+                    <div
+                      className="chart-scroll-container"
+                      style={{
+                        marginBottom: "24px",
+                        backgroundColor: "white",
+                        borderRadius: "10px",
+                        padding: "16px",
+                        boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
+                        position: "relative",
+                        overflowX: "auto",
+                        WebkitOverflowScrolling: "touch",
+                      }}
+                    >
+                      <div
+                        style={{
+                          minHeight: "250px",
+                          height: window.innerWidth < 768 ? "280px" : "300px",
+                          minWidth: window.innerWidth < 768 ? "300px" : "100%",
+                        }}
+                      >
+                        <canvas ref={complaintsStatusChartRef}></canvas>
+                      </div>
                     </div>
                   </IonCol>
                 </IonRow>
+
+                {/* Complaint types chart with horizontal scrolling */}
                 <IonRow>
                   <IonCol size="12">
                     <div
-                      className="canvas-container"
-                      style={{ minHeight: "400px" }}
+                      className="chart-scroll-container"
+                      style={{
+                        backgroundColor: "white",
+                        borderRadius: "10px",
+                        padding: "16px",
+                        boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
+                        position: "relative",
+                        overflowX: "auto",
+                        WebkitOverflowScrolling: "touch",
+                      }}
                     >
-                      <canvas ref={complaintsTypeChartRef}></canvas>
+                      <div
+                        style={{
+                          height: window.innerWidth < 768 ? "380px" : "400px",
+                          minWidth: window.innerWidth < 768 ? "600px" : "100%",
+                        }}
+                      >
+                        <canvas ref={complaintsTypeChartRef}></canvas>
+                      </div>
                     </div>
                   </IonCol>
                 </IonRow>
@@ -839,36 +924,123 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
 
             {activeTab === "users" && stats && (
               <IonGrid>
+                {/* Summary header - Mobile optimized */}
                 <IonRow>
                   <IonCol size="12">
-                    <div className="stats-header">
-                      <h2>
+                    <div
+                      className="stats-header"
+                      style={{
+                        padding: "12px",
+                        backgroundColor: "#f5f7ff",
+                        borderRadius: "10px",
+                        marginBottom: "16px",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                      }}
+                    >
+                      <h2
+                        style={{
+                          fontSize: "1.2rem",
+                          margin: "0",
+                          textAlign: "center",
+                          fontWeight: "700",
+                          color: "#002fa7",
+                        }}
+                      >
                         Total Users:{" "}
-                        <span className="stats-total-value">
+                        <span
+                          className="stats-total-value"
+                          style={{
+                            fontSize: "1.5rem",
+                            color: "#002fa7",
+                            fontWeight: "800",
+                          }}
+                        >
                           {stats.users.total}
                         </span>
                         {filter.month && (
-                          <span className="filter-info">
-                            {" "}
-                            ({filter.month} {filter.year})
+                          <span
+                            className="filter-info"
+                            style={{
+                              fontSize: "0.95rem",
+                              fontWeight: "500",
+                              color: "#666",
+                              display: "block",
+                              marginTop: "4px",
+                            }}
+                          >
+                            {filter.month} {filter.year}
                           </span>
                         )}
                         {!filter.month && (
-                          <span className="filter-info"> ({filter.year})</span>
+                          <span
+                            className="filter-info"
+                            style={{
+                              fontSize: "0.95rem",
+                              fontWeight: "500",
+                              color: "#666",
+                              display: "block",
+                              marginTop: "4px",
+                            }}
+                          >
+                            {filter.year}
+                          </span>
                         )}
                       </h2>
                     </div>
                   </IonCol>
                 </IonRow>
+
+                {/* User charts with horizontal scrolling */}
                 <IonRow>
                   <IonCol size="12" sizeMd="7">
-                    <div className="canvas-container">
-                      <canvas ref={usersChartRef}></canvas>
+                    <div
+                      className="chart-scroll-container"
+                      style={{
+                        marginBottom: "24px",
+                        backgroundColor: "white",
+                        borderRadius: "10px",
+                        padding: "16px",
+                        boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
+                        position: "relative",
+                        overflowX: "auto",
+                        WebkitOverflowScrolling: "touch",
+                      }}
+                    >
+                      <div
+                        style={{
+                          minHeight: "250px",
+                          height: "300px",
+                          minWidth: window.innerWidth < 768 ? "500px" : "100%",
+                        }}
+                      >
+                        <canvas ref={usersChartRef}></canvas>
+                      </div>
                     </div>
                   </IonCol>
+
                   <IonCol size="12" sizeMd="5">
-                    <div className="canvas-container">
-                      <canvas ref={usersRoleChartRef}></canvas>
+                    <div
+                      className="chart-scroll-container"
+                      style={{
+                        marginBottom: "24px",
+                        backgroundColor: "white",
+                        borderRadius: "10px",
+                        padding: "16px",
+                        boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
+                        position: "relative",
+                        overflowX: "auto",
+                        WebkitOverflowScrolling: "touch",
+                      }}
+                    >
+                      <div
+                        style={{
+                          minHeight: "250px",
+                          height: "300px",
+                          minWidth: window.innerWidth < 768 ? "300px" : "100%",
+                        }}
+                      >
+                        <canvas ref={usersRoleChartRef}></canvas>
+                      </div>
                     </div>
                   </IonCol>
                 </IonRow>
