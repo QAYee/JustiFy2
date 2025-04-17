@@ -214,7 +214,7 @@ const Home: React.FC = () => {
                     }}
                   >
                     <IonImg
-                      src={`${latestNews.image}`}
+                      src={`https://ivory-swallow-404351.hostingersite.com/Justify/uploads/${latestNews.image}`}
                       style={{
                         width: "100%",
                         maxHeight: "400px",
