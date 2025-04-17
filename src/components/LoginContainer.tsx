@@ -87,13 +87,13 @@ const LoginContainer: React.FC = () => {
     <IonContent className="login-container">
       <IonCard className="login-card">
         <IonImg
-          src="src\styles\2-removebg-preview.png"
+          src="https://ivory-swallow-404351.hostingersite.com/Justify/uploads/2-removebg-preview.png"
           alt="JustiFy Logo"
           className="login-logo-image"
           style={{ width: "120px", maxWidth: "70%", margin: "0 auto" }}
         />
         <IonCardTitle className="ion-text-center">
-          <h1 className="login-logo">JustiFy</h1>
+          <h1 className="login-logo">JustiFi</h1>
         </IonCardTitle>
 
         <h2 className="login-subtitle">Login</h2>

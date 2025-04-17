@@ -335,8 +335,28 @@ const NewsContainer: React.FC = () => {
       description: news.description,
       contentType: news.contentType,
     });
+
     if (news.image) {
-      setPreviewUrl(news.image);
+      // Clean up the image URL if it contains localhost path
+      let cleanImagePath = news.image;
+
+      if (cleanImagePath.includes("http://127.0.0.1/justify/uploads/")) {
+        cleanImagePath = cleanImagePath.replace(
+          "http://127.0.0.1/justify/uploads/",
+          ""
+        );
+      }
+
+      // Only set the preview URL if we're displaying an image from the server
+      // or if it's already a complete URL (without the localhost prefix)
+      if (cleanImagePath.startsWith("http")) {
+        setPreviewUrl(cleanImagePath);
+      } else {
+        const imageUrl = `https://ivory-swallow-404351.hostingersite.com/Justify/uploads/${cleanImagePath}`;
+        setPreviewUrl(imageUrl);
+      }
+    } else {
+      setPreviewUrl(null);
     }
   };
 
@@ -949,7 +969,16 @@ const NewsContainer: React.FC = () => {
                           }}
                         >
                           <IonImg
-                            src={item.image}
+                            src={
+                              item.image.includes("http://127.0.0.1/justify/uploads/")
+                                ? `https://ivory-swallow-404351.hostingersite.com/Justify/uploads/${item.image.replace(
+                                    "http://127.0.0.1/justify/uploads/",
+                                    ""
+                                  )}`
+                                : item.image.startsWith("http")
+                                ? item.image
+                                : `https://ivory-swallow-404351.hostingersite.com/Justify/uploads/${item.image}`
+                            }
                             alt="Content Image"
                             style={{
                               width: "100%",
@@ -958,6 +987,7 @@ const NewsContainer: React.FC = () => {
                             }}
                             onIonError={(e) => {
                               const target = e.target as HTMLIonImgElement;
+                              console.error(`Failed to load image: ${target.src}`);
                               target.style.display = "none";
                             }}
                           />

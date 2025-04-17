@@ -113,7 +113,7 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
         </div>
         <IonCardHeader style={{ paddingTop: '16px', background: '#ffffff', textAlign: 'center' }}>
           <IonCardSubtitle style={{ color: '#666666', fontWeight: 500, fontSize: '14px' }}>Welcome to</IonCardSubtitle>
-          <IonCardTitle style={{ color: '#263238', fontWeight: 700, fontSize: '24px' }}>JustiFy Community Portal</IonCardTitle>
+          <IonCardTitle style={{ color: '#263238', fontWeight: 700, fontSize: '24px' }}>JustiFi Community Portal</IonCardTitle>
         </IonCardHeader>
         <IonCardContent style={{ background: '#ffffff', paddingTop: '0', textAlign: 'center' }}>
           <p style={{ color: '#546e7a', lineHeight: '1.5', marginBottom: '20px' }}>

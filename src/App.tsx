@@ -208,7 +208,7 @@ const AdminApp: React.FC = () => {
     <IonTabs>
       <IonHeader>
         <IonToolbar style={{ "--background": "#002fa7", "--color": "white" }}>
-          <IonTitle>JustiFy Admin Portal</IonTitle>
+          <IonTitle>JustiFi Admin Portal</IonTitle>
           <IonButtons slot="end">
             <IonButton href="/admin/dashboard" style={{ "--color": "#9be368" }}>
               <IonIcon icon={person} />
@@ -281,7 +281,7 @@ const UserApp: React.FC = () => {
     <IonTabs>
       <IonHeader>
         <IonToolbar style={{ "--background": "#002fa7", "--color": "white" }}>
-          <IonTitle className="centered-title">JustiFy</IonTitle>
+          <IonTitle className="centered-title">JustiFi</IonTitle>
           <IonButtons slot="end">
             <IonButton href="/dashboard" style={{ "--color": "#9be368" }}>
               <IonIcon icon={person} />

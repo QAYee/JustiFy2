@@ -183,7 +183,7 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
           Admin Dashboard
         </IonCardTitle>
         <IonCardSubtitle style={{ fontSize: "16px", marginTop: "4px" }}>
-          Welcome to the JustiFy Admin Portal
+          Welcome to the JustiFi Admin Portal
         </IonCardSubtitle>
           </IonCardHeader>
           <IonCardContent>

@@ -115,7 +115,7 @@ const Home: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle className="centered-title">JustiFy</IonTitle>
+          <IonTitle className="centered-title">JustiFi</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
