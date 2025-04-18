@@ -172,11 +172,17 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
   return (
     <div className="ion-padding">
       {/* Admin Dashboard Header */}
-      <div className="ion-text-center" style={{ margin: "0 auto", maxWidth: "800px" }}>
+      <div style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+        margin: "0 auto"
+      }}>
         <IonCard
           className="ion-no-margin"
           color="primary"
-          style={{ borderRadius: "12px", marginBottom: "24px", width: "100%" }}
+          style={{ borderRadius: "12px", marginBottom: "24px", maxWidth: "800px", width: "100%" }}
         >
           <IonCardHeader>
         <IonCardTitle style={{ fontSize: "24px", fontWeight: "700" }}>

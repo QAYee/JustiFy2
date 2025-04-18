@@ -30,7 +30,7 @@ const LoginContainer: React.FC = () => {
   const history = useHistory();
 
   const validateForm = (): boolean => {
-    if (!email || !password) {
+    if (!email?.trim() || !password?.trim()) {
       setError("Both username and password are required.");
       return false;
     }
@@ -77,7 +77,7 @@ const LoginContainer: React.FC = () => {
       }
     } catch (error) {
       console.error("Login error:", error);
-      setError("Invalid username or password");
+      setError("Invalid Email or password");
     } finally {
       setIsLoading(false);
     }
@@ -106,7 +106,7 @@ const LoginContainer: React.FC = () => {
 
         <IonItem className="login-form-item">
           <IonLabel position="floating" color="primary">
-            Username
+            Email
           </IonLabel>
           <IonInput
             type="text"

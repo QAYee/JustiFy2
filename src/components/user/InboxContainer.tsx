@@ -584,69 +584,98 @@ const InboxContainer: React.FC<ContainerProps> = ({
               className="ion-padding"
               style={{ "--background": "white" }}
             >
-              <div style={{ padding: "16px" }}>
+                <div className="announcement-detail">
                 {selectedAnnouncement.image && (
-                  <div style={{ textAlign: "center", margin: "16px 0" }}>
-                    <img
-                      src={selectedAnnouncement.image}
-                      alt="Announcement"
-                      style={{
-                        maxWidth: "100%",
-                        maxHeight: "300px",
-                        borderRadius: "8px",
-                      }}
-                      onError={(e) => {
-                        // Handle broken images
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = "none";
-                      }}
-                    />
+                  <div className="announcement-image-container">
+                  <IonImg
+                    src={
+                    selectedAnnouncement.image.includes("http://127.0.0.1/justify/uploads/")
+                      ? `https://ivory-swallow-404351.hostingersite.com/Justify/uploads/${selectedAnnouncement.image.replace(
+                        "http://127.0.0.1/justify/uploads/",
+                        ""
+                      )}`
+                      : selectedAnnouncement.image.startsWith("http")
+                      ? selectedAnnouncement.image
+                      : `https://ivory-swallow-404351.hostingersite.com/Justify/uploads/${selectedAnnouncement.image}`
+                    }
+                    alt="Announcement"
+                    className="announcement-image"
+                    onIonError={(e) => {
+                    const target = e.target as HTMLIonImgElement;
+                    console.error(`Failed to load image: ${target.src}`);
+                    target.style.display = "none";
+                    }}
+                  />
                   </div>
                 )}
 
                 <IonText>
-                  <h2>{selectedAnnouncement.title}</h2>
+                  <h2 className="announcement-title">{selectedAnnouncement.title}</h2>
 
-                  <div
-                    style={{
-                      color: "#666",
-                      marginBottom: "16px",
-                      fontSize: "14px",
-                    }}
-                  >
+                  <div className="announcement-meta">
+                  <IonIcon
+                    icon={timeOutline}
+                    style={{ verticalAlign: "middle", marginRight: "6px" }}
+                  />
+                  {new Date(selectedAnnouncement.created_at).toLocaleString()}
+
+                  <span className="read-status">
                     <IonIcon
-                      icon={timeOutline}
-                      style={{ verticalAlign: "middle", marginRight: "4px" }}
+                    icon={mailOpenOutline}
+                    style={{ verticalAlign: "middle", marginRight: "6px" }}
                     />
-                    {new Date(selectedAnnouncement.created_at).toLocaleString()}
-
-                    {/* Always show as "Read" in the modal since we mark it when opening */}
-                    <span style={{ marginLeft: "10px", color: "#888" }}>
-                      <IonIcon
-                        icon={mailOpenOutline}
-                        style={{
-                          verticalAlign: "middle",
-                          marginRight: "4px",
-                        }}
-                      />
-                      Read
-                    </span>
+                    Read
+                  </span>
                   </div>
 
-                  <p
-                    style={{
-                      whiteSpace: "pre-wrap",
-                      lineHeight: "1.6",
-                      fontSize: "16px",
-                      margin: "16px 0",
-                      color: "#333", // Added for better readability
-                    }}
-                  >
-                    {selectedAnnouncement.description ||
-                      "No description available"}
+                  <p className="announcement-content">
+                  {selectedAnnouncement.description ||
+                    "No description available"}
                   </p>
                 </IonText>
-              </div>
+                </div>
+
+                <style jsx>{`
+                .announcement-detail {
+                  padding: 8px 0;
+                }
+                .announcement-image-container {
+                  text-align: center;
+                  margin: 16px 0 24px;
+                }
+                .announcement-image {
+                  max-width: 100%;
+                  max-height: 300px;
+                  border-radius: 8px;
+                  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                }
+                .announcement-title {
+                  font-size: 22px;
+                  font-weight: 600;
+                  color: #222;
+                  margin-bottom: 12px;
+                }
+                .announcement-meta {
+                  color: #666;
+                  margin-bottom: 20px;
+                  font-size: 14px;
+                  display: flex;
+                  align-items: center;
+                }
+                .read-status {
+                  margin-left: 16px;
+                  color: #555;
+                  display: flex;
+                  align-items: center;
+                }
+                .announcement-content {
+                  white-space: pre-wrap;
+                  line-height: 1.6;
+                  font-size: 16px;
+                  margin: 16px 0;
+                  color: #333;
+                }
+                `}</style>
             </IonContent>
             <div style={{ padding: "16px", background: "white" }}>
               {/* Removed the "Mark as Read" button */}
