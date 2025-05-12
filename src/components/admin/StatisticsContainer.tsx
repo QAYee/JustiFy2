@@ -19,6 +19,7 @@ import {
   IonItem,
   IonButton,
   IonToast,
+  IonIcon,
 } from "@ionic/react";
 import { mailOutline, peopleOutline, flagOutline } from "ionicons/icons";
 import Chart from "chart.js/auto";
@@ -131,6 +132,573 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
     "November",
     "December",
   ];
+
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+
+  const printComplaintsReport = () => {
+    if (!stats) return;
+
+    try {
+      setToastMessage("Preparing Complaints Report for printing...");
+      setShowToast(true);
+
+      // Create a temporary PDF document
+      const pdf = new jsPDF();
+
+      // Add title
+      pdf.setFontSize(18);
+      pdf.setTextColor(0, 47, 167); // #002fa7 - primary blue
+      pdf.text("Complaints Summary", 105, 15, { align: "center" });
+
+      // Add date range
+      pdf.setFontSize(12);
+      pdf.setTextColor(100, 100, 100); // gray
+      const dateText = filter.month
+        ? `${filter.month} ${filter.year}`
+        : `${filter.year} - All Months`;
+      pdf.text(`Date Range: ${dateText}`, 105, 25, { align: "center" });
+
+      // Add total complaints
+      pdf.setFontSize(14);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text(`Total Complaints: ${stats.complaints.total}`, 20, 40);
+
+      // Add complaints by status
+      pdf.setFontSize(14);
+      pdf.text("Complaints by Status:", 20, 55);
+
+      let yPos = 60;
+      stats.complaints.byStatus.forEach((status) => {
+        pdf.setFontSize(12);
+        pdf.text(`• ${status.status}: ${status.count}`, 30, yPos);
+        yPos += 7;
+      });
+
+      // Add complaints by type
+      yPos += 5;
+      pdf.setFontSize(14);
+      pdf.text("Complaints by Type:", 20, yPos);
+      yPos += 5;
+
+      stats.complaints.byType.forEach((type) => {
+        pdf.setFontSize(12);
+        pdf.text(`• ${type.type}: ${type.count}`, 30, yPos);
+        yPos += 7;
+      });
+
+      // Add monthly/daily analysis
+      yPos += 5;
+      pdf.setFontSize(14);
+
+      if (filter.month) {
+        pdf.text(`Daily Complaints in ${filter.month}:`, 20, yPos);
+        yPos += 5;
+
+        // Find highest and lowest days
+        const dailyData = stats.complaints.monthly;
+        if (dailyData && dailyData.length > 0) {
+          const sortedData = [...dailyData].sort((a, b) => b.count - a.count);
+
+          pdf.setFontSize(12);
+          if (sortedData.length > 0) {
+            pdf.text(
+              `• Highest: Day ${sortedData[0].day || "N/A"} (${
+                sortedData[0].count
+              } complaints)`,
+              30,
+              yPos
+            );
+            yPos += 7;
+          }
+
+          if (sortedData.length > 1) {
+            pdf.text(
+              `• Lowest: Day ${
+                sortedData[sortedData.length - 1].day || "N/A"
+              } (${sortedData[sortedData.length - 1].count} complaints)`,
+              30,
+              yPos
+            );
+          }
+        }
+      } else {
+        pdf.text("Monthly Complaints:", 20, yPos);
+        yPos += 5;
+
+        // Find highest and lowest months
+        const monthlyData = stats.complaints.monthly;
+        if (monthlyData && monthlyData.length > 0) {
+          const sortedData = [...monthlyData].sort((a, b) => b.count - a.count);
+
+          pdf.setFontSize(12);
+          if (sortedData.length > 0) {
+            pdf.text(
+              `• Highest: ${sortedData[0].month} (${sortedData[0].count} complaints)`,
+              30,
+              yPos
+            );
+            yPos += 7;
+          }
+
+          if (sortedData.length > 1) {
+            pdf.text(
+              `• Lowest: ${sortedData[sortedData.length - 1].month} (${
+                sortedData[sortedData.length - 1].count
+              } complaints)`,
+              30,
+              yPos
+            );
+          }
+        }
+      }
+
+      // Add footer
+      pdf.setFontSize(10);
+      pdf.setTextColor(150, 150, 150);
+      const today = new Date();
+      pdf.text(
+        `Generated on: ${today.toLocaleDateString()} at ${today.toLocaleTimeString()}`,
+        105,
+        280,
+        { align: "center" }
+      );
+
+      // Open PDF in a new window for printing
+      const pdfOutput = pdf.output("blob");
+      const pdfUrl = URL.createObjectURL(pdfOutput);
+      const printWindow = window.open(pdfUrl);
+
+      if (printWindow) {
+        printWindow.onload = () => {
+          printWindow.print();
+          setToastMessage("Print dialog opened. Please proceed with printing.");
+          setShowToast(true);
+        };
+      } else {
+        setToastMessage(
+          "Failed to open print dialog. Please check your popup settings."
+        );
+        setShowToast(true);
+      }
+    } catch (error) {
+      console.error("Error printing complaints report:", error);
+      setToastMessage("Failed to print. Please try again.");
+      setShowToast(true);
+    }
+  };
+
+  const printUserStatsReport = () => {
+    if (!stats) return;
+
+    try {
+      setToastMessage("Preparing User Statistics Report for printing...");
+      setShowToast(true);
+
+      // Create PDF document
+      const pdf = new jsPDF();
+
+      // Add title
+      pdf.setFontSize(18);
+      pdf.setTextColor(0, 47, 167); // #002fa7 - primary blue
+      pdf.text("User Statistics Summary", 105, 15, { align: "center" });
+
+      // Add date range
+      pdf.setFontSize(12);
+      pdf.setTextColor(100, 100, 100); // gray
+      const dateText = filter.month
+        ? `${filter.month} ${filter.year}`
+        : `${filter.year} - All Months`;
+      pdf.text(`Date Range: ${dateText}`, 105, 25, { align: "center" });
+
+      // Add total users
+      pdf.setFontSize(14);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text(`Total Users: ${stats.users.total}`, 20, 40);
+
+      // Add users by role
+      pdf.setFontSize(14);
+      pdf.text("User Distribution by Role:", 20, 55);
+
+      let yPos = 60;
+      stats.users.byRole.forEach((role) => {
+        pdf.setFontSize(12);
+        pdf.text(`• ${role.role}: ${role.count}`, 30, yPos);
+        yPos += 7;
+      });
+
+      // Add monthly/daily registration summary
+      yPos += 5;
+      pdf.setFontSize(14);
+
+      if (filter.month) {
+        pdf.text(`Daily User Registrations in ${filter.month}:`, 20, yPos);
+        yPos += 5;
+
+        // Find highest and lowest days
+        const dailyData = stats.users.monthly;
+        if (dailyData && dailyData.length > 0) {
+          const sortedData = [...dailyData].sort((a, b) => b.count - a.count);
+
+          pdf.setFontSize(12);
+          if (sortedData.length > 0) {
+            pdf.text(
+              `• Highest: Day ${sortedData[0].day || "N/A"} (${
+                sortedData[0].count
+              } registrations)`,
+              30,
+              yPos
+            );
+            yPos += 7;
+          }
+
+          if (sortedData.length > 1) {
+            pdf.text(
+              `• Lowest: Day ${
+                sortedData[sortedData.length - 1].day || "N/A"
+              } (${sortedData[sortedData.length - 1].count} registrations)`,
+              30,
+              yPos
+            );
+          }
+        }
+      } else {
+        pdf.text("Monthly User Registrations:", 20, yPos);
+        yPos += 5;
+
+        // Find highest and lowest months
+        const monthlyData = stats.users.monthly;
+        if (monthlyData && monthlyData.length > 0) {
+          const sortedData = [...monthlyData].sort((a, b) => b.count - a.count);
+
+          pdf.setFontSize(12);
+          if (sortedData.length > 0) {
+            pdf.text(
+              `• Highest: ${sortedData[0].month} (${sortedData[0].count} registrations)`,
+              30,
+              yPos
+            );
+            yPos += 7;
+          }
+
+          if (sortedData.length > 1) {
+            pdf.text(
+              `• Lowest: ${sortedData[sortedData.length - 1].month} (${
+                sortedData[sortedData.length - 1].count
+              } registrations)`,
+              30,
+              yPos
+            );
+          }
+        }
+      }
+
+      // Add footer
+      pdf.setFontSize(10);
+      pdf.setTextColor(150, 150, 150);
+      const today = new Date();
+      pdf.text(
+        `Generated on: ${today.toLocaleDateString()} at ${today.toLocaleTimeString()}`,
+        105,
+        280,
+        { align: "center" }
+      );
+
+      // Open PDF in a new window for printing
+      const pdfOutput = pdf.output("blob");
+      const pdfUrl = URL.createObjectURL(pdfOutput);
+      const printWindow = window.open(pdfUrl);
+
+      if (printWindow) {
+        printWindow.onload = () => {
+          printWindow.print();
+          setToastMessage("Print dialog opened. Please proceed with printing.");
+          setShowToast(true);
+        };
+      } else {
+        setToastMessage(
+          "Failed to open print dialog. Please check your popup settings."
+        );
+        setShowToast(true);
+      }
+    } catch (error) {
+      console.error("Error printing user statistics report:", error);
+      setToastMessage("Failed to print. Please try again.");
+      setShowToast(true);
+    }
+  };
+
+  const printUsersTableReport = () => {
+    if (!stats || !stats.users.userData) return;
+
+    try {
+      setToastMessage("Preparing Users Table Report for printing...");
+      setShowToast(true);
+
+      // Create PDF document in landscape orientation for better table viewing
+      const pdf = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: "a4",
+      });
+
+      // Add title
+      pdf.setFontSize(18);
+      pdf.setTextColor(0, 47, 167); // #002fa7 - primary blue
+      pdf.text("Users Table Summary", pdf.internal.pageSize.width / 2, 15, {
+        align: "center",
+      });
+
+      // Add date
+      pdf.setFontSize(12);
+      pdf.setTextColor(100, 100, 100); // gray
+      const today = new Date();
+      pdf.text(
+        `Generated on: ${today.toLocaleDateString()}`,
+        pdf.internal.pageSize.width / 2,
+        25,
+        {
+          align: "center",
+        }
+      );
+
+      // Filter and sort users based on current view
+      const filteredSortedUsers = stats.users.userData
+        .filter((user) =>
+          Object.values(user)
+            .join(" ")
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
+        )
+        .sort((a, b) => {
+          const aValue = a[sortField];
+          const bValue = b[sortField];
+
+          const direction = sortDirection === "asc" ? 1 : -1;
+
+          if (typeof aValue === "boolean" && typeof bValue === "boolean") {
+            return aValue === bValue ? 0 : aValue ? direction : -direction;
+          }
+
+          if (typeof aValue === "number" && typeof bValue === "number") {
+            return (aValue - bValue) * direction;
+          }
+
+          const aStr = String(aValue || "");
+          const bStr = String(bValue || "");
+
+          return aStr.localeCompare(bStr) * direction;
+        });
+
+      // Add total and filtered counts
+      pdf.setFontSize(11);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text(`Total Users: ${stats.users.userData.length}`, 15, 35);
+      pdf.text(`Filtered Users: ${filteredSortedUsers.length}`, 60, 35);
+      if (searchTerm) {
+        pdf.text(`Search Term: "${searchTerm}"`, 105, 35);
+      }
+      pdf.text(`Sort by: ${String(sortField)} (${sortDirection})`, 180, 35);
+
+      // Set up table layout
+      const startY = 42;
+      const cellPadding = 2;
+      const pageWidth = pdf.internal.pageSize.width;
+      const tableWidth = pageWidth - 30; // 15mm margins on each side
+
+      // Define column structure (column widths should add up to tableWidth)
+      const columns = [
+        { header: "Name", key: "name", width: tableWidth * 0.2 },
+        { header: "Email", key: "email", width: tableWidth * 0.3 },
+        { header: "Phone", key: "phone", width: tableWidth * 0.15 },
+        { header: "Role", key: "role", width: tableWidth * 0.1 },
+        { header: "Created", key: "created_at", width: tableWidth * 0.15 },
+        { header: "Verified", key: "verified", width: tableWidth * 0.1 },
+      ];
+
+      // Calculate column start positions
+      const columnPositions = [];
+      let currentPosition = 15; // Start from left margin
+      columnPositions.push(currentPosition);
+
+      for (let i = 0; i < columns.length; i++) {
+        currentPosition += columns[i].width;
+        columnPositions.push(currentPosition);
+      }
+
+      // Draw table header background
+      pdf.setFillColor(242, 246, 255); // Light blue background for header
+      pdf.rect(15, startY, tableWidth, 8, "F");
+
+      // Draw table headers
+      pdf.setDrawColor(200, 200, 200);
+      pdf.setLineWidth(0.1);
+      pdf.line(15, startY, 15 + tableWidth, startY); // Top border
+      pdf.line(15, startY + 8, 15 + tableWidth, startY + 8); // Bottom border
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(0, 47, 167); // Primary blue
+      pdf.setFontSize(10);
+
+      // Draw column headers and vertical lines
+      for (let i = 0; i < columns.length; i++) {
+        // Draw column header text
+        pdf.text(
+          columns[i].header,
+          columnPositions[i] + cellPadding,
+          startY + 5
+        );
+
+        // Draw vertical line for this column
+        pdf.line(columnPositions[i], startY, columnPositions[i], startY + 8);
+      }
+
+      // Draw final vertical line
+      pdf.line(
+        columnPositions[columnPositions.length - 1],
+        startY,
+        columnPositions[columnPositions.length - 1],
+        startY + 8
+      );
+
+      // Add user data
+      let yPos = startY + 8; // Start after header
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(0, 0, 0); // Black text
+      pdf.setFontSize(9);
+
+      // Process rows with pagination
+      for (let i = 0; i < filteredSortedUsers.length; i++) {
+        const user = filteredSortedUsers[i];
+        const rowHeight = 7;
+
+        // Add new page if needed
+        if (yPos > pdf.internal.pageSize.height - 20) {
+          pdf.addPage();
+
+          // Reset position for new page
+          yPos = 15;
+
+          // Redraw header on new page
+          pdf.setFillColor(242, 246, 255);
+          pdf.rect(15, yPos, tableWidth, 8, "F");
+
+          pdf.setFont("helvetica", "bold");
+          pdf.setTextColor(0, 47, 167);
+          pdf.setFontSize(10);
+
+          // Draw column headers again
+          for (let j = 0; j < columns.length; j++) {
+            pdf.text(
+              columns[j].header,
+              columnPositions[j] + cellPadding,
+              yPos + 5
+            );
+
+            // Draw vertical line for this column
+            pdf.line(columnPositions[j], yPos, columnPositions[j], yPos + 8);
+          }
+
+          // Draw final vertical line and bottom border
+          pdf.line(
+            columnPositions[columnPositions.length - 1],
+            yPos,
+            columnPositions[columnPositions.length - 1],
+            yPos + 8
+          );
+          pdf.line(15, yPos, 15 + tableWidth, yPos); // Top border
+          pdf.line(15, yPos + 8, 15 + tableWidth, yPos + 8); // Bottom border
+
+          yPos += 8; // Move down past header
+
+          pdf.setFont("helvetica", "normal");
+          pdf.setTextColor(0, 0, 0);
+          pdf.setFontSize(9);
+        }
+
+        // Row background for alternating rows
+        if (i % 2 === 1) {
+          pdf.setFillColor(249, 250, 252);
+          pdf.rect(15, yPos, tableWidth, rowHeight, "F");
+        }
+
+        // Draw cell data
+        // Name
+        let name = user.name || "-";
+        if (name.length > 20) name = name.substring(0, 18) + "...";
+        pdf.text(name, columnPositions[0] + cellPadding, yPos + 4);
+
+        // Email
+        let email = user.email || "-";
+        if (email.length > 30) email = email.substring(0, 28) + "...";
+        pdf.text(email, columnPositions[1] + cellPadding, yPos + 4);
+
+        // Phone
+        let phone = user.phone || "-";
+        if (phone.length > 15) phone = phone.substring(0, 13) + "...";
+        pdf.text(phone, columnPositions[2] + cellPadding, yPos + 4);
+
+        // Role
+        pdf.text(user.role || "-", columnPositions[3] + cellPadding, yPos + 4);
+
+        // Created date
+        let created = "-";
+        if (user.created_at) {
+          try {
+            created = new Date(user.created_at).toLocaleDateString();
+          } catch (e) {
+            created = user.created_at;
+          }
+        }
+        pdf.text(created, columnPositions[4] + cellPadding, yPos + 4);
+
+        // Verified
+        pdf.text(
+          user.verified ? "Yes" : "No",
+          columnPositions[5] + cellPadding,
+          yPos + 4
+        );
+
+        // Draw vertical lines for each cell
+        for (let j = 0; j < columnPositions.length; j++) {
+          pdf.line(
+            columnPositions[j],
+            yPos,
+            columnPositions[j],
+            yPos + rowHeight
+          );
+        }
+
+        // Move down for next row
+        yPos += rowHeight;
+      }
+
+      // Draw final row bottom border and table right border
+      pdf.line(15, yPos, 15 + tableWidth, yPos);
+
+      // Open PDF in a new window for printing
+      const pdfOutput = pdf.output("blob");
+      const pdfUrl = URL.createObjectURL(pdfOutput);
+      const printWindow = window.open(pdfUrl);
+
+      if (printWindow) {
+        printWindow.onload = () => {
+          printWindow.print();
+          setToastMessage("Print dialog opened. Please proceed with printing.");
+          setShowToast(true);
+        };
+      } else {
+        setToastMessage(
+          "Failed to open print dialog. Please check your popup settings."
+        );
+        setShowToast(true);
+      }
+    } catch (error) {
+      console.error("Error printing users table report:", error);
+      setToastMessage("Failed to print. Please try again.");
+      setShowToast(true);
+    }
+  };
 
   const fetchStatistics = async (year: number, month: string | null) => {
     setLoading(true);
@@ -295,46 +863,56 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
 
     // Get current screen width for responsive adjustments
     const screenWidth = window.innerWidth;
-    const isMobile = screenWidth < 768;
+    const isMobile = screenWidth < 768; // Common responsive chart options
+    const getResponsiveOptions = (title: string) => {
+      type LegendPosition =
+        | "top"
+        | "bottom"
+        | "left"
+        | "right"
+        | "center"
+        | "chartArea";
 
-    // Common responsive chart options
-    const getResponsiveOptions = (title: string) => ({
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: isMobile ? "bottom" : ("top" as const),
-          labels: {
-            boxWidth: isMobile ? 12 : 20,
-            padding: isMobile ? 10 : 20,
+      const position: LegendPosition = isMobile ? "bottom" : "top";
+
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position,
+            labels: {
+              boxWidth: isMobile ? 12 : 20,
+              padding: isMobile ? 10 : 20,
+              color: chartColors.primary,
+              font: {
+                size: isMobile ? 10 : 14,
+                weight: "bold" as const,
+              },
+            },
+          },
+          title: {
+            display: true,
+            text: title,
             color: chartColors.primary,
             font: {
-              size: isMobile ? 10 : 14,
+              weight: "bold" as const,
+              size: isMobile ? 14 : 16,
+            },
+            padding: {
+              top: 10,
+              bottom: isMobile ? 5 : 10,
+            },
+          },
+          datalabels: {
+            font: {
+              size: isMobile ? 9 : 11,
               weight: "bold" as const,
             },
           },
         },
-        title: {
-          display: true,
-          text: title,
-          color: chartColors.primary,
-          font: {
-            weight: "bold",
-            size: isMobile ? 14 : 16,
-          },
-          padding: {
-            top: 10,
-            bottom: isMobile ? 5 : 10,
-          },
-        },
-        datalabels: {
-          font: {
-            size: isMobile ? 9 : 11,
-            weight: "bold",
-          },
-        },
-      },
-    });
+      };
+    };
 
     // Destroy existing charts to prevent memory leaks
     Object.values(chartInstances.current).forEach((chart) => {
@@ -683,10 +1261,7 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortField, setSortField] = useState<keyof UserData>("role");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
 
-  // Generate summary PDFs for different tabs
   const generateComplaintsPDF = () => {
     if (!stats) return;
 
@@ -1194,11 +1769,7 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
           yPos + 4
         );
 
-        // Draw row bottom border
-        pdf.setDrawColor(230, 230, 230);
-        pdf.line(15, yPos + rowHeight, 15 + tableWidth, yPos + rowHeight);
-
-        // Draw vertical borders for each column
+        // Draw vertical lines for each cell
         for (let j = 0; j < columnPositions.length; j++) {
           pdf.line(
             columnPositions[j],
@@ -1208,18 +1779,12 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
           );
         }
 
-        yPos += rowHeight; // Move to next row
+        // Move down for next row
+        yPos += rowHeight;
       }
 
-      // Add footer with record count
-      pdf.setFontSize(9);
-      pdf.setTextColor(100, 100, 100);
-      pdf.text(
-        `Report generated by Justify Admin Panel | ${today.toLocaleString()}`,
-        pdf.internal.pageSize.width / 2,
-        pdf.internal.pageSize.height - 10,
-        { align: "center" }
-      );
+      // Draw final row bottom border and table right border
+      pdf.line(15, yPos, 15 + tableWidth, yPos);
 
       // Save the PDF
       pdf.save(
@@ -1437,7 +2002,6 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
                     </div>
                   </IonCol>
                 </IonRow>
-
                 {/* Charts - Mobile responsive layout */}
                 <IonRow>
                   {/* Chart container with horizontal scrolling */}
@@ -1492,7 +2056,6 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
                     </div>
                   </IonCol>
                 </IonRow>
-
                 {/* Complaint types chart with horizontal scrolling */}
                 <IonRow>
                   <IonCol size="12">
@@ -1518,7 +2081,7 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
                       </div>
                     </div>
                   </IonCol>
-                </IonRow>
+                </IonRow>{" "}
                 <IonRow>
                   <IonCol size="12" className="ion-text-end">
                     <IonButton
@@ -1526,7 +2089,17 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
                       className="stats-outline-button"
                       onClick={generateComplaintsPDF}
                     >
-                      Download Complaints PDF
+                      <IonIcon icon={downloadOutline} slot="start" />
+                      Download PDF
+                    </IonButton>
+                    <IonButton
+                      fill="outline"
+                      className="stats-outline-button"
+                      onClick={printComplaintsReport}
+                      style={{ marginLeft: "8px" }}
+                    >
+                      <IonIcon icon={printOutline} slot="start" />
+                      Print Report
                     </IonButton>
                   </IonCol>
                 </IonRow>
@@ -1600,7 +2173,6 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
                     </div>
                   </IonCol>
                 </IonRow>
-
                 {/* User charts with horizontal scrolling */}
                 <IonRow>
                   <IonCol size="12" sizeMd="7">
@@ -1654,7 +2226,7 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
                       </div>
                     </div>
                   </IonCol>
-                </IonRow>
+                </IonRow>{" "}
                 <IonRow>
                   <IonCol size="12" className="ion-text-end">
                     <IonButton
@@ -1662,7 +2234,17 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
                       className="stats-outline-button"
                       onClick={generateUserStatsPDF}
                     >
-                      Download User Stats PDF
+                      <IonIcon icon={downloadOutline} slot="start" />
+                      Download PDF
+                    </IonButton>
+                    <IonButton
+                      fill="outline"
+                      className="stats-outline-button"
+                      onClick={printUserStatsReport}
+                      style={{ marginLeft: "8px" }}
+                    >
+                      <IonIcon icon={printOutline} slot="start" />
+                      Print Report
                     </IonButton>
                   </IonCol>
                 </IonRow>
@@ -2083,7 +2665,7 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
                       </div>
                     </div>
                   </IonCol>
-                </IonRow>
+                </IonRow>{" "}
                 <IonRow>
                   <IonCol size="12" className="ion-text-end">
                     <IonButton
@@ -2091,7 +2673,17 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
                       className="stats-outline-button"
                       onClick={generateUserTablePDF}
                     >
-                      Download Users Table PDF
+                      <IonIcon icon={downloadOutline} slot="start" />
+                      Download PDF
+                    </IonButton>
+                    <IonButton
+                      fill="outline"
+                      className="stats-outline-button"
+                      onClick={printUsersTableReport}
+                      style={{ marginLeft: "8px" }}
+                    >
+                      <IonIcon icon={printOutline} slot="start" />
+                      Print Report
                     </IonButton>
                   </IonCol>
                 </IonRow>
