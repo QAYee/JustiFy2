@@ -18,11 +18,15 @@ import {
   IonSelectOption,
   IonItem,
   IonButton,
+  IonToast,
 } from "@ionic/react";
 import { mailOutline, peopleOutline, flagOutline } from "ionicons/icons";
 import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { Chart as ChartJS, ArcElement } from "chart.js";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import { printOutline, downloadOutline } from "ionicons/icons";
 
 // Import the CSS file
 import "./StatisticsContainer.css";
@@ -50,6 +54,20 @@ interface ComplaintsByMonth {
   date?: string;
 }
 
+interface UserData {
+  id: number;
+  name: string;
+  email: string;
+  address: string;
+  phone: string;
+  age: number | null;
+  birthdate: string | null;
+  created_at: string;
+  verification_code: string | null;
+  verified: boolean;
+  role: string;
+}
+
 interface StatisticsData {
   complaints: {
     total: number;
@@ -61,6 +79,7 @@ interface StatisticsData {
     total: number;
     monthly: { month: string; count: number; day?: number; date?: string }[];
     byRole: { role: string; count: number }[];
+    userData: UserData[];
   };
 }
 
@@ -115,6 +134,9 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
 
   const fetchStatistics = async (year: number, month: string | null) => {
     setLoading(true);
+    console.log(
+      `Fetching statistics for year: ${year}, month: ${month || "all"}`
+    );
 
     try {
       // Build query parameters
@@ -124,16 +146,34 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
       }
 
       // Fetch complaints statistics
+      console.log(
+        `Fetching complaints from: https://justifi.animal911.me/Justify/index.php/StatisticsController/complaints?${params}`
+      );
       const complaintResponse = await fetch(
         `https://justifi.animal911.me/Justify/index.php/StatisticsController/complaints?${params}`
       );
       const complaintData = await complaintResponse.json();
+      console.log("Complaints API response:", complaintData);
 
       // Fetch user statistics
+      console.log(
+        `Fetching users from: https://justifi.animal911.me/Justify/index.php/StatisticsController/users?${params}`
+      );
       const userResponse = await fetch(
         `https://justifi.animal911.me/Justify/index.php/StatisticsController/users?${params}`
       );
       const userData = await userResponse.json();
+      console.log("Users API response:", userData);
+
+      // Fetch user list data
+      console.log(
+        "Fetching user list from: https://justifi.animal911.me/Justify/index.php/StatisticsController/user_list"
+      );
+      const userListResponse = await fetch(
+        `https://justifi.animal911.me/Justify/index.php/StatisticsController/user_list`
+      );
+      const userListData = await userListResponse.json();
+      console.log("User list API response:", userListData);
 
       // Check if the responses were successful based on the status flag in response
       if (!complaintData.status || !userData.status) {
@@ -159,6 +199,7 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
           total: userData.total || 0,
           monthly: usersDataPoints,
           byRole: userData.byRole || [],
+          userData: userListData.users || [],
         },
       });
 
@@ -262,14 +303,14 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          position: isMobile ? "bottom" : "top",
+          position: isMobile ? "bottom" : ("top" as const),
           labels: {
             boxWidth: isMobile ? 12 : 20,
             padding: isMobile ? 10 : 20,
             color: chartColors.primary,
             font: {
               size: isMobile ? 10 : 14,
-              weight: "bold",
+              weight: "bold" as const,
             },
           },
         },
@@ -638,6 +679,562 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
     }
   }, [stats, loading, activeTab, filter]);
 
+  // Add these state variables after your existing state variables
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [sortField, setSortField] = useState<keyof UserData>("role");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+
+  // Generate summary PDFs for different tabs
+  const generateComplaintsPDF = () => {
+    if (!stats) return;
+
+    try {
+      setToastMessage("Generating Complaints PDF...");
+      setShowToast(true);
+
+      // Create PDF document
+      const pdf = new jsPDF();
+
+      // Add title
+      pdf.setFontSize(18);
+      pdf.setTextColor(0, 47, 167); // #002fa7 - primary blue
+      pdf.text("Complaints Statistics Summary", 105, 15, { align: "center" });
+
+      // Add date range
+      pdf.setFontSize(12);
+      pdf.setTextColor(100, 100, 100); // gray
+      const dateText = filter.month
+        ? `${filter.month} ${filter.year}`
+        : `${filter.year} - All Months`;
+      pdf.text(`Date Range: ${dateText}`, 105, 25, { align: "center" });
+
+      // Add total complaints
+      pdf.setFontSize(14);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text(`Total Complaints: ${stats.complaints.total}`, 20, 40);
+
+      // Add complaints by status
+      pdf.setFontSize(14);
+      pdf.text("Complaints by Status:", 20, 55);
+
+      let yPos = 60;
+      stats.complaints.byStatus.forEach((status) => {
+        pdf.setFontSize(12);
+        pdf.text(`• ${status.status}: ${status.count}`, 30, yPos);
+        yPos += 7;
+      });
+
+      // Add complaints by type
+      yPos += 5;
+      pdf.setFontSize(14);
+      pdf.text("Top 5 Complaint Types:", 20, yPos);
+      yPos += 5;
+
+      // Sort by count and take top 5
+      const topTypes = [...stats.complaints.byType]
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+
+      topTypes.forEach((type) => {
+        pdf.setFontSize(12);
+        pdf.text(`• ${type.type}: ${type.count}`, 30, yPos);
+        yPos += 7;
+      });
+
+      // Add monthly/daily distribution summary
+      yPos += 5;
+      pdf.setFontSize(14);
+
+      if (filter.month) {
+        pdf.text(`Daily Complaints in ${filter.month}:`, 20, yPos);
+        yPos += 5;
+
+        // Find highest and lowest days
+        const dailyData = stats.complaints.monthly;
+        if (dailyData && dailyData.length > 0) {
+          const sortedData = [...dailyData].sort((a, b) => b.count - a.count);
+
+          pdf.setFontSize(12);
+          if (sortedData.length > 0) {
+            pdf.text(
+              `• Highest: Day ${sortedData[0].day || "N/A"} (${
+                sortedData[0].count
+              } complaints)`,
+              30,
+              yPos
+            );
+            yPos += 7;
+          }
+
+          if (sortedData.length > 1) {
+            pdf.text(
+              `• Lowest: Day ${
+                sortedData[sortedData.length - 1].day || "N/A"
+              } (${sortedData[sortedData.length - 1].count} complaints)`,
+              30,
+              yPos
+            );
+          }
+        }
+      } else {
+        pdf.text("Monthly Complaints Distribution:", 20, yPos);
+        yPos += 5;
+
+        // Find highest and lowest months
+        const monthlyData = stats.complaints.monthly;
+        if (monthlyData && monthlyData.length > 0) {
+          const sortedData = [...monthlyData].sort((a, b) => b.count - a.count);
+
+          pdf.setFontSize(12);
+          if (sortedData.length > 0) {
+            pdf.text(
+              `• Highest: ${sortedData[0].month} (${sortedData[0].count} complaints)`,
+              30,
+              yPos
+            );
+            yPos += 7;
+          }
+
+          if (sortedData.length > 1) {
+            pdf.text(
+              `• Lowest: ${sortedData[sortedData.length - 1].month} (${
+                sortedData[sortedData.length - 1].count
+              } complaints)`,
+              30,
+              yPos
+            );
+          }
+        }
+      }
+
+      // Add footer
+      pdf.setFontSize(10);
+      pdf.setTextColor(150, 150, 150);
+      const today = new Date();
+      pdf.text(
+        `Generated on: ${today.toLocaleDateString()} at ${today.toLocaleTimeString()}`,
+        105,
+        280,
+        { align: "center" }
+      );
+
+      // Save the PDF
+      pdf.save(
+        `Complaints_Summary_${filter.year}_${filter.month || "All"}.pdf`
+      );
+
+      setToastMessage("Complaints summary PDF downloaded successfully!");
+      setShowToast(true);
+    } catch (error) {
+      console.error("Error generating complaints PDF:", error);
+      setToastMessage("Failed to generate PDF. Please try again.");
+      setShowToast(true);
+    }
+  };
+
+  const generateUserStatsPDF = () => {
+    if (!stats) return;
+
+    try {
+      setToastMessage("Generating User Statistics PDF...");
+      setShowToast(true);
+
+      // Create PDF document
+      const pdf = new jsPDF();
+
+      // Add title
+      pdf.setFontSize(18);
+      pdf.setTextColor(0, 47, 167); // #002fa7 - primary blue
+      pdf.text("User Statistics Summary", 105, 15, { align: "center" });
+
+      // Add date range
+      pdf.setFontSize(12);
+      pdf.setTextColor(100, 100, 100); // gray
+      const dateText = filter.month
+        ? `${filter.month} ${filter.year}`
+        : `${filter.year} - All Months`;
+      pdf.text(`Date Range: ${dateText}`, 105, 25, { align: "center" });
+
+      // Add total users
+      pdf.setFontSize(14);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text(`Total Users: ${stats.users.total}`, 20, 40);
+
+      // Add users by role
+      pdf.setFontSize(14);
+      pdf.text("User Distribution by Role:", 20, 55);
+
+      let yPos = 60;
+      stats.users.byRole.forEach((role) => {
+        pdf.setFontSize(12);
+        pdf.text(`• ${role.role}: ${role.count}`, 30, yPos);
+        yPos += 7;
+      });
+
+      // Add monthly/daily registration summary
+      yPos += 5;
+      pdf.setFontSize(14);
+
+      if (filter.month) {
+        pdf.text(`Daily User Registrations in ${filter.month}:`, 20, yPos);
+        yPos += 5;
+
+        // Find highest and lowest days
+        const dailyData = stats.users.monthly;
+        if (dailyData && dailyData.length > 0) {
+          const sortedData = [...dailyData].sort((a, b) => b.count - a.count);
+
+          pdf.setFontSize(12);
+          if (sortedData.length > 0) {
+            pdf.text(
+              `• Highest: Day ${sortedData[0].day || "N/A"} (${
+                sortedData[0].count
+              } registrations)`,
+              30,
+              yPos
+            );
+            yPos += 7;
+          }
+
+          if (sortedData.length > 1) {
+            pdf.text(
+              `• Lowest: Day ${
+                sortedData[sortedData.length - 1].day || "N/A"
+              } (${sortedData[sortedData.length - 1].count} registrations)`,
+              30,
+              yPos
+            );
+          }
+        }
+      } else {
+        pdf.text("Monthly User Registrations:", 20, yPos);
+        yPos += 5;
+
+        // Find highest and lowest months
+        const monthlyData = stats.users.monthly;
+        if (monthlyData && monthlyData.length > 0) {
+          const sortedData = [...monthlyData].sort((a, b) => b.count - a.count);
+
+          pdf.setFontSize(12);
+          if (sortedData.length > 0) {
+            pdf.text(
+              `• Highest: ${sortedData[0].month} (${sortedData[0].count} registrations)`,
+              30,
+              yPos
+            );
+            yPos += 7;
+          }
+
+          if (sortedData.length > 1) {
+            pdf.text(
+              `• Lowest: ${sortedData[sortedData.length - 1].month} (${
+                sortedData[sortedData.length - 1].count
+              } registrations)`,
+              30,
+              yPos
+            );
+          }
+        }
+      }
+
+      // Add footer
+      pdf.setFontSize(10);
+      pdf.setTextColor(150, 150, 150);
+      const today = new Date();
+      pdf.text(
+        `Generated on: ${today.toLocaleDateString()} at ${today.toLocaleTimeString()}`,
+        105,
+        280,
+        { align: "center" }
+      );
+
+      // Save the PDF
+      pdf.save(
+        `User_Statistics_Summary_${filter.year}_${filter.month || "All"}.pdf`
+      );
+
+      setToastMessage("User statistics summary PDF downloaded successfully!");
+      setShowToast(true);
+    } catch (error) {
+      console.error("Error generating user statistics PDF:", error);
+      setToastMessage("Failed to generate PDF. Please try again.");
+      setShowToast(true);
+    }
+  };
+  const generateUserTablePDF = () => {
+    if (!stats || !stats.users.userData) return;
+
+    try {
+      setToastMessage("Generating Users Table PDF...");
+      setShowToast(true);
+
+      // Create PDF document in landscape orientation for better table viewing
+      const pdf = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: "a4",
+      });
+
+      // Add title
+      pdf.setFontSize(18);
+      pdf.setTextColor(0, 47, 167); // #002fa7 - primary blue
+      pdf.text("Users Table Summary", pdf.internal.pageSize.width / 2, 15, {
+        align: "center",
+      });
+
+      // Add date
+      pdf.setFontSize(12);
+      pdf.setTextColor(100, 100, 100); // gray
+      const today = new Date();
+      pdf.text(
+        `Generated on: ${today.toLocaleDateString()}`,
+        pdf.internal.pageSize.width / 2,
+        25,
+        {
+          align: "center",
+        }
+      );
+
+      // Filter and sort users based on current view
+      const filteredSortedUsers = stats.users.userData
+        .filter((user) =>
+          Object.values(user)
+            .join(" ")
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
+        )
+        .sort((a, b) => {
+          const aValue = a[sortField];
+          const bValue = b[sortField];
+
+          const direction = sortDirection === "asc" ? 1 : -1;
+
+          if (typeof aValue === "boolean" && typeof bValue === "boolean") {
+            return aValue === bValue ? 0 : aValue ? direction : -direction;
+          }
+
+          if (typeof aValue === "number" && typeof bValue === "number") {
+            return (aValue - bValue) * direction;
+          }
+
+          const aStr = String(aValue || "");
+          const bStr = String(bValue || "");
+
+          return aStr.localeCompare(bStr) * direction;
+        });
+
+      // Add total and filtered counts
+      pdf.setFontSize(11);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text(`Total Users: ${stats.users.userData.length}`, 15, 35);
+      pdf.text(`Filtered Users: ${filteredSortedUsers.length}`, 60, 35);
+      if (searchTerm) {
+        pdf.text(`Search Term: "${searchTerm}"`, 105, 35);
+      }
+      pdf.text(`Sort by: ${String(sortField)} (${sortDirection})`, 180, 35);
+
+      // Set up table layout
+      const startY = 42;
+      const cellPadding = 2;
+      const pageWidth = pdf.internal.pageSize.width;
+      const tableWidth = pageWidth - 30; // 15mm margins on each side
+
+      // Define column structure (column widths should add up to tableWidth)
+      const columns = [
+        { header: "Name", key: "name", width: tableWidth * 0.2 },
+        { header: "Email", key: "email", width: tableWidth * 0.3 },
+        { header: "Phone", key: "phone", width: tableWidth * 0.15 },
+        { header: "Role", key: "role", width: tableWidth * 0.1 },
+        { header: "Created", key: "created_at", width: tableWidth * 0.15 },
+        { header: "Verified", key: "verified", width: tableWidth * 0.1 },
+      ];
+
+      // Calculate column start positions
+      const columnPositions = [];
+      let currentPosition = 15; // Start from left margin
+      columnPositions.push(currentPosition);
+
+      for (let i = 0; i < columns.length; i++) {
+        currentPosition += columns[i].width;
+        columnPositions.push(currentPosition);
+      }
+
+      // Draw table header background
+      pdf.setFillColor(242, 246, 255); // Light blue background for header
+      pdf.rect(15, startY, tableWidth, 8, "F");
+
+      // Draw table headers
+      pdf.setDrawColor(200, 200, 200);
+      pdf.setLineWidth(0.1);
+      pdf.line(15, startY, 15 + tableWidth, startY); // Top border
+      pdf.line(15, startY + 8, 15 + tableWidth, startY + 8); // Bottom border
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(0, 47, 167); // Primary blue
+      pdf.setFontSize(10);
+
+      // Draw column headers and vertical lines
+      for (let i = 0; i < columns.length; i++) {
+        // Draw column header text
+        pdf.text(
+          columns[i].header,
+          columnPositions[i] + cellPadding,
+          startY + 5
+        );
+
+        // Draw vertical line for this column
+        pdf.line(columnPositions[i], startY, columnPositions[i], startY + 8);
+      }
+
+      // Draw final vertical line
+      pdf.line(
+        columnPositions[columnPositions.length - 1],
+        startY,
+        columnPositions[columnPositions.length - 1],
+        startY + 8
+      );
+
+      // Add user data
+      let yPos = startY + 8; // Start after header
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(0, 0, 0); // Black text
+      pdf.setFontSize(9);
+
+      // Process rows with pagination
+      for (let i = 0; i < filteredSortedUsers.length; i++) {
+        const user = filteredSortedUsers[i];
+        const rowHeight = 7;
+
+        // Add new page if needed
+        if (yPos > pdf.internal.pageSize.height - 20) {
+          pdf.addPage();
+
+          // Reset position for new page
+          yPos = 15;
+
+          // Redraw header on new page
+          pdf.setFillColor(242, 246, 255);
+          pdf.rect(15, yPos, tableWidth, 8, "F");
+
+          pdf.setFont("helvetica", "bold");
+          pdf.setTextColor(0, 47, 167);
+          pdf.setFontSize(10);
+
+          // Draw column headers again
+          for (let j = 0; j < columns.length; j++) {
+            pdf.text(
+              columns[j].header,
+              columnPositions[j] + cellPadding,
+              yPos + 5
+            );
+
+            // Draw vertical line for this column
+            pdf.line(columnPositions[j], yPos, columnPositions[j], yPos + 8);
+          }
+
+          // Draw final vertical line and bottom border
+          pdf.line(
+            columnPositions[columnPositions.length - 1],
+            yPos,
+            columnPositions[columnPositions.length - 1],
+            yPos + 8
+          );
+          pdf.line(15, yPos, 15 + tableWidth, yPos); // Top border
+          pdf.line(15, yPos + 8, 15 + tableWidth, yPos + 8); // Bottom border
+
+          yPos += 8; // Move down past header
+
+          pdf.setFont("helvetica", "normal");
+          pdf.setTextColor(0, 0, 0);
+          pdf.setFontSize(9);
+        }
+
+        // Row background for alternating rows
+        if (i % 2 === 1) {
+          pdf.setFillColor(249, 250, 252);
+          pdf.rect(15, yPos, tableWidth, rowHeight, "F");
+        }
+
+        // Draw cell data
+        // Name
+        let name = user.name || "-";
+        if (name.length > 20) name = name.substring(0, 18) + "...";
+        pdf.text(name, columnPositions[0] + cellPadding, yPos + 4);
+
+        // Email
+        let email = user.email || "-";
+        if (email.length > 30) email = email.substring(0, 28) + "...";
+        pdf.text(email, columnPositions[1] + cellPadding, yPos + 4);
+
+        // Phone
+        let phone = user.phone || "-";
+        if (phone.length > 15) phone = phone.substring(0, 13) + "...";
+        pdf.text(phone, columnPositions[2] + cellPadding, yPos + 4);
+
+        // Role
+        pdf.text(user.role || "-", columnPositions[3] + cellPadding, yPos + 4);
+
+        // Created date
+        let created = "-";
+        if (user.created_at) {
+          try {
+            created = new Date(user.created_at).toLocaleDateString();
+          } catch (e) {
+            created = user.created_at;
+          }
+        }
+        pdf.text(created, columnPositions[4] + cellPadding, yPos + 4);
+
+        // Verified
+        pdf.text(
+          user.verified ? "Yes" : "No",
+          columnPositions[5] + cellPadding,
+          yPos + 4
+        );
+
+        // Draw row bottom border
+        pdf.setDrawColor(230, 230, 230);
+        pdf.line(15, yPos + rowHeight, 15 + tableWidth, yPos + rowHeight);
+
+        // Draw vertical borders for each column
+        for (let j = 0; j < columnPositions.length; j++) {
+          pdf.line(
+            columnPositions[j],
+            yPos,
+            columnPositions[j],
+            yPos + rowHeight
+          );
+        }
+
+        yPos += rowHeight; // Move to next row
+      }
+
+      // Add footer with record count
+      pdf.setFontSize(9);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(
+        `Report generated by Justify Admin Panel | ${today.toLocaleString()}`,
+        pdf.internal.pageSize.width / 2,
+        pdf.internal.pageSize.height - 10,
+        { align: "center" }
+      );
+
+      // Save the PDF
+      pdf.save(
+        `Users_Table_Report_${filter.year}_${filter.month || "All"}.pdf`
+      );
+
+      setToastMessage("Users table summary PDF downloaded successfully!");
+      setShowToast(true);
+    } catch (error) {
+      console.error("Error generating users table PDF:", error);
+      setToastMessage("Failed to generate PDF. Please try again.");
+      setShowToast(true);
+    }
+  };
+
   return (
     <>
       <IonCardHeader className="stats-card-header">
@@ -758,7 +1355,10 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
             <IonLabel>Complaints</IonLabel>
           </IonSegmentButton>
           <IonSegmentButton value="users">
-            <IonLabel>Users</IonLabel>
+            <IonLabel>User Stats</IonLabel>
+          </IonSegmentButton>
+          <IonSegmentButton value="usersTable">
+            <IonLabel>Users Table</IonLabel>
           </IonSegmentButton>
         </IonSegment>
 
@@ -919,6 +1519,17 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
                     </div>
                   </IonCol>
                 </IonRow>
+                <IonRow>
+                  <IonCol size="12" className="ion-text-end">
+                    <IonButton
+                      fill="outline"
+                      className="stats-outline-button"
+                      onClick={generateComplaintsPDF}
+                    >
+                      Download Complaints PDF
+                    </IonButton>
+                  </IonCol>
+                </IonRow>
               </IonGrid>
             )}
 
@@ -1044,11 +1655,457 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
                     </div>
                   </IonCol>
                 </IonRow>
+                <IonRow>
+                  <IonCol size="12" className="ion-text-end">
+                    <IonButton
+                      fill="outline"
+                      className="stats-outline-button"
+                      onClick={generateUserStatsPDF}
+                    >
+                      Download User Stats PDF
+                    </IonButton>
+                  </IonCol>
+                </IonRow>
+              </IonGrid>
+            )}
+
+            {activeTab === "usersTable" && stats && (
+              <IonGrid>
+                <IonRow>
+                  <IonCol size="12">
+                    <div
+                      className="user-table-container"
+                      style={{
+                        backgroundColor: "white",
+                        borderRadius: "10px",
+                        padding: "16px",
+                        boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
+                      }}
+                    >
+                      <div
+                        className="search-and-filter"
+                        style={{ marginBottom: "16px" }}
+                      >
+                        <IonLabel
+                          position="stacked"
+                          style={{ color: "#002fa7", fontWeight: "bold" }}
+                        >
+                          Search Users
+                        </IonLabel>
+                        <input
+                          type="text"
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          placeholder="Search by name, email, address..."
+                          style={{
+                            width: "100%",
+                            padding: "8px 12px",
+                            border: "1px solid #e0e0e0",
+                            borderRadius: "8px",
+                            fontSize: "0.9rem",
+                            boxShadow: "0 1px 3px rgba(0,0,0,0.05) inset",
+                            backgroundColor: "white",
+                          }}
+                        />
+                      </div>
+
+                      <div
+                        className="table-responsive"
+                        style={{ overflowX: "auto" }}
+                      >
+                        <table
+                          style={{
+                            width: "100%",
+                            borderCollapse: "collapse",
+                            fontSize: "0.9rem",
+                            minWidth: "900px", // Ensures horizontal scrolling on small screens
+                          }}
+                        >
+                          <thead>
+                            <tr style={{ backgroundColor: "#f5f7ff" }}>
+                              <th
+                                style={{
+                                  padding: "12px 8px",
+                                  textAlign: "left",
+                                  borderBottom: "2px solid #e0e0e0",
+                                  color: "#002fa7",
+                                  cursor: "pointer",
+                                  position: "sticky",
+                                  top: 0,
+                                  zIndex: 1,
+                                  backgroundColor: "#f5f7ff",
+                                }}
+                                onClick={() => {
+                                  if (sortField === "name") {
+                                    setSortDirection(
+                                      sortDirection === "asc" ? "desc" : "asc"
+                                    );
+                                  } else {
+                                    setSortField("name");
+                                    setSortDirection("asc");
+                                  }
+                                }}
+                              >
+                                Name{" "}
+                                {sortField === "name" &&
+                                  (sortDirection === "asc" ? "▲" : "▼")}
+                              </th>
+                              <th
+                                style={{
+                                  padding: "12px 8px",
+                                  textAlign: "left",
+                                  borderBottom: "2px solid #e0e0e0",
+                                  color: "#002fa7",
+                                  cursor: "pointer",
+                                  position: "sticky",
+                                  top: 0,
+                                  zIndex: 1,
+                                  backgroundColor: "#f5f7ff",
+                                }}
+                                onClick={() => {
+                                  if (sortField === "age") {
+                                    setSortDirection(
+                                      sortDirection === "asc" ? "desc" : "asc"
+                                    );
+                                  } else {
+                                    setSortField("age");
+                                    setSortDirection("asc");
+                                  }
+                                }}
+                              >
+                                Age{" "}
+                                {sortField === "age" &&
+                                  (sortDirection === "asc" ? "▲" : "▼")}
+                              </th>
+                              <th
+                                style={{
+                                  padding: "12px 8px",
+                                  textAlign: "left",
+                                  borderBottom: "2px solid #e0e0e0",
+                                  color: "#002fa7",
+                                  cursor: "pointer",
+                                  position: "sticky",
+                                  top: 0,
+                                  zIndex: 1,
+                                  backgroundColor: "#f5f7ff",
+                                }}
+                                onClick={() => {
+                                  if (sortField === "email") {
+                                    setSortDirection(
+                                      sortDirection === "asc" ? "desc" : "asc"
+                                    );
+                                  } else {
+                                    setSortField("email");
+                                    setSortDirection("asc");
+                                  }
+                                }}
+                              >
+                                Email{" "}
+                                {sortField === "email" &&
+                                  (sortDirection === "asc" ? "▲" : "▼")}
+                              </th>
+                              <th
+                                style={{
+                                  padding: "12px 8px",
+                                  textAlign: "left",
+                                  borderBottom: "2px solid #e0e0e0",
+                                  color: "#002fa7",
+                                  cursor: "pointer",
+                                  position: "sticky",
+                                  top: 0,
+                                  zIndex: 1,
+                                  backgroundColor: "#f5f7ff",
+                                }}
+                                onClick={() => {
+                                  if (sortField === "address") {
+                                    setSortDirection(
+                                      sortDirection === "asc" ? "desc" : "asc"
+                                    );
+                                  } else {
+                                    setSortField("address");
+                                    setSortDirection("asc");
+                                  }
+                                }}
+                              >
+                                Address{" "}
+                                {sortField === "address" &&
+                                  (sortDirection === "asc" ? "▲" : "▼")}
+                              </th>
+                              <th
+                                style={{
+                                  padding: "12px 8px",
+                                  textAlign: "left",
+                                  borderBottom: "2px solid #e0e0e0",
+                                  color: "#002fa7",
+                                  cursor: "pointer",
+                                  position: "sticky",
+                                  top: 0,
+                                  zIndex: 1,
+                                  backgroundColor: "#f5f7ff",
+                                }}
+                                onClick={() => {
+                                  if (sortField === "phone") {
+                                    setSortDirection(
+                                      sortDirection === "asc" ? "desc" : "asc"
+                                    );
+                                  } else {
+                                    setSortField("phone");
+                                    setSortDirection("asc");
+                                  }
+                                }}
+                              >
+                                Phone{" "}
+                                {sortField === "phone" &&
+                                  (sortDirection === "asc" ? "▲" : "▼")}
+                              </th>
+                              <th
+                                style={{
+                                  padding: "12px 8px",
+                                  textAlign: "left",
+                                  borderBottom: "2px solid #e0e0e0",
+                                  color: "#002fa7",
+                                  cursor: "pointer",
+                                  position: "sticky",
+                                  top: 0,
+                                  zIndex: 1,
+                                  backgroundColor: "#f5f7ff",
+                                }}
+                                onClick={() => {
+                                  if (sortField === "created_at") {
+                                    setSortDirection(
+                                      sortDirection === "asc" ? "desc" : "asc"
+                                    );
+                                  } else {
+                                    setSortField("created_at");
+                                    setSortDirection("desc");
+                                  }
+                                }}
+                              >
+                                Registration Date{" "}
+                                {sortField === "created_at" &&
+                                  (sortDirection === "asc" ? "▲" : "▼")}
+                              </th>
+                              <th
+                                style={{
+                                  padding: "12px 8px",
+                                  textAlign: "left",
+                                  borderBottom: "2px solid #e0e0e0",
+                                  color: "#002fa7",
+                                  cursor: "pointer",
+                                  position: "sticky",
+                                  top: 0,
+                                  zIndex: 1,
+                                  backgroundColor: "#f5f7ff",
+                                }}
+                                onClick={() => {
+                                  if (sortField === "verified") {
+                                    setSortDirection(
+                                      sortDirection === "asc" ? "desc" : "asc"
+                                    );
+                                  } else {
+                                    setSortField("verified");
+                                    setSortDirection("asc");
+                                  }
+                                }}
+                              >
+                                Verified{" "}
+                                {sortField === "verified" &&
+                                  (sortDirection === "asc" ? "▲" : "▼")}
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {stats.users.userData &&
+                              stats.users.userData
+                                .filter((user) =>
+                                  Object.values(user)
+                                    .join(" ")
+                                    .toLowerCase()
+                                    .includes(searchTerm.toLowerCase())
+                                )
+                                .sort((a, b) => {
+                                  const aValue = a[sortField];
+                                  const bValue = b[sortField];
+
+                                  if (sortField === "created_at") {
+                                    return sortDirection === "asc"
+                                      ? new Date(aValue as string).getTime() -
+                                          new Date(bValue as string).getTime()
+                                      : new Date(bValue as string).getTime() -
+                                          new Date(aValue as string).getTime();
+                                  }
+
+                                  if (
+                                    typeof aValue === "boolean" &&
+                                    typeof bValue === "boolean"
+                                  ) {
+                                    return sortDirection === "asc"
+                                      ? aValue === bValue
+                                        ? 0
+                                        : aValue
+                                        ? 1
+                                        : -1
+                                      : aValue === bValue
+                                      ? 0
+                                      : aValue
+                                      ? -1
+                                      : 1;
+                                  }
+
+                                  if (
+                                    typeof aValue === "number" &&
+                                    typeof bValue === "number"
+                                  ) {
+                                    return sortDirection === "asc"
+                                      ? aValue - bValue
+                                      : bValue - aValue;
+                                  }
+
+                                  if (
+                                    typeof aValue === "string" &&
+                                    typeof bValue === "string"
+                                  ) {
+                                    return sortDirection === "asc"
+                                      ? aValue.localeCompare(bValue)
+                                      : bValue.localeCompare(aValue);
+                                  }
+
+                                  return 0;
+                                })
+                                .map((user) => (
+                                  <tr
+                                    key={user.id}
+                                    style={{
+                                      borderBottom: "1px solid #f0f0f0",
+                                      backgroundColor: "white",
+                                      transition: "background-color 0.2s",
+                                    }}
+                                    onMouseOver={(e) =>
+                                      ((
+                                        e.currentTarget as HTMLTableRowElement
+                                      ).style.backgroundColor = "#f9f9ff")
+                                    }
+                                    onMouseOut={(e) =>
+                                      ((
+                                        e.currentTarget as HTMLTableRowElement
+                                      ).style.backgroundColor = "white")
+                                    }
+                                  >
+                                    <td style={{ padding: "12px 8px" }}>
+                                      {user.name}
+                                    </td>
+                                    <td style={{ padding: "12px 8px" }}>
+                                      {user.age || "-"}
+                                    </td>
+                                    <td style={{ padding: "12px 8px" }}>
+                                      {user.email}
+                                    </td>
+                                    <td style={{ padding: "12px 8px" }}>
+                                      {user.address || "-"}
+                                    </td>
+                                    <td style={{ padding: "12px 8px" }}>
+                                      {user.phone || "-"}
+                                    </td>
+                                    <td style={{ padding: "12px 8px" }}>
+                                      {new Date(
+                                        user.created_at
+                                      ).toLocaleDateString()}
+                                    </td>
+                                    <td style={{ padding: "12px 8px" }}>
+                                      <span
+                                        style={{
+                                          padding: "3px 8px",
+                                          borderRadius: "12px",
+                                          fontSize: "0.8rem",
+                                          fontWeight: 500,
+                                          backgroundColor: user.verified
+                                            ? "rgba(46, 213, 115, 0.15)"
+                                            : "rgba(255, 71, 87, 0.15)",
+                                          color: user.verified
+                                            ? "#2ecc71"
+                                            : "#ff4757",
+                                        }}
+                                      >
+                                        {user.verified ? "Yes" : "No"}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                ))}
+                          </tbody>
+                        </table>
+
+                        {stats.users.userData &&
+                          stats.users.userData.filter((user) =>
+                            Object.values(user)
+                              .join(" ")
+                              .toLowerCase()
+                              .includes(searchTerm.toLowerCase())
+                          ).length === 0 && (
+                            <div
+                              style={{
+                                padding: "30px 0",
+                                textAlign: "center",
+                                color: "#666",
+                              }}
+                            >
+                              No users found matching your search criteria.
+                            </div>
+                          )}
+                      </div>
+
+                      <div
+                        style={{
+                          marginTop: "16px",
+                          fontSize: "0.9rem",
+                          color: "#666",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <div>
+                          <strong>Total Records:</strong>{" "}
+                          {stats.users.userData
+                            ? stats.users.userData.length
+                            : 0}
+                        </div>
+                        <div>
+                          <strong>Filtered Records:</strong>{" "}
+                          {stats.users.userData
+                            ? stats.users.userData.filter((user) =>
+                                Object.values(user)
+                                  .join(" ")
+                                  .toLowerCase()
+                                  .includes(searchTerm.toLowerCase())
+                              ).length
+                            : 0}
+                        </div>
+                      </div>
+                    </div>
+                  </IonCol>
+                </IonRow>
+                <IonRow>
+                  <IonCol size="12" className="ion-text-end">
+                    <IonButton
+                      fill="outline"
+                      className="stats-outline-button"
+                      onClick={generateUserTablePDF}
+                    >
+                      Download Users Table PDF
+                    </IonButton>
+                  </IonCol>
+                </IonRow>
               </IonGrid>
             )}
           </>
         )}
       </IonCardContent>
+      <IonToast
+        isOpen={showToast}
+        message={toastMessage}
+        duration={3000}
+        onDidDismiss={() => setShowToast(false)}
+      />
     </>
   );
 };
