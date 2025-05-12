@@ -156,7 +156,7 @@ const InboxContainer: React.FC<ContainerProps> = ({
         // Try to fetch the current user from your auth API endpoint
         try {
           const response = await fetch(
-            "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/UserController/getCurrentUser",
+            "https://justifi.animal911.me/Justify/index.php/UserController/getCurrentUser",
             {
               credentials: "include", // Include cookies if using cookie-based auth
               headers: {
@@ -206,7 +206,7 @@ const InboxContainer: React.FC<ContainerProps> = ({
 
     try {
       // Make sure the endpoint includes user_id parameter
-      const endpoint = `https://ivory-swallow-404351.hostingersite.com/Justify/index.php/AnnouncementController/getUserAnnouncements?user_id=${userId}`;
+      const endpoint = `https://justifi.animal911.me/Justify/index.php/AnnouncementController/getUserAnnouncements?user_id=${userId}`;
 
       const response = await fetch(endpoint, {
         headers: {
@@ -291,7 +291,7 @@ const InboxContainer: React.FC<ContainerProps> = ({
       );
 
       const response = await fetch(
-        "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/AnnouncementController/markAsRead",
+        "https://justifi.animal911.me/Justify/index.php/AnnouncementController/markAsRead",
         {
           method: "POST",
           headers: {
@@ -584,58 +584,62 @@ const InboxContainer: React.FC<ContainerProps> = ({
               className="ion-padding"
               style={{ "--background": "white" }}
             >
-                <div className="announcement-detail">
+              <div className="announcement-detail">
                 {selectedAnnouncement.image && (
                   <div className="announcement-image-container">
-                  <IonImg
-                    src={
-                    selectedAnnouncement.image.includes("http://127.0.0.1/justify/uploads/")
-                      ? `https://ivory-swallow-404351.hostingersite.com/Justify/uploads/${selectedAnnouncement.image.replace(
-                        "http://127.0.0.1/justify/uploads/",
-                        ""
-                      )}`
-                      : selectedAnnouncement.image.startsWith("http")
-                      ? selectedAnnouncement.image
-                      : `https://ivory-swallow-404351.hostingersite.com/Justify/uploads/${selectedAnnouncement.image}`
-                    }
-                    alt="Announcement"
-                    className="announcement-image"
-                    onIonError={(e) => {
-                    const target = e.target as HTMLIonImgElement;
-                    console.error(`Failed to load image: ${target.src}`);
-                    target.style.display = "none";
-                    }}
-                  />
+                    <IonImg
+                      src={
+                        selectedAnnouncement.image.includes(
+                          "http://127.0.0.1/justify/uploads/"
+                        )
+                          ? `https://justifi.animal911.me/Justify/uploads/${selectedAnnouncement.image.replace(
+                              "http://127.0.0.1/justify/uploads/",
+                              ""
+                            )}`
+                          : selectedAnnouncement.image.startsWith("http")
+                          ? selectedAnnouncement.image
+                          : `https://justifi.animal911.me/Justify/uploads/${selectedAnnouncement.image}`
+                      }
+                      alt="Announcement"
+                      className="announcement-image"
+                      onIonError={(e) => {
+                        const target = e.target as HTMLIonImgElement;
+                        console.error(`Failed to load image: ${target.src}`);
+                        target.style.display = "none";
+                      }}
+                    />
                   </div>
                 )}
 
                 <IonText>
-                  <h2 className="announcement-title">{selectedAnnouncement.title}</h2>
+                  <h2 className="announcement-title">
+                    {selectedAnnouncement.title}
+                  </h2>
 
                   <div className="announcement-meta">
-                  <IonIcon
-                    icon={timeOutline}
-                    style={{ verticalAlign: "middle", marginRight: "6px" }}
-                  />
-                  {new Date(selectedAnnouncement.created_at).toLocaleString()}
-
-                  <span className="read-status">
                     <IonIcon
-                    icon={mailOpenOutline}
-                    style={{ verticalAlign: "middle", marginRight: "6px" }}
+                      icon={timeOutline}
+                      style={{ verticalAlign: "middle", marginRight: "6px" }}
                     />
-                    Read
-                  </span>
+                    {new Date(selectedAnnouncement.created_at).toLocaleString()}
+
+                    <span className="read-status">
+                      <IonIcon
+                        icon={mailOpenOutline}
+                        style={{ verticalAlign: "middle", marginRight: "6px" }}
+                      />
+                      Read
+                    </span>
                   </div>
 
                   <p className="announcement-content">
-                  {selectedAnnouncement.description ||
-                    "No description available"}
+                    {selectedAnnouncement.description ||
+                      "No description available"}
                   </p>
                 </IonText>
-                </div>
+              </div>
 
-                <style jsx>{`
+              <style jsx>{`
                 .announcement-detail {
                   padding: 8px 0;
                 }
@@ -675,7 +679,7 @@ const InboxContainer: React.FC<ContainerProps> = ({
                   margin: 16px 0;
                   color: #333;
                 }
-                `}</style>
+              `}</style>
             </IonContent>
             <div style={{ padding: "16px", background: "white" }}>
               {/* Removed the "Mark as Read" button */}

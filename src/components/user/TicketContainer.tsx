@@ -173,7 +173,7 @@ const TicketContainer: React.FC = () => {
   const fetchUserComplaints = async (userId: number) => {
     try {
       const response = await fetch(
-        `https://ivory-swallow-404351.hostingersite.com/Justify/index.php/ComplaintController/getAllComplaints?user_id=${userId}`,
+        `https://justifi.animal911.me/Justify/index.php/ComplaintController/getAllComplaints?user_id=${userId}`,
         {
           method: "GET",
           headers: {
@@ -211,7 +211,7 @@ const TicketContainer: React.FC = () => {
       }
 
       const response = await fetch(
-        `https://ivory-swallow-404351.hostingersite.com/Justify/index.php/ChatController/getMessages/${complaintId}`
+        `https://justifi.animal911.me/Justify/index.php/ChatController/getMessages/${complaintId}`
       );
 
       const data = await response.json();
@@ -261,7 +261,7 @@ const TicketContainer: React.FC = () => {
 
     try {
       const response = await fetch(
-        "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/ChatController/sendMessage",
+        "https://justifi.animal911.me/Justify/index.php/ChatController/sendMessage",
         {
           method: "POST",
           headers: {
@@ -374,7 +374,7 @@ const TicketContainer: React.FC = () => {
   const fetchComplaintTypes = async () => {
     try {
       const response = await fetch(
-        "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/ComplaintController/getComplaintTypes",
+        "https://justifi.animal911.me/Justify/index.php/ComplaintController/getComplaintTypes",
         {
           method: "GET",
           headers: {
@@ -864,77 +864,83 @@ const TicketContainer: React.FC = () => {
                     </div>
                   </div>
 
-                    <div className="complaint-detail-item">
+                  <div className="complaint-detail-item">
                     <strong>Complainant:</strong>
                     <span>{user?.name || "You"}</span>
-                    </div>
+                  </div>
 
-                    <div className="complaint-detail-item">
+                  <div className="complaint-detail-item">
                     <strong>Respondent:</strong>
                     <span>
                       {selectedComplaint.respondent || "Not specified"}
                     </span>
-                    </div>
+                  </div>
 
-                    <div className="complaint-detail-item">
+                  <div className="complaint-detail-item">
                     <strong>Complaint Type:</strong>
                     <span>{getComplaintTypeName(selectedComplaint)}</span>
-                    </div>
+                  </div>
 
-                    {selectedComplaint.description && (
+                  {selectedComplaint.description && (
                     <div className="complaint-detail-item">
                       <strong>Description:</strong>
                       <p
-                      style={{
-                        background: "#f5f5f5",
-                        padding: "10px",
-                        borderRadius: "8px",
-                        whiteSpace: "pre-wrap",
-                        margin: "8px 0",
-                      }}
+                        style={{
+                          background: "#f5f5f5",
+                          padding: "10px",
+                          borderRadius: "8px",
+                          whiteSpace: "pre-wrap",
+                          margin: "8px 0",
+                        }}
                       >
-                      {selectedComplaint.description}
+                        {selectedComplaint.description}
                       </p>
                     </div>
-                    )}
+                  )}
 
-                    {/* Display complaint image if available */}
-                    {selectedComplaint.image && (
+                  {/* Display complaint image if available */}
+                  {selectedComplaint.image && (
                     <div className="attachment-container">
                       <p>
-                      <strong>Attachment:</strong>
+                        <strong>Attachment:</strong>
                       </p>
                       <div className="image-container">
-                      <img
-                        src={`https://ivory-swallow-404351.hostingersite.com/Justify/uploads/complaints/${selectedComplaint.image}`}
-                        alt="Complaint attachment" 
-                        className="complaint-image"
-                        onClick={(e) => {
-                        // Allow image to be viewed in full size when clicked
-                        window.open(e.currentTarget.src, '_blank');
-                        }}
-                      />
+                        <img
+                          src={`https://justifi.animal911.me/Justify/uploads/complaints/${selectedComplaint.image}`}
+                          alt="Complaint attachment"
+                          className="complaint-image"
+                          onClick={(e) => {
+                            // Allow image to be viewed in full size when clicked
+                            window.open(e.currentTarget.src, "_blank");
+                          }}
+                        />
                       </div>
-                      <p style={{ fontSize: "0.8em", color: "#666", marginTop: "5px" }}>
-                      Tap image to view full size
+                      <p
+                        style={{
+                          fontSize: "0.8em",
+                          color: "#666",
+                          marginTop: "5px",
+                        }}
+                      >
+                        Tap image to view full size
                       </p>
                     </div>
-                    )}
+                  )}
 
-                    {/* Add the details field here */}
-                    {selectedComplaint.details && (
+                  {/* Add the details field here */}
+                  {selectedComplaint.details && (
                     <div className="complaint-detail-item">
                       <strong>Additional Details:</strong>
                       <p
-                      style={{
-                        background: "#f5f5f5",
-                        padding: "10px",
-                        borderRadius: "8px",
-                        whiteSpace: "pre-wrap",
-                        margin: "8px 0",
-                      }}
+                        style={{
+                          background: "#f5f5f5",
+                          padding: "10px",
+                          borderRadius: "8px",
+                          whiteSpace: "pre-wrap",
+                          margin: "8px 0",
+                        }}
                       >
-                      {selectedComplaint.details}
+                        {selectedComplaint.details}
                       </p>
                     </div>
                   )}

@@ -69,9 +69,9 @@ const DashboardContainer: React.FC = () => {
     if (user?.image) {
       console.log(
         "Image URL:",
-        `https://ivory-swallow-404351.hostingersite.com/Justify/uploads/${user.image}`
+        `https://justifi.animal911.me/Justify/uploads/${user.image}`
       );
-      fetch(`https://ivory-swallow-404351.hostingersite.com/Justify/uploads/${user.image}`)
+      fetch(`https://justifi.animal911.me/Justify/uploads/${user.image}`)
         .then((response) => {
           if (!response.ok) {
             console.error("Image not found or server error:", response.status);

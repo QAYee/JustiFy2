@@ -125,13 +125,13 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
 
       // Fetch complaints statistics
       const complaintResponse = await fetch(
-        `https://ivory-swallow-404351.hostingersite.com/Justify/index.php/StatisticsController/complaints?${params}`
+        `https://justifi.animal911.me/Justify/index.php/StatisticsController/complaints?${params}`
       );
       const complaintData = await complaintResponse.json();
 
       // Fetch user statistics
       const userResponse = await fetch(
-        `https://ivory-swallow-404351.hostingersite.com/Justify/index.php/StatisticsController/users?${params}`
+        `https://justifi.animal911.me/Justify/index.php/StatisticsController/users?${params}`
       );
       const userData = await userResponse.json();
 

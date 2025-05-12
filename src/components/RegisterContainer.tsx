@@ -104,7 +104,7 @@ const RegisterContainer: React.FC = () => {
 
       // Call backend API to send verification code
       const response = await fetch(
-        "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/EmailController/sendVerificationCode",
+        "https://justifi.animal911.me/Justify/index.php/EmailController/sendVerificationCode",
         {
           method: "POST",
           headers: {
@@ -221,7 +221,7 @@ const RegisterContainer: React.FC = () => {
     try {
       // Send registration request
       const response = await fetch(
-        "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/RegisterController/register",
+        "https://justifi.animal911.me/Justify/index.php/RegisterController/register",
         {
           method: "POST",
           body: userData,
@@ -282,21 +282,20 @@ const RegisterContainer: React.FC = () => {
         onDidDismiss={() => setShowPicker(false)}
         className="datetime-modal"
       >
-          <div className="ion-padding">
-            <h2>Select Birthdate</h2>
-            <IonDatetime
-              value={birthdate}
-              min="1900-01-01"
-              max="2025-12-31"
-              onIonChange={handleBirthdateChange}
-              presentation="date"
-              showDefaultButtons={true}
-              doneText="Confirm"
-              cancelText="Cancel"
-              className="custom-datetime"
-            />
-          </div>
-        
+        <div className="ion-padding">
+          <h2>Select Birthdate</h2>
+          <IonDatetime
+            value={birthdate}
+            min="1900-01-01"
+            max="2025-12-31"
+            onIonChange={handleBirthdateChange}
+            presentation="date"
+            showDefaultButtons={true}
+            doneText="Confirm"
+            cancelText="Cancel"
+            className="custom-datetime"
+          />
+        </div>
       </IonModal>
 
       <IonItem className="register-form-item">

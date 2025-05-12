@@ -71,7 +71,7 @@ const Home: React.FC = () => {
   const fetchNewsData = async () => {
     try {
       const response = await fetch(
-        "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/NewsController/getNews",
+        "https://justifi.animal911.me/Justify/index.php/NewsController/getNews",
         {
           headers: { "Content-Type": "application/json" },
         }
@@ -214,7 +214,7 @@ const Home: React.FC = () => {
                     }}
                   >
                     <IonImg
-                      src={`https://ivory-swallow-404351.hostingersite.com/Justify/uploads/${latestNews.image}`}
+                      src={`https://justifi.animal911.me/Justify/uploads/${latestNews.image}`}
                       style={{
                         width: "100%",
                         maxHeight: "400px",

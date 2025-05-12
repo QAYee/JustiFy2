@@ -56,7 +56,7 @@ import { useHistory } from "react-router-dom";
 import "./DashboardContainer.css";
 
 // Update the API_BASE_URL to match the correct path for your controller
-const API_BASE_URL = "https://ivory-swallow-404351.hostingersite.com/Justify/index.php"; // Define the API base URL
+const API_BASE_URL = "https://justifi.animal911.me/Justify/index.php"; // Define the API base URL
 
 // Add this function to get the authentication token
 const getAuthToken = () => {
@@ -131,10 +131,10 @@ const DashboardContainer: React.FC = () => {
     if (user?.image) {
       console.log(
         "Image URL:",
-        `https://ivory-swallow-404351.hostingersite.com/Justify/uploads/${user.image}`
+        `https://justifi.animal911.me/Justify/uploads/${user.image}`
       );
       // Test image availability
-      fetch(`https://ivory-swallow-404351.hostingersite.com/Justify/uploads/${user.image}`)
+      fetch(`https://justifi.animal911.me/Justify/uploads/${user.image}`)
         .then((response) => {
           if (!response.ok) {
             console.error("Image not found or server error:", response.status);
@@ -368,7 +368,7 @@ const DashboardContainer: React.FC = () => {
         >
           {user?.image ? (
             <img
-              src={`https://ivory-swallow-404351.hostingersite.com/Justify/uploads/images/${user.image}`}
+              src={`https://justifi.animal911.me/Justify/uploads/images/${user.image}`}
               alt={user?.name}
               onError={(e) => {
                 console.log("Image failed to load:", e.currentTarget.src);

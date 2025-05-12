@@ -137,8 +137,8 @@ const NewsContainer: React.FC = () => {
     // Determine which endpoint to use based on content type
     const endpoint =
       formData.contentType === "news"
-        ? "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/NewsController/addNews"
-        : "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/AnnouncementController/addAnnouncement";
+        ? "https://justifi.animal911.me/Justify/index.php/NewsController/addNews"
+        : "https://justifi.animal911.me/Justify/index.php/AnnouncementController/addAnnouncement";
 
     try {
       const response = await fetch(endpoint, {
@@ -181,7 +181,7 @@ const NewsContainer: React.FC = () => {
     try {
       // Fetch news
       const newsResponse = await fetch(
-        "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/NewsController/getNews",
+        "https://justifi.animal911.me/Justify/index.php/NewsController/getNews",
         {
           headers: { "Content-Type": "application/json" },
         }
@@ -197,7 +197,7 @@ const NewsContainer: React.FC = () => {
 
       // Fetch announcements
       const announcementResponse = await fetch(
-        "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/AnnouncementController/getAnnouncements",
+        "https://justifi.animal911.me/Justify/index.php/AnnouncementController/getAnnouncements",
         {
           headers: { "Content-Type": "application/json" },
         }
@@ -302,7 +302,7 @@ const NewsContainer: React.FC = () => {
   const fetchUsers = async () => {
     try {
       const response = await fetch(
-        "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/AnnouncementController/getUsers",
+        "https://justifi.animal911.me/Justify/index.php/AnnouncementController/getUsers",
         {
           headers: { "Content-Type": "application/json" },
         }
@@ -352,7 +352,7 @@ const NewsContainer: React.FC = () => {
       if (cleanImagePath.startsWith("http")) {
         setPreviewUrl(cleanImagePath);
       } else {
-        const imageUrl = `https://ivory-swallow-404351.hostingersite.com/Justify/uploads/${cleanImagePath}`;
+        const imageUrl = `https://justifi.animal911.me/Justify/uploads/${cleanImagePath}`;
         setPreviewUrl(imageUrl);
       }
     } else {
@@ -387,8 +387,8 @@ const NewsContainer: React.FC = () => {
     // Determine which endpoint to use based on content type
     const endpoint =
       formData.contentType === "news"
-        ? "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/NewsController/updateNews"
-        : "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/AnnouncementController/updateAnnouncement";
+        ? "https://justifi.animal911.me/Justify/index.php/NewsController/updateNews"
+        : "https://justifi.animal911.me/Justify/index.php/AnnouncementController/updateAnnouncement";
 
     try {
       const response = await fetch(endpoint, {
@@ -438,8 +438,8 @@ const NewsContainer: React.FC = () => {
     const isAnnouncement = contentToDelete?.contentType === "announcement";
 
     const endpoint = isAnnouncement
-      ? "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/AnnouncementController/deleteAnnouncement"
-      : "https://ivory-swallow-404351.hostingersite.com/Justify/index.php/NewsController/deleteNews";
+      ? "https://justifi.animal911.me/Justify/index.php/AnnouncementController/deleteAnnouncement"
+      : "https://justifi.animal911.me/Justify/index.php/NewsController/deleteNews";
 
     try {
       const response = await fetch(endpoint, {
@@ -970,14 +970,16 @@ const NewsContainer: React.FC = () => {
                         >
                           <IonImg
                             src={
-                              item.image.includes("http://127.0.0.1/justify/uploads/")
-                                ? `https://ivory-swallow-404351.hostingersite.com/Justify/uploads/${item.image.replace(
+                              item.image.includes(
+                                "http://127.0.0.1/justify/uploads/"
+                              )
+                                ? `https://justifi.animal911.me/Justify/uploads/${item.image.replace(
                                     "http://127.0.0.1/justify/uploads/",
                                     ""
                                   )}`
                                 : item.image.startsWith("http")
                                 ? item.image
-                                : `https://ivory-swallow-404351.hostingersite.com/Justify/uploads/${item.image}`
+                                : `https://justifi.animal911.me/Justify/uploads/${item.image}`
                             }
                             alt="Content Image"
                             style={{
@@ -987,7 +989,9 @@ const NewsContainer: React.FC = () => {
                             }}
                             onIonError={(e) => {
                               const target = e.target as HTMLIonImgElement;
-                              console.error(`Failed to load image: ${target.src}`);
+                              console.error(
+                                `Failed to load image: ${target.src}`
+                              );
                               target.style.display = "none";
                             }}
                           />

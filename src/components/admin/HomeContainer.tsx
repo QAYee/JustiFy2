@@ -110,7 +110,7 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
 
     try {
       const response = await fetch(
-        `https://ivory-swallow-404351.hostingersite.com/Justify/index.php/ComplaintController/getAllComplaints`,
+        `https://justifi.animal911.me/Justify/index.php/ComplaintController/getAllComplaints`,
         {
           method: "GET",
           headers: {
@@ -172,73 +172,78 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
   return (
     <div className="ion-padding">
       {/* Admin Dashboard Header */}
-      <div style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        width: "100%",
-        margin: "0 auto"
-      }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+          margin: "0 auto",
+        }}
+      >
         <IonCard
           className="ion-no-margin"
           color="primary"
-          style={{ borderRadius: "12px", marginBottom: "24px", maxWidth: "800px", width: "100%" }}
+          style={{
+            borderRadius: "12px",
+            marginBottom: "24px",
+            maxWidth: "800px",
+            width: "100%",
+          }}
         >
           <IonCardHeader>
-        <IonCardTitle style={{ fontSize: "24px", fontWeight: "700" }}>
-          Admin Dashboard
-        </IonCardTitle>
-        <IonCardSubtitle style={{ fontSize: "16px", marginTop: "4px" }}>
-          Welcome to the JustiFi Admin Portal
-        </IonCardSubtitle>
+            <IonCardTitle style={{ fontSize: "24px", fontWeight: "700" }}>
+              Admin Dashboard
+            </IonCardTitle>
+            <IonCardSubtitle style={{ fontSize: "16px", marginTop: "4px" }}>
+              Welcome to the JustiFi Admin Portal
+            </IonCardSubtitle>
           </IonCardHeader>
           <IonCardContent>
-        <p style={{ marginBottom: "20px", fontSize: "15px" }}>
-          Manage complaints, users, and community announcements from this
-          central dashboard.
-        </p>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "12px",
-            flexWrap: "wrap"
-          }}
-        >
-          <IonButton
-            fill="solid"
-            color="light"
-            href="/admin/complain"
-            style={{ fontWeight: "500" }}
-          >
-            View Complaints
-            <IonIcon slot="end" icon={arrowForwardOutline} />
-          </IonButton>
-          <IonButton
-            fill="solid"
-            color="light"
-            href="/admin/inbox"
-            style={{ fontWeight: "500" }}
-          >
-            <IonIcon slot="start" icon={notificationsOutline} />
-            Notifications
-            <IonBadge
-          color="danger"
-          style={{
-            marginLeft: "8px",
-            borderRadius: "10px",
-            padding: "4px 8px",
-          }}
+            <p style={{ marginBottom: "20px", fontSize: "15px" }}>
+              Manage complaints, users, and community announcements from this
+              central dashboard.
+            </p>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "12px",
+                flexWrap: "wrap",
+              }}
             >
-          5
-            </IonBadge>
-          </IonButton>
-        </div>
+              <IonButton
+                fill="solid"
+                color="light"
+                href="/admin/complain"
+                style={{ fontWeight: "500" }}
+              >
+                View Complaints
+                <IonIcon slot="end" icon={arrowForwardOutline} />
+              </IonButton>
+              <IonButton
+                fill="solid"
+                color="light"
+                href="/admin/inbox"
+                style={{ fontWeight: "500" }}
+              >
+                <IonIcon slot="start" icon={notificationsOutline} />
+                Notifications
+                <IonBadge
+                  color="danger"
+                  style={{
+                    marginLeft: "8px",
+                    borderRadius: "10px",
+                    padding: "4px 8px",
+                  }}
+                >
+                  5
+                </IonBadge>
+              </IonButton>
+            </div>
           </IonCardContent>
         </IonCard>
       </div>
-
-  
 
       {/* Recent Complaints */}
       <h2 style={sectionHeaderStyle}>
@@ -420,7 +425,7 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
                 fill="outline"
                 slot="end"
                 size="small"
-                style={{ fontWeight: "500" , color: "#3880ff"}}
+                style={{ fontWeight: "500", color: "#3880ff" }}
               >
                 Manage
               </IonButton>
@@ -431,7 +436,7 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
           <IonButton
             expand="block"
             fill="outline"
-            style={{ marginTop: "8px", fontWeight: "500" , color: "#3880ff" }}
+            style={{ marginTop: "8px", fontWeight: "500", color: "#3880ff" }}
           >
             Manage Events
             <IonIcon slot="end" icon={arrowForwardOutline} />

@@ -30,7 +30,7 @@ import {
 import "./MessageContainer.css";
 
 // Base URL for API calls
-const API_BASE_URL = "https://ivory-swallow-404351.hostingersite.com/Justify/index.php";
+const API_BASE_URL = "https://justifi.animal911.me/Justify/index.php";
 
 interface Message {
   id: number;
