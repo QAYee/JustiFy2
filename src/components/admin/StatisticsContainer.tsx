@@ -28,6 +28,9 @@ import { Chart as ChartJS, ArcElement } from "chart.js";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { printOutline, downloadOutline } from "ionicons/icons";
+import { Capacitor } from "@capacitor/core";
+import { Filesystem, Directory } from "@capacitor/filesystem";
+import { Share } from "@capacitor/share";
 
 // Import the CSS file
 import "./StatisticsContainer.css";
@@ -135,6 +138,28 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
 
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+
+  // Utility to detect if running in Capacitor (mobile)
+  const isCapacitor = Capacitor.isNativePlatform();
+
+  // Utility to save PDF on mobile (no share)
+  async function savePDFMobileOnly(pdfBlob: Blob, fileName: string) {
+    // Convert blob to base64
+    const arrayBuffer = await pdfBlob.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+    let binary = "";
+    for (let i = 0; i < uint8Array.length; i++) {
+      binary += String.fromCharCode(uint8Array[i]);
+    }
+    const base64 = btoa(binary);
+
+    // Save to Filesystem (base64 is default if encoding is not set)
+    await Filesystem.writeFile({
+      path: fileName,
+      data: base64,
+      directory: Directory.Documents,
+    });
+  }
 
   const printComplaintsReport = () => {
     if (!stats) return;
@@ -1262,7 +1287,7 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
   const [sortField, setSortField] = useState<keyof UserData>("role");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  const generateComplaintsPDF = () => {
+  const generateComplaintsPDF = async () => {
     if (!stats) return;
 
     try {
@@ -1395,12 +1420,23 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
         { align: "center" }
       );
 
-      // Save the PDF
-      pdf.save(
-        `Complaints_Summary_${filter.year}_${filter.month || "All"}.pdf`
-      );
+      // Save or share PDF
+      if (isCapacitor) {
+        const pdfBlob = pdf.output("blob");
+        await savePDFMobileOnly(
+          pdfBlob,
+          `Complaints_Summary_${filter.year}_${filter.month || "All"}.pdf`
+        );
+        setToastMessage(
+          "Complaints summary PDF saved to device (Documents folder)!"
+        );
+      } else {
+        pdf.save(
+          `Complaints_Summary_${filter.year}_${filter.month || "All"}.pdf`
+        );
+        setToastMessage("Complaints summary PDF downloaded successfully!");
+      }
 
-      setToastMessage("Complaints summary PDF downloaded successfully!");
       setShowToast(true);
     } catch (error) {
       console.error("Error generating complaints PDF:", error);
@@ -1409,7 +1445,7 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
     }
   };
 
-  const generateUserStatsPDF = () => {
+  const generateUserStatsPDF = async () => {
     if (!stats) return;
 
     try {
@@ -1525,12 +1561,23 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
         { align: "center" }
       );
 
-      // Save the PDF
-      pdf.save(
-        `User_Statistics_Summary_${filter.year}_${filter.month || "All"}.pdf`
-      );
+      // Save or share PDF
+      if (isCapacitor) {
+        const pdfBlob = pdf.output("blob");
+        await savePDFMobileOnly(
+          pdfBlob,
+          `User_Statistics_Summary_${filter.year}_${filter.month || "All"}.pdf`
+        );
+        setToastMessage(
+          "User statistics summary PDF saved to device (Documents folder)!"
+        );
+      } else {
+        pdf.save(
+          `User_Statistics_Summary_${filter.year}_${filter.month || "All"}.pdf`
+        );
+        setToastMessage("User statistics summary PDF downloaded successfully!");
+      }
 
-      setToastMessage("User statistics summary PDF downloaded successfully!");
       setShowToast(true);
     } catch (error) {
       console.error("Error generating user statistics PDF:", error);
@@ -1538,7 +1585,8 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
       setShowToast(true);
     }
   };
-  const generateUserTablePDF = () => {
+
+  const generateUserTablePDF = async () => {
     if (!stats || !stats.users.userData) return;
 
     try {
@@ -1786,12 +1834,23 @@ const StatisticsContainer: React.FC<ContainerProps> = ({ name }) => {
       // Draw final row bottom border and table right border
       pdf.line(15, yPos, 15 + tableWidth, yPos);
 
-      // Save the PDF
-      pdf.save(
-        `Users_Table_Report_${filter.year}_${filter.month || "All"}.pdf`
-      );
+      // Save or share PDF
+      if (isCapacitor) {
+        const pdfBlob = pdf.output("blob");
+        await savePDFMobileOnly(
+          pdfBlob,
+          `Users_Table_Report_${filter.year}_${filter.month || "All"}.pdf`
+        );
+        setToastMessage(
+          "Users table summary PDF saved to device (Documents folder)!"
+        );
+      } else {
+        pdf.save(
+          `Users_Table_Report_${filter.year}_${filter.month || "All"}.pdf`
+        );
+        setToastMessage("Users table summary PDF downloaded successfully!");
+      }
 
-      setToastMessage("Users table summary PDF downloaded successfully!");
       setShowToast(true);
     } catch (error) {
       console.error("Error generating users table PDF:", error);
