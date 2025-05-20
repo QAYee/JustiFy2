@@ -340,9 +340,9 @@ const NewsContainer: React.FC = () => {
       // Clean up the image URL if it contains localhost path
       let cleanImagePath = news.image;
 
-      if (cleanImagePath.includes("http://127.0.0.1/justify/uploads/")) {
+      if (cleanImagePath.includes("http://justifi.animal911.me/justify/uploads/")) {
         cleanImagePath = cleanImagePath.replace(
-          "http://127.0.0.1/justify/uploads/",
+          "http://justifi.animal911.me/justify/uploads/",
           ""
         );
       }

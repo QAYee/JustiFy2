@@ -94,7 +94,59 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
   return (
     <div className="home-container">
       {/* Welcome Card */}
-      <IonCard style={{ borderRadius: '15px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', overflow: 'hidden', margin: '16px auto', maxWidth: '800px' }}>
+      
+
+      {/* Announcements Section */}
+      <h2 className="section-header">
+        <IonIcon icon={megaphoneOutline} />
+        Announcements & Events
+      </h2>
+
+      {announcements.map((announcement) => (
+        <IonCard key={announcement.id}>
+          <img
+            alt={announcement.title}
+            src={announcement.image || "/placeholder.svg"}
+            style={{ maxHeight: "150px", objectFit: "cover", width: "100%" }}
+          />
+          <IonCardHeader>
+            <IonCardSubtitle>
+              {announcement.subtitle}
+              {announcement.important && (
+                <IonChip
+                  color="danger"
+                  outline={true}
+                  style={{ marginLeft: "8px" }}
+                >
+                  <IonIcon icon={alertCircleOutline} />
+                  <IonLabel>Important</IonLabel>
+                </IonChip>
+              )}
+            </IonCardSubtitle>
+            <IonCardTitle>{announcement.title}</IonCardTitle>
+          </IonCardHeader>
+          <IonCardContent>
+            <p style={{ marginBottom: "12px" }}>{announcement.content}</p>
+            <p className="date-text">
+              <IonIcon icon={calendarOutline} />
+              {announcement.date}
+            </p>
+            <IonButton fill="clear" size="small" style={{ marginTop: "8px" }}>
+              Read More
+              <IonIcon slot="end" icon={arrowForwardOutline} />
+            </IonButton>
+          </IonCardContent>
+        </IonCard>
+      ))}
+
+    
+   <h2 className="section-header">
+        <IonIcon icon={megaphoneOutline} />
+        File a Complaint
+      </h2>
+
+
+<IonCard style={{ borderRadius: '15px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', overflow: 'hidden', margin: '16px auto', maxWidth: '800px' }}>
         <div style={{ position: 'relative' }}>
           <img
         alt="Barangay Hall"
@@ -141,52 +193,6 @@ const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
           </div>
         </IonCardContent>
       </IonCard>
-
-      {/* Announcements Section */}
-      <h2 className="section-header">
-        <IonIcon icon={megaphoneOutline} />
-        Announcements & Events
-      </h2>
-
-      {announcements.map((announcement) => (
-        <IonCard key={announcement.id}>
-          <img
-            alt={announcement.title}
-            src={announcement.image || "/placeholder.svg"}
-            style={{ maxHeight: "150px", objectFit: "cover", width: "100%" }}
-          />
-          <IonCardHeader>
-            <IonCardSubtitle>
-              {announcement.subtitle}
-              {announcement.important && (
-                <IonChip
-                  color="danger"
-                  outline={true}
-                  style={{ marginLeft: "8px" }}
-                >
-                  <IonIcon icon={alertCircleOutline} />
-                  <IonLabel>Important</IonLabel>
-                </IonChip>
-              )}
-            </IonCardSubtitle>
-            <IonCardTitle>{announcement.title}</IonCardTitle>
-          </IonCardHeader>
-          <IonCardContent>
-            <p style={{ marginBottom: "12px" }}>{announcement.content}</p>
-            <p className="date-text">
-              <IonIcon icon={calendarOutline} />
-              {announcement.date}
-            </p>
-            <IonButton fill="clear" size="small" style={{ marginTop: "8px" }}>
-              Read More
-              <IonIcon slot="end" icon={arrowForwardOutline} />
-            </IonButton>
-          </IonCardContent>
-        </IonCard>
-      ))}
-
-    
-
      
 
       {/* News Section */}
