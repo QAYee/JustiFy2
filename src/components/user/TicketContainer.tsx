@@ -40,6 +40,7 @@ import {
   timeOutline,
 } from "ionicons/icons";
 import "./TicketContainer.css";
+import { color } from "html2canvas/dist/types/css/types/color";
 
 interface UserData {
   name: string;
@@ -421,9 +422,9 @@ const TicketContainer: React.FC = () => {
           style={{
             padding: "16px",
             fontSize: "24px",
-            color: "#0066cc",
             marginBottom: "16px",
             fontWeight: "bold",
+            color: "#fffff",
           }}
         >
           Your Recent Complaints
