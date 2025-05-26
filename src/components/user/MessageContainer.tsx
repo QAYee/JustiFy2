@@ -175,23 +175,12 @@ const MessageContainer: React.FC<{ name: string }> = ({ name }) => {
 
   // Add this function before your return statement in MessageContainer
   const sendAutomaticAdminResponse = async (userMessageId: number) => {
-    // Check if auto-response was already sent recently
-    const lastAutoResponseTime = localStorage.getItem(
-      `lastAutoResponse_${currentUserId}`
-    );
-    const currentTime = new Date().getTime();
-
-    // If there was a previous auto-response, check the time difference
-    if (lastAutoResponseTime) {
-      const timeSinceLastResponse =
-        currentTime - parseInt(lastAutoResponseTime);
-      const sixHoursInMs = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
-
-      // If it's been less than 6 hours, don't send another auto-response
-      if (timeSinceLastResponse < sixHoursInMs) {
-        console.log("Auto-response skipped - already sent within last 6 hours");
-        return;
-      }
+    // Only send auto-response if not already sent for this conversation
+    const autoResponseKey = `autoResponseSent_${
+      conversationId || currentUserId
+    }`;
+    if (localStorage.getItem(autoResponseKey) === "true") {
+      return; // Already sent, do not send again
     }
 
     // Wait 2 seconds to simulate admin response delay
@@ -208,48 +197,25 @@ const MessageContainer: React.FC<{ name: string }> = ({ name }) => {
     };
 
     try {
-      // Add the auto-response to the messages state
       setMessages((prevMessages) => [...prevMessages, autoResponse]);
-
-      // Save the time of this auto-response
-      localStorage.setItem(
-        `lastAutoResponse_${currentUserId}`,
-        currentTime.toString()
-      );
+      localStorage.setItem(autoResponseKey, "true"); // Mark as sent
 
       // Optionally save this auto-response to the database
-      const response = await fetch(
-        `${API_BASE_URL}/MessageController/sendAutoResponse`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_id: currentUserId,
-            message: autoResponse.text,
-            is_admin: 1, // 1 for admin
-            in_response_to: userMessageId,
-            timestamp: currentTime, // Also send timestamp to server
-          }),
-        }
-      );
-
-      // If you want to handle the server response
-      if (response.ok) {
-        const data = await response.json();
-        if (data.status) {
-          // Update the auto-response with the correct ID from server
-          setMessages((prevMessages) =>
-            prevMessages.map((msg) =>
-              msg.id === autoResponse.id ? { ...msg, id: data.data.id } : msg
-            )
-          );
-        }
-      }
+      await fetch(`${API_BASE_URL}/MessageController/sendAutoResponse`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: currentUserId,
+          message: autoResponse.text,
+          is_admin: 1,
+          in_response_to: userMessageId,
+          timestamp: Date.now(),
+        }),
+      });
     } catch (error) {
       console.error("Error sending automatic response:", error);
-      // Even if server storage fails, keep the auto-response in UI
     }
   };
 
