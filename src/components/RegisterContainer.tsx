@@ -46,6 +46,10 @@ const RegisterContainer: React.FC = () => {
   const [verificationError, setVerificationError] = useState("");
   const [showVerificationAlert, setShowVerificationAlert] = useState(false);
 
+  const [passwordTouched, setPasswordTouched] = useState(false);
+
+  const passwordValid = /^(?=.*\d).{8,}$/.test(password);
+
   const calculateAge = (dob: string): string => {
     const birthDate = new Date(dob);
     const today = new Date();
@@ -151,6 +155,19 @@ const RegisterContainer: React.FC = () => {
       !confirmPassword
     ) {
       alert("All fields are required");
+      return false;
+    }
+
+    // Age requirement: must be 18 or above
+    if (parseInt(age, 10) < 18) {
+      alert("You must be at least 18 years old to register.");
+      return false;
+    }
+
+    // Password must be at least 8 characters and contain at least one number
+    const passwordRegex = /^(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      setPasswordTouched(true); // Show the hint in red
       return false;
     }
 
@@ -338,9 +355,25 @@ const RegisterContainer: React.FC = () => {
           type="password"
           value={password}
           onIonChange={(e) => setPassword(e.detail.value || "")}
+          onIonBlur={() => setPasswordTouched(true)}
           required
         />
       </IonItem>
+      {/* Password requirements hint */}
+      {(passwordTouched || password) && (
+        <div
+          style={{
+            color: passwordValid ? "green" : "red",
+            fontSize: "0.95em",
+            marginLeft: "16px",
+            marginBottom: "8px",
+          }}
+        >
+          {passwordValid
+            ? "Password meets requirements."
+            : "Password must be at least 8 characters and contain at least one number."}
+        </div>
+      )}
 
       <IonItem className="register-form-item">
         <IonLabel position="floating">Confirm Password</IonLabel>
